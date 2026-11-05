@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+artifacts/sisa/*.joblib
+artifacts/models/*.joblib
+artifacts/evaluation/
+logs/*.log

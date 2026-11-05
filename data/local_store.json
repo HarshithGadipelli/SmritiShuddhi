@@ -1,0 +1,102 @@
+{
+  "news": [
+    {
+      "news_id": "NEWS_REAL_001",
+      "sample_id": "SYN_REAL_001",
+      "title": "ISRO Releases Scientific Data Archive from Chandrayaan Mission on ISSDC",
+      "text": "Indian Space Research Organisation (ISRO) has officially opened the scientific payload repository on the Indian Space Science Data Centre for researchers globally.",
+      "source": "ISRO Press Office",
+      "author": "Dr. S. Nair",
+      "category": "Science & Space",
+      "status": "PUBLISHED",
+      "fake_probability": 0.08,
+      "real_probability": 0.92,
+      "risk_band": "LOW_RISK_FACTUAL",
+      "action_recommended": "ALLOW_AUTOMATIC_BROADCAST",
+      "created_at": "2026-11-03T13:20:24.011244+00:00",
+      "_id": "news_1793712024011_0"
+    },
+    {
+      "news_id": "NEWS_REAL_002",
+      "sample_id": "SYN_REAL_002",
+      "title": "India Meteorological Department Issues Heatwave Alert for Northern States",
+      "text": "IMD red alert advisory issued for Delhi, Rajasthan, and Haryana with temperatures touching 45C. Public advised to stay hydrated.",
+      "source": "IMD Weather Bureau",
+      "author": "Bureau Reporter",
+      "category": "Weather",
+      "status": "PUBLISHED",
+      "fake_probability": 0.05,
+      "real_probability": 0.95,
+      "risk_band": "LOW_RISK_FACTUAL",
+      "action_recommended": "ALLOW_AUTOMATIC_BROADCAST",
+      "created_at": "2026-11-03T13:20:24.011244+00:00",
+      "_id": "news_1793712024012_1"
+    },
+    {
+      "news_id": "NEWS_MOD_003",
+      "sample_id": "SYN_MOD_003",
+      "title": "State Road Transport Authority Reviews Potential 10% Fare Revision Next Quarter",
+      "text": "Regional transport unions submit memorandum proposing tariff updates to offset diesel expenses. Ministry committee review planned.",
+      "source": "State Tribune",
+      "author": "A. Verma",
+      "category": "Economy",
+      "status": "PENDING_ADMIN_REVIEW",
+      "fake_probability": 0.48,
+      "real_probability": 0.52,
+      "risk_band": "MODERATE_RISK",
+      "action_recommended": "MONITOR_USER_FEEDBACK",
+      "created_at": "2026-11-03T13:20:24.011244+00:00",
+      "_id": "news_1793712024013_2"
+    },
+    {
+      "news_id": "NEWS_FAKE_004",
+      "sample_id": "SYN_R_00445",
+      "title": "VIRAL ALERT: RBI Invaliding All 500 Rupee Currency Notes Tonight",
+      "text": "Urgent WhatsApp warning: Reserve Bank of India is withdrawing all 500 currency notes from circulation midnight. Secret exposed share immediately before ban!",
+      "source": "Social Media Forward",
+      "author": "Anonymous Viral Post",
+      "category": "Banking",
+      "status": "BLOCKED_HIGH_RISK_FAKE",
+      "fake_probability": 0.94,
+      "real_probability": 0.06,
+      "risk_band": "HIGH_RISK_FAKE",
+      "action_recommended": "FLAG_FOR_ADMIN_REVIEW_OR_REVOCATION",
+      "created_at": "2026-11-03T13:20:24.011244+00:00",
+      "_id": "news_1793712024013_3"
+    },
+    {
+      "news_id": "NEWS_FAKE_005",
+      "sample_id": "SYN_R_00782",
+      "title": "Free 5000 Rs Laptop Scheme Under Prime Minister Scheme Approved",
+      "text": "Breaking dhamaka news: Government is providing free laptops and 5000 rupees to all students under PM Free Laptop Yojana. Register now via link!",
+      "source": "WhatsApp Group Broadcast",
+      "author": "Viral Forwarder",
+      "category": "Government Schemes",
+      "status": "BLOCKED_HIGH_RISK_FAKE",
+      "fake_probability": 0.96,
+      "real_probability": 0.04,
+      "risk_band": "HIGH_RISK_FAKE",
+      "action_recommended": "FLAG_FOR_ADMIN_REVIEW_OR_REVOCATION",
+      "created_at": "2026-11-03T13:20:24.011244+00:00",
+      "_id": "news_1793712024014_4"
+    }
+  ],
+  "audit_logs": [
+    {
+      "action": "EXACT_UNLEARNING_EXECUTED",
+      "sample_id": "SYN_R_00445",
+      "news_id": null,
+      "strategy": "all_benchmark",
+      "created_at": "2026-11-02T16:53:56.853344+00:00",
+      "_id": "audit_logs_1793638436853_0"
+    },
+    {
+      "action": "EXACT_UNLEARNING_EXECUTED",
+      "sample_id": "SYN_R_00445",
+      "news_id": null,
+      "strategy": "all_benchmark",
+      "created_at": "2026-11-02T16:54:31.899054+00:00",
+      "_id": "audit_logs_1793638471899_1"
+    }
+  ]
+}

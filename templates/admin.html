@@ -1,0 +1,8 @@
+<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Admin Control Center</title><link rel='stylesheet' href='/static/style.css'></head><body>
+<header><div><h1>Admin Control Center</h1><p>Selective human review + machine unlearning</p></div><a class='link' href='/'>User view</a></header>
+<main id='adminApp' class='grid'>
+<section class='card'><h2>System status</h2><div id='status' class='stats'></div></section>
+<section class='card'><h2>High-risk queue</h2><div id='riskQueue'></div></section>
+<section class='card'><h2>Removal requests</h2><div id='requests'></div></section>
+<section class='card'><h2>Unlearning log</h2><div id='jobs'></div></section>
+</main><script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script><script src='/static/admin.js'></script></body></html>

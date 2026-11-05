@@ -1,0 +1,10 @@
+{
+  "shard_id": 3,
+  "rank": 8,
+  "alpha": 16,
+  "scaling": 2.0,
+  "input_dim": 512,
+  "sample_count": 201,
+  "bias": -0.0037108693970367315,
+  "updated_at": "2026-11-03 20:47:49"
+}

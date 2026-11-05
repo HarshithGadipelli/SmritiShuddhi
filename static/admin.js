@@ -1,0 +1,9 @@
+const socket=io(); const status=document.getElementById('status'), riskQueue=document.getElementById('riskQueue'), requests=document.getElementById('requests'), jobs=document.getElementById('jobs');
+function esc(s){return String(s||'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[c]))}
+async function api(url,opt){const r=await fetch(url,opt);const d=await r.json();if(r.status===401){location.href='/login'}return d}
+async function refresh(){const s=await api('/api/admin/status');status.innerHTML=`<div class='stat'><b>Model</b><br>${esc(s.model_version)}</div><div class='stat'><b>Active news</b><br>${s.news_count}</div><div class='stat'><b>High risk</b><br>${s.high_risk_count}</div><div class='stat'><b>Pending requests</b><br>${s.request_count}</div><div class='stat'><b>Connected</b><br>${s.connected_devices}</div>`;
+const q=await api('/api/admin/high-risk');riskQueue.innerHTML=q.length?q.map(n=>`<div class='request'><b>${esc(n.title)}</b><div class='muted'>${(n.fake_probability*100).toFixed(1)}% fake risk · ${esc(n.news_id)}</div><div class='row'><button onclick="decision('${n.news_id}','keep')">Keep</button><button onclick="decision('${n.news_id}','remove')">Remove</button><button onclick="decision('${n.news_id}','unlearn')">Unlearn + Remove</button></div></div>`).join(''):'<div class="muted">No high-risk items.</div>';
+const rr=await api('/api/admin/requests');requests.innerHTML=rr.length?rr.map(x=>`<div class='request'><b>${esc(x.request_type)}</b> · ${esc(x.news_id)}<div>${esc(x.description)}</div></div>`).join(''):'<div class="muted">No requests.</div>';
+}
+async function decision(id,d){const r=await api('/api/admin/news/'+id+'/decision',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision:d})});alert(JSON.stringify(r));refresh()}
+socket.on('admin_alert',refresh);socket.on('news_revoked',refresh);socket.on('model_updated',refresh);refresh();

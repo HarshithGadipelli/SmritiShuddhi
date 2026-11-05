@@ -1,0 +1,47 @@
+fake_news_unlearning_project/
+├── app.py
+├── config.py
+├── db.py
+├── model_service.py
+├── utils.py
+├── requirements.txt
+├── requirements-optional-transformer.txt
+├── .env.example
+├── docker-compose.yml
+├── README.md
+├── training/
+│   ├── data_utils.py
+│   ├── prepare_dataset.py
+│   ├── train_sisa.py
+│   ├── train_deberta.py
+│   ├── import_liar.py
+│   └── normalize_external_csv.py
+├── unlearning/
+│   └── sisa.py
+├── evaluation/
+│   ├── evaluate_model.py
+│   └── benchmark_unlearning.py
+├── scripts/
+│   ├── generate_demo_dataset.py
+│   ├── check_environment.py
+│   ├── start_project.ps1
+│   ├── setup_mongo.ps1
+│   ├── stop_mongo.ps1
+│   └── run_windows.bat
+├── templates/
+│   ├── index.html
+│   ├── admin.html
+│   └── login.html
+├── static/
+│   ├── app.js
+│   ├── admin.js
+│   └── style.css
+├── data/
+│   ├── demo/
+│   ├── raw/
+│   └── processed/
+├── artifacts/
+│   ├── sisa/
+│   ├── models/
+│   └── evaluation/
+└── logs/

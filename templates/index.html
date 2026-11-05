@@ -1,0 +1,6 @@
+<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>NewsGuard Demo</title><link rel='stylesheet' href='/static/style.css'></head><body>
+<header><div><h1>NewsGuard</h1><p>Risk-aware fake-news detection + machine-unlearning demonstration</p></div><a class='link' href='/admin'>Admin</a></header>
+<main class='grid'>
+<section class='card'><h2>Submit News</h2><form id='newsForm'><label>Headline</label><input id='title' required><label>Article text</label><textarea id='content' rows='8' required></textarea><button>Analyze & Publish</button></form><div id='result'></div></section>
+<section class='card'><h2>Live Feed</h2><div class='small'>Low-risk news is published immediately. High-risk items enter the admin queue.</div><div id='feed'></div></section>
+</main><script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script><script src='/static/app.js'></script></body></html>

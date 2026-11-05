@@ -1,0 +1,2 @@
+This project scaffold and source code are provided for educational and research demonstration use.
+External datasets and pretrained models are governed by their own licenses/terms and are not redistributed here.

@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMRITI SHUDDHI (स्मृति शुद्धि) // Real-Time AI News & Exact Machine Unlearning Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/dashboard.css">
+</head>
+<body>
+  <!-- =====================================================================
+       TOP TICKER: GLOBAL MARKETS & WEATHER (NEWSPAPER HEADER BAR)
+       ===================================================================== -->
+  <div class="market-ticker-bar">
+    <div class="market-ticker-track">
+      <span class="ticker-item"><span class="ticker-dot live-pulse"></span> <strong>EDITION:</strong> Global Digital & India National</span>
+      <span class="ticker-item">🌦️ New Delhi 28°C / Clear</span>
+      <span class="ticker-item">📈 BSE SENSEX <strong>81,452.80</strong> <span class="accent-green">+0.42%</span></span>
+      <span class="ticker-item">📈 NIFTY 50 <strong>24,815.10</strong> <span class="accent-green">+0.48%</span></span>
+      <span class="ticker-item">📉 BRENT CRUDE <strong>$74.20</strong> <span class="accent-crimson">-0.82%</span></span>
+      <span class="ticker-item">🟡 GOLD 24K <strong>₹78,400</strong>/10g</span>
+      <span class="ticker-item">🛡️ <strong>AI VERIFICATION:</strong> DeBERTa-v3 + BGE-M3 + Neo4j Active</span>
+      <span class="ticker-item">⚡ <strong>UNLEARN:</strong> 3 Exact Structural Families Ready</span>
+    </div>
+  </div>
+
+  <div class="layout-container">
+    <!-- =====================================================================
+         NEWSPAPER MASTHEAD
+         ===================================================================== -->
+    <header class="newspaper-masthead">
+      <div class="masthead-meta-row">
+        <div class="masthead-date" id="currentDateStr">Tuesday, November 3, 2026 • Vol. LXXIV No. 248</div>
+        <div class="masthead-edition">THE WORLD'S FIRST MACHINE-UNLEARNING NEWS PLATFORM</div>
+        <div class="masthead-user-controls">
+          <!-- THEME TOGGLE (LIGHT / PAPER / DARK) -->
+          <div class="theme-switch-group" title="Toggle Reading Aesthetic">
+            <button class="theme-ui-btn active" id="btnThemeLight" onclick="setTheme('light')" title="Clean modern light mode">
+              <span>☀️</span> <span id="themeLightText">Light</span>
+            </button>
+            <button class="theme-ui-btn" id="btnThemePaper" onclick="setTheme('paper')" title="Authentic newsprint paper reading mode">
+              <span>📰</span> <span id="themePaperText">Paper</span>
+            </button>
+            <button class="theme-ui-btn" id="btnThemeDark" onclick="setTheme('dark')" title="Dark mode">
+              <span>🌙</span> <span id="themeDarkText">Dark</span>
+            </button>
+          </div>
+
+          <!-- MULTILINGUAL UI TOGGLE (ENGLISH / HINDI / TELUGU) -->
+          <div class="lang-switch-group" title="Switch interface language / భాష మార్చండి / भाषा बदलें">
+            <button class="lang-ui-btn active" id="btnUiEn" onclick="setUiLanguage('en')">EN</button>
+            <button class="lang-ui-btn" id="btnUiHi" onclick="setUiLanguage('hi')">हिंदी</button>
+            <button class="lang-ui-btn" id="btnUiTe" onclick="setUiLanguage('te')">తెలుగు</button>
+          </div>
+
+          <!-- AUTH ACTION BUTTONS (ALWAYS VISIBLE & PROMINENT) -->
+          <div class="auth-actions-group">
+            <button class="nav-auth-btn btn-signin" id="btnNavSignIn" onclick="openAuthModal('login')" title="Sign in to your account">
+              <span>🔑</span> <span id="navSignInText">Sign In</span>
+            </button>
+            <button class="nav-auth-btn btn-register" id="btnNavRegister" onclick="openAuthModal('register')" title="Register a new platform account">
+              <span>📝</span> <span id="navRegisterText">Register</span>
+            </button>
+          </div>
+
+          <!-- LOGGED-IN USER PROFILE & LOGOUT -->
+          <div class="user-profile-widget" id="userProfileBox">
+            <button class="auth-profile-btn" id="authBtn" onclick="openAuthModal('login')" title="Account details">
+              <span class="user-avatar" id="navAvatar">👤</span>
+              <span class="user-name" id="navUserName">Alex Rivera</span>
+              <span class="user-role-badge badge-green" id="navUserBadge">JOURNALIST</span>
+            </button>
+            <button class="btn-logout" id="btnLogout" onclick="handleLogout()" title="Sign out / Switch account">
+              <span>🚪</span> <span id="navLogoutText">Sign Out</span>
+            </button>
+          </div>
+
+          <!-- QUICK ROLE SWITCHER -->
+          <div class="role-pill-switch" title="Toggle between Citizen Journalist and Chief Fact-Checker">
+            <span class="switch-label" id="roleSwitchLabel">Role:</span>
+            <button class="role-btn active" id="btnRoleJournalist" onclick="switchUserRole('JOURNALIST')">
+              <span>👤</span> <span id="roleJournalistText">Journalist</span>
+            </button>
+            <button class="role-btn" id="btnRoleAdmin" onclick="switchUserRole('ADMIN')">
+              <span>🛡️</span> <span id="roleAdminText">Admin</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="masthead-main">
+        <div class="masthead-seal">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
+        <div class="newspaper-title-group">
+          <h1 class="newspaper-title" id="mastheadTitle">Smriti Shuddhi</h1>
+          <div class="devanagari-masthead-title" id="mastheadScriptTitle">स्मृति शुद्धि</div>
+        </div>
+        <div class="masthead-seal right-seal">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+        </div>
+      </div>
+
+      <div class="masthead-tagline">
+        <span id="mastheadTagline1">NATIONAL MULTILINGUAL NEWS WIRE & EXACT MACHINE UNLEARNING ENGINE</span> •
+        <span id="mastheadTagline2">DUAL-TRACK HYBRID FACT VERIFICATION</span> •
+        <span id="mastheadTagline3">सत्यमेव जयते • MATHEMATICAL MEMORY PURIFICATION</span>
+      </div>
+    </header>
+
+    <!-- =====================================================================
+         HEADLINES BREAKING NEWS WRAPPER
+         ===================================================================== -->
+    <div class="breaking-news-wrapper">
+      <div class="breaking-news-label">
+        <span class="live-blink-circle"></span>
+        <span class="breaking-text">BREAKING NEWS</span>
+      </div>
+      <div class="breaking-news-content">
+        <div class="breaking-news-marquee" id="breakingTickerMarquee">
+          <span class="breaking-item" onclick="openFeaturedLeadArticle()">🚨 <strong>PIB FACT CHECK:</strong> Viral WhatsApp claim on currency demonetization is fake and unsubstantiated.</span>
+          <span class="breaking-item">🛰️ <strong>ISRO ARCHIVE:</strong> Lunar elemental spectrometry repository released on ISSDC portal for global researchers.</span>
+          <span class="breaking-item">🌡️ <strong>IMD WARNING:</strong> Severe heatwave advisory active across northern states; public urged to take precautions.</span>
+          <span class="breaking-item">⚡ <strong>MACHINE UNLEARNING:</strong> 3 structural families active: SISA Partitioning, Decremental Closed-Form SVM, and Modular LoRA.</span>
+        </div>
+      </div>
+      <button class="live-sync-btn" onclick="syncLiveNews()" title="Fetch live real-time RSS news wire">
+        <span id="syncIcon">🔄</span> <span id="syncBtnText">Sync Live Wire</span>
+      </button>
+    </div>
+
+    <!-- =====================================================================
+         NAVIGATION TABS
+         ===================================================================== -->
+    <nav class="newspaper-nav-bar">
+      <div class="nav-links">
+        <button class="nav-tab active" id="tabWireBtn" onclick="switchTab('wire')">
+          <span class="tab-icon">📰</span> <span id="tabWireText">Front Page Wire</span>
+        </button>
+        <button class="nav-tab" id="tabIngestBtn" onclick="switchTab('ingest')">
+          <span class="tab-icon">✍️</span> <span id="tabIngestText">Submit News & Scan</span>
+        </button>
+        <button class="nav-tab" id="tabSubmissionsBtn" onclick="switchTab('submissions')">
+          <span class="tab-icon">📂</span> <span id="tabSubmissionsText">My Submissions</span>
+          <span class="nav-badge" id="mySubmissionsCount">0</span>
+        </button>
+        <button class="nav-tab admin-only-tab" id="tabAdminBtn" onclick="switchTab('admin')">
+          <span class="tab-icon">🛡️</span> <span id="tabAdminText">Admin Editorial & 3-Family Unlearning</span>
+          <span class="nav-badge badge-crimson" id="adminPendingBadge">2</span>
+        </button>
+        <button class="nav-tab" id="tabAuditBtn" onclick="switchTab('audit')">
+          <span class="tab-icon">📡</span> <span id="tabAuditText">Live WebSocket Stream</span>
+        </button>
+      </div>
+
+      <!-- LIVE SEARCH BAR -->
+      <div class="nav-search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="newsSearchInput" placeholder="Search dispatches & topics..." oninput="handleNewsSearch(event)">
+      </div>
+
+      <!-- Live Pipeline Health Meters -->
+      <div class="nav-meters admin-only-ui" id="adminNavMeters">
+        <div class="meter-chip">
+          <span class="meter-label">REDIS:</span>
+          <span class="meter-val accent-green" id="cacheHitRate">Sub-5ms</span>
+        </div>
+        <div class="meter-chip">
+          <span class="meter-label">DeBERTa:</span>
+          <span class="meter-val accent-purple">W₀ Frozen</span>
+        </div>
+        <div class="meter-chip">
+          <span class="meter-label">UNLEARN:</span>
+          <span class="meter-val accent-cyan">O(1) Algebraic</span>
+        </div>
+      </div>
+
+      <!-- Consumer-Facing Edition Meters (Clean Abstraction) -->
+      <div class="nav-meters user-only-ui" id="userNavMeters">
+        <div class="meter-chip">
+          <span class="meter-label">EDITION:</span>
+          <span class="meter-val accent-cyan">Digital Daily</span>
+        </div>
+        <div class="meter-chip">
+          <span class="meter-label">FACT CHECK:</span>
+          <span class="meter-val accent-green">PIB / Reuters Wires</span>
+        </div>
+        <div class="meter-chip">
+          <span class="meter-label">PLATFORM:</span>
+          <span class="meter-val accent-purple">Smriti Shuddhi Active</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- =====================================================================
+         TAB 1: FRONT PAGE NEWS WIRE
+         ===================================================================== -->
+    <section class="view-section active" id="viewWire">
+      <!-- ANIME NEWS ANCHOR BROADCAST DESK -->
+      <div class="anime-anchor-broadcast-card">
+        <div class="anchor-avatar-box">
+          <img src="/static/anime_reporter.png" alt="Aria Vance - Lead AI Fact Verification Anchor" class="anchor-portrait">
+          <span class="live-stream-badge"><span class="pulse-dot"></span> LIVE ON AIR</span>
+        </div>
+        <div class="anchor-briefing-box">
+          <div class="anchor-identity">
+            <div class="anchor-name-row">
+              <span class="anchor-name">Aria Vance</span>
+              <span class="anchor-badge" id="anchorRoleBadge">Lead Fact Verification Anchor</span>
+              <span class="anchor-studio-tag">Smriti Shuddhi Neural Broadcast Studio 1A</span>
+            </div>
+            <div class="anchor-channel-status">
+              <span class="status-indicator"></span> Real-Time Indian & Global Wire Feeds: <strong>The Hindu</strong>, <strong>Times of India</strong>, <strong>NDTV</strong>, <strong>BBC News Hindi</strong>, <strong>PIB Fact Check</strong>
+            </div>
+          </div>
+          <div class="anchor-dialogue" id="anchorDialogue">
+            "Good day. I am Aria Vance, anchoring live from the Smriti Shuddhi Fact Verification Desk. 
+            All dispatches published here undergo rigorous <strong>Dual-Track Neural Verification</strong> (DeBERTa-v3 stylistic scrutiny + 1024-dim BGE-M3 fact cross-referencing). 
+            Should misinformation enter the system, our platform executes <strong>Exact Mathematical Unlearning</strong> across 3 structural families with 0.00% residual memorization."
+          </div>
+          <div class="anchor-actions-bar">
+            <button class="btn btn-primary btn-sm" onclick="switchTab('ingest')">
+              <span>🎙️</span> <span id="anchorBtnSubmit">Submit Story for Fact-Check</span>
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="syncLiveNews()">
+              <span>🔄</span> <span id="anchorBtnSync">Refresh Live Indian Wire Feeds</span>
+            </button>
+            <button class="btn btn-amber btn-sm admin-only-ui" onclick="switchTab('admin')">
+              <span>🛡️</span> <span id="anchorBtnUnlearn">Launch 3-Family Unlearning Workbench</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILTER CONTROLS: SECTIONS & LANGUAGES -->
+      <div class="filter-controls-row">
+        <!-- CATEGORY FILTER PILLS -->
+        <div class="category-filters-bar">
+          <span class="filter-label" id="lblSectionsFilter">Sections:</span>
+          <button class="cat-pill active" onclick="filterCategory('All')">All Stories</button>
+          <button class="cat-pill" onclick="filterCategory('Science & Space')">Science & Space</button>
+          <button class="cat-pill" onclick="filterCategory('Banking & Economy')">Banking & Economy</button>
+          <button class="cat-pill" onclick="filterCategory('Governance & Policy')">Governance & Policy</button>
+          <button class="cat-pill" onclick="filterCategory('Technology & AI')">Technology & AI</button>
+          <button class="cat-pill" onclick="filterCategory('Weather & Safety')">Weather & Safety</button>
+        </div>
+
+        <!-- LANGUAGE FILTER PILLS -->
+        <div class="language-filters-bar">
+          <span class="filter-label" id="lblLangFilter">Language:</span>
+          <button class="lang-pill active" id="langAllBtn" onclick="filterLanguage('All')">🌐 All</button>
+          <button class="lang-pill" id="langEnBtn" onclick="filterLanguage('English')">🇮🇳 English</button>
+          <button class="lang-pill" id="langHiBtn" onclick="filterLanguage('Hindi')">🇮🇳 हिंदी (Hindi)</button>
+          <button class="lang-pill" id="langTeBtn" onclick="filterLanguage('Telugu')">🇮🇳 తెలుగు (Telugu)</button>
+        </div>
+      </div>
+
+      <!-- NEWSPAPER WIRE HERO GRID -->
+      <div class="newspaper-grid-layout">
+        <!-- LEFT: FEATURED LEAD STORY -->
+        <article class="featured-hero-article" id="featuredHeroCard" onclick="openHeroModal()">
+          <div class="hero-image-wrapper">
+            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80" alt="Space Mission" id="heroImage" class="hero-image">
+            <span class="verification-badge badge-verified" id="heroVerifiedBadge">
+              <span class="badge-icon">✓</span> SMRITI SHUDDHI VERIFIED • 92% AUTHENTIC
+            </span>
+            <span class="hero-category-tag" id="heroCategory">Science & Space</span>
+          </div>
+          <div class="hero-content">
+            <div class="hero-byline">
+              <span class="byline-source" id="heroSource">ISRO Press Office</span> • 
+              <span class="byline-author" id="heroAuthor">By Dr. S. Nair</span> • 
+              <span class="byline-time" id="heroReadingTime">3 min read</span>
+            </div>
+            <h2 class="hero-headline" id="heroTitle">
+              ISRO Releases Scientific Data Archive from Chandrayaan Mission on ISSDC
+            </h2>
+            <p class="hero-excerpt" id="heroExcerpt">
+              Indian Space Research Organisation (ISRO) has officially opened the scientific payload repository on the Indian Space Science Data Centre for researchers globally. Datasets include elemental compositions and thermal readings.
+            </p>
+            <div class="hero-footer">
+              <span class="read-more-link">Read Full Report with Dual-Track Fact Certificate →</span>
+              <span class="publish-time-stamp" id="heroTime">Today • 14:10 IST</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- RIGHT: TOP STORIES & TRENDING WIRE -->
+        <aside class="trending-wire-sidebar">
+          <div class="sidebar-header">
+            <h3>Trending Fact-Checked Wire</h3>
+            <span class="sidebar-tag">Live Feed</span>
+          </div>
+          <div class="trending-list" id="trendingList">
+            <!-- Rendered Dynamically -->
+          </div>
+        </aside>
+      </div>
+
+      <!-- MAIN STORIES 3-COLUMN GRID -->
+      <div class="section-divider">
+        <h3 class="section-divider-title">Dispatches & Verified Investigations</h3>
+        <span class="section-divider-line"></span>
+      </div>
+
+      <div class="news-cards-grid" id="newsFeedGrid">
+        <!-- Rendered Dynamically -->
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         TAB 2: SUBMIT NEWS & DUAL-TRACK AI SCAN
+         ===================================================================== -->
+    <section class="view-section" id="viewIngest">
+      <div class="ingest-wrapper">
+        <!-- LEFT: INPUT FORM & DOCUMENT UPLOAD -->
+        <div class="ingest-panel">
+          <div class="panel-header">
+            <h2>Citizen & Journalist Submission Gateway</h2>
+            <span class="panel-tag tag-blue">Dual-Track Hybrid Gate</span>
+          </div>
+          <p class="panel-desc">
+            Submit news through direct editorial text or upload full text documents (.txt, .docx, .pdf, .md, .csv).
+            Our dual-track engine verifies stylistic markers with DeBERTa-v3 and cross-checks PIB/RBI/ISRO truth repositories.
+          </p>
+
+          <!-- UPLOAD MODE TOGGLE -->
+          <div class="upload-mode-toggle">
+            <button class="mode-btn active" id="btnModeText" onclick="setIngestMode('text')">
+              <span>✍️</span> Direct Text Input
+            </button>
+            <button class="mode-btn" id="btnModeDoc" onclick="setIngestMode('document')">
+              <span>📄</span> Upload Text Document (.txt, .docx, .pdf)
+            </button>
+          </div>
+
+          <!-- QUICK TEST SAMPLES -->
+          <div class="quick-samples">
+            <span class="samples-label">Quick Test Scenarios:</span>
+            <button class="sample-btn btn-sample-real" onclick="loadSample('isro_chandrayaan')">Verified: ISRO Release</button>
+            <button class="sample-btn btn-sample-real" onclick="loadSample('imd_heatwave')">Verified: IMD Heatwave</button>
+            <button class="sample-btn btn-sample-mod" onclick="loadSample('transport_fare')">Moderate: Bus Tariff</button>
+            <button class="sample-btn btn-sample-fake" onclick="loadSample('rbi_500')">Fake: RBI 500 Ban</button>
+            <button class="sample-btn btn-sample-fake" onclick="loadSample('pib_laptop')">Fake: Free Laptop 5000</button>
+          </div>
+
+          <!-- DOCUMENT UPLOAD DROP-ZONE (VISIBLE IN DOC MODE) -->
+          <div class="document-drop-zone" id="docDropZone" style="display: none;" onclick="triggerFilePicker(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)">
+            <input type="file" id="filePicker" accept=".txt,.docx,.pdf,.md,.csv,.json" style="display: none;" onchange="handleFileSelected(event)">
+            <div class="drop-icon">📁</div>
+            <div class="drop-title">Drag & Drop News Document Here</div>
+            <div class="drop-subtitle">Supports .txt, .docx, .pdf, .md, .json, .csv (Max 10MB)</div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('filePicker').click()">
+              Browse Files from Computer
+            </button>
+
+            <!-- DOCUMENT PREVIEW CARD -->
+            <div class="parsed-file-badge" id="parsedFileBadge" style="display: none;">
+              <div class="file-info-icon">📄</div>
+              <div class="file-info-meta">
+                <strong id="parsedFileName">document.txt</strong>
+                <span id="parsedFileDetails">14.2 KB • 480 words extracted</span>
+              </div>
+              <button type="button" class="file-remove-btn" onclick="clearUploadedFile()">×</button>
+            </div>
+          </div>
+
+          <!-- FORM INPUTS -->
+          <div class="input-form">
+            <div class="form-row">
+              <div class="form-group flex-2">
+                <label for="headlineInput">Headline / Title *</label>
+                <input type="text" id="headlineInput" placeholder="Enter bold newspaper headline..." value="PIB Fact Check: Free 5000 Rs Laptop Scheme Under Prime Minister Scheme is Fake">
+              </div>
+              <div class="form-group flex-1">
+                <label for="categoryInput">Category *</label>
+                <select id="categoryInput">
+                  <option value="Governance & Policy">Governance & Policy</option>
+                  <option value="Banking & Economy">Banking & Economy</option>
+                  <option value="Science & Space">Science & Space</option>
+                  <option value="Weather & Safety">Weather & Safety</option>
+                  <option value="Technology & AI">Technology & AI</option>
+                  <option value="World News">World News</option>
+                  <option value="General">General News</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="bodyInput">Article Full Body / Viral Forward *</label>
+              <textarea id="bodyInput" rows="5" placeholder="Enter article body or paste message here...">Viral WhatsApp message claiming the government has approved 5000 rupees and free laptops for all students under PM Free Laptop Yojana. Register now via link immediately!</textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="sourceInput">Source / News Agency</label>
+                <input type="text" id="sourceInput" value="Social Media Forward">
+              </div>
+              <div class="form-group">
+                <label for="authorInput">Author / Reporter</label>
+                <input type="text" id="authorInput" value="Alex Rivera">
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" id="publishBtn" onclick="submitAndVerifyNews()">
+                <span class="btn-icon">⚡</span> Run Dual-Track Scan & Verify
+              </button>
+              <label class="cache-bypass-label">
+                <input type="checkbox" id="bypassCache"> Bypass Redis Cache
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: LIVE SCAN VERDICT & RECEIPT (USER ABSTRACTION VS ADMIN XAI) -->
+        <div class="ingest-panel">
+          <div class="panel-header">
+            <h2 id="ingestPanelHeader">Verification Verdict & Editorial Receipt</h2>
+            <span class="panel-tag tag-cyan" id="ingestPanelTag">Dual-Track Verification Gate</span>
+          </div>
+
+          <!-- USER-FACING CLEAN EDITORIAL RECEIPT (COMPLETE ABSTRACTION) -->
+          <div class="citizen-receipt-card user-only-ui" id="citizenScanResult" style="display: none;">
+            <div class="receipt-header">
+              <div class="receipt-seal">✓</div>
+              <div class="receipt-meta">
+                <span class="receipt-edition" id="citizenReceiptEdition">SMRITI SHUDDHI • OFFICIAL EDITORIAL RECEIPT</span>
+                <h3 class="receipt-headline" id="citizenReceiptHeadline">Headline goes here</h3>
+                <span class="receipt-byline" id="citizenReceiptByline">Submitted by Alex Rivera • Just now</span>
+              </div>
+            </div>
+
+            <!-- 3-TIER CLASSIFICATION TAG BADGE -->
+            <div class="citizen-tag-wrapper">
+              <div class="citizen-3tier-badge" id="citizenTagBadge">
+                <span class="tag-badge-icon" id="citizenTagIcon">✓</span>
+                <span class="tag-badge-text" id="citizenTagText">REAL (VERIFIED AUTHENTIC)</span>
+              </div>
+              <div class="citizen-confidence-gauge">
+                <span class="gauge-label">Authenticity Confidence:</span>
+                <strong class="gauge-value accent-green" id="citizenConfidenceVal">94%</strong>
+              </div>
+            </div>
+
+            <div class="citizen-explanation-box" id="citizenExplanationBox">
+              <h4 id="citizenExplanationTitle">Editorial Status: Live on News Wire</h4>
+              <p id="citizenExplanationText">
+                Your submitted story has successfully passed independent multi-source verification and is published immediately to the public front-page wire!
+              </p>
+            </div>
+
+            <div class="citizen-checks-row">
+              <div class="check-chip">
+                <span class="check-icon">✓</span>
+                <span>Government & Wire Cross-Check</span>
+              </div>
+              <div class="check-chip">
+                <span class="check-icon">✓</span>
+                <span>Linguistic Framing Analysis</span>
+              </div>
+              <div class="check-chip">
+                <span class="check-icon">✓</span>
+                <span>Cryptographic Digest Anchored</span>
+              </div>
+            </div>
+
+            <div class="citizen-receipt-actions">
+              <button class="btn btn-primary btn-sm" onclick="switchTab('wire')">
+                <span>📰</span> View Front Page Wire
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="switchTab('submissions')">
+                <span>📂</span> View My Submissions
+              </button>
+            </div>
+          </div>
+
+          <!-- ADMIN-FACING DEEP ML DIAGNOSTIC HUD (FULL TECHNICAL TRANSPARENCY) -->
+          <div class="result-display admin-only-ui" id="resultDisplay" style="display: none;">
+            <div class="result-header">
+              <div class="verdict-banner">
+                <span class="verdict-badge" id="verdictBadge">HIGH RISK FAKE</span>
+                <span class="verdict-action" id="verdictAction">FLAGGED FOR ADMIN UNLEARNING</span>
+              </div>
+              <div class="latency-indicator">
+                <span class="latency-val accent-cyan" id="latencyVal">4.2 ms</span>
+                <span class="latency-badge" id="cacheBadge">⚡ REDIS HIT</span>
+              </div>
+            </div>
+
+            <!-- PROBABILITY BARS -->
+            <div class="probability-bars">
+              <div class="prob-row">
+                <div class="prob-label">Fake Probability: <strong id="fakeScoreText">92.4%</strong></div>
+                <div class="progress-track"><div class="progress-fill fill-fake" id="fakeBar" style="width: 92.4%;"></div></div>
+              </div>
+              <div class="prob-row">
+                <div class="prob-label">Authenticity Probability: <strong id="realScoreText">7.6%</strong></div>
+                <div class="progress-track"><div class="progress-fill fill-real" id="realBar" style="width: 7.6%;"></div></div>
+              </div>
+            </div>
+
+            <!-- DUAL-TRACK ARCHITECTURAL CARDS -->
+            <div class="tracks-grid">
+              <!-- TRACK A -->
+              <div class="track-card">
+                <div class="track-title">
+                  <span class="track-tag tag-purple">TRACK A</span>
+                  <h3>Stylistic DeBERTa Parsing</h3>
+                </div>
+                <div class="track-stat">
+                  <span class="stat-name">Stylistic Risk (S_style):</span>
+                  <span class="stat-num accent-purple" id="sStyleVal">0.88</span>
+                </div>
+                <div class="track-details">
+                  <div>Sensational Cues: <strong id="sensationalCues">2</strong></div>
+                  <div>Framing Risk: <strong id="framingRisk">HIGH</strong></div>
+                </div>
+              </div>
+
+              <!-- TRACK B -->
+              <div class="track-card">
+                <div class="track-title">
+                  <span class="track-tag tag-cyan">TRACK B</span>
+                  <h3>Factual Vector Retrieval</h3>
+                </div>
+                <div class="track-stat">
+                  <span class="stat-name">Factual Fake (S_fact):</span>
+                  <span class="stat-num accent-cyan" id="sFactVal">0.95</span>
+                </div>
+                <div class="track-details">
+                  <div>Evidence Source: <strong id="evidenceSource">PIB Fact Check</strong></div>
+                  <div>Temporal Graph: <strong id="timelineScore">100% Consistent</strong></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- XAI CITATION BOX -->
+            <div class="xai-box">
+              <div class="xai-header">🧠 Explainable AI (XAI) Synthesis</div>
+              <ul class="xai-list" id="xaiList">
+                <li>Official verification evidence matched in Qdrant truth vectors.</li>
+              </ul>
+            </div>
+
+            <!-- LINGUISTIC DECEPTION HEATMAP -->
+            <div class="heatmap-panel" id="heatmapPanel" style="display: none;">
+              <div class="heatmap-header">
+                <span class="heatmap-title">🔬 Token-Level Deceptive Rhetoric Heatmap</span>
+                <span class="arousal-indicator">Arousal Index: <strong id="arousalScoreText">0.85</strong></span>
+              </div>
+              <div class="heatmap-text-container" id="heatmapTextContainer">
+                <!-- Highlighted article text -->
+              </div>
+              <div class="cue-legend">
+                <span class="legend-item"><span class="legend-dot cue-urgency"></span> Urgency / Panic</span>
+                <span class="legend-item"><span class="legend-dot cue-sensationalism"></span> Clickbait / Sensational</span>
+                <span class="legend-item"><span class="legend-dot cue-conspiratorial"></span> Conspiratorial Framing</span>
+                <span class="legend-item"><span class="legend-dot cue-punctuation"></span> Punctuation Amplification</span>
+              </div>
+            </div>
+
+            <!-- OUTCOME NOTICE -->
+            <div id="submissionOutcomeNotice" class="submission-notice"></div>
+          </div>
+
+          <!-- PLACEHOLDER -->
+          <div id="scanPlaceholder" class="scan-placeholder">
+            <div class="placeholder-icon">🛰️</div>
+            <h3>Waiting for News Submission</h3>
+            <p>Upload a text document or enter an article on the left to witness real-time verification and editorial review.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         TAB 3: MY SUBMISSIONS (CITIZEN JOURNALIST VIEW)
+         ===================================================================== -->
+    <section class="view-section" id="viewSubmissions">
+      <div class="submissions-header">
+        <div>
+          <h2>My Submitted Articles & Live Status</h2>
+          <p class="section-desc">Track real-time publishing status, verification certificates, and review decisions for articles you uploaded.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="switchTab('ingest')">
+          <span>✍️</span> Submit New Story
+        </button>
+      </div>
+
+      <div class="submissions-grid" id="userSubmissionsGrid">
+        <!-- Rendered Dynamically -->
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         TAB 4: ADMIN EDITORIAL & 3-FAMILY EXACT MACHINE UNLEARNING
+         ===================================================================== -->
+    <section class="view-section admin-section" id="viewAdmin">
+      <!-- ADMIN BANNER -->
+      <div class="admin-top-banner">
+        <div>
+          <span class="admin-badge">🛡️ CHIEF FACT-CHECKER CONTROL CENTER</span>
+          <h2>Editorial Review & Exact Machine Unlearning Engine</h2>
+        </div>
+        <div class="admin-quick-stats">
+          <div class="stat-mini">
+            <span class="stat-mini-val accent-crimson" id="adminBlockedCount">2</span>
+            <span class="stat-mini-label">Fake Stories to Unlearn</span>
+          </div>
+          <div class="stat-mini">
+            <span class="stat-mini-val accent-amber" id="adminPendingCount">1</span>
+            <span class="stat-mini-label">Pending Review</span>
+          </div>
+          <div class="stat-mini">
+            <span class="stat-mini-val accent-green">0.00%</span>
+            <span class="stat-mini-label">Residual Influence</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-split-grid">
+        <!-- LEFT: EDITORIAL QUEUES -->
+        <div class="admin-column">
+          <!-- QUEUE 1: HIGH RISK FAKE NEWS FOR UNLEARNING -->
+          <div class="admin-card">
+            <div class="card-header header-crimson">
+              <h3>🚨 Quarantined Fake News (Target for Machine Unlearning)</h3>
+              <span class="badge-pill badge-crimson" id="blockedQueueBadge">2 Items</span>
+            </div>
+            <p class="card-caption">
+              These articles have been mathematically identified as fraudulent. Click an item to load it into the Unlearning Workbench.
+            </p>
+            <div class="queue-items-container" id="adminBlockedList">
+              <!-- Rendered Dynamically -->
+            </div>
+          </div>
+
+          <!-- QUEUE 2: MODERATE RISK REVIEW -->
+          <div class="admin-card">
+            <div class="card-header header-amber">
+              <h3>⚖️ Ambiguous & Moderate-Risk Queue (Editorial Approval)</h3>
+              <span class="badge-pill badge-amber" id="pendingQueueBadge">1 Item</span>
+            </div>
+            <p class="card-caption">
+              Review nuanced or regional dispatches. Approve to publish immediately or reject to purge.
+            </p>
+            <div class="queue-items-container" id="adminPendingList">
+              <!-- Rendered Dynamically -->
+            </div>
+          </div>
+
+          <!-- QUEUE 3: LIVE VERIFIED DISPATCHES (CITIZEN & WIRE OVERSIGHT) -->
+          <div class="admin-card">
+            <div class="card-header header-green">
+              <h3>✓ Verified Submissions Oversight (Real Dispatches)</h3>
+              <span class="badge-pill badge-green" id="verifiedQueueBadge">Factual</span>
+            </div>
+            <p class="card-caption">
+              Live user submissions authenticated by DeBERTa-v3 and published directly to the public wire.
+            </p>
+            <div class="queue-items-container" id="adminVerifiedList">
+              <!-- Rendered Dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: 3-FAMILY MACHINE UNLEARNING WORKBENCH -->
+        <div class="admin-column">
+          <div class="admin-card unlearning-workbench">
+            <div class="card-header header-green">
+              <h3>Exact Machine Unlearning Workbench (3 Structural Families)</h3>
+              <span class="badge-pill badge-green">Exact Removal Guarantee</span>
+            </div>
+
+            <!-- TARGET ARTICLE INSPECTOR -->
+            <div class="target-inspector">
+              <div class="target-meta">
+                <span class="target-id" id="targetSampleIdDisplay">TARGET SAMPLE: SYN_R_00445</span>
+                <span class="badge-pill badge-crimson" id="targetRiskTag">HIGH_RISK_FAKE</span>
+              </div>
+              <h4 class="target-headline" id="targetTitleDisplay">
+                VIRAL ALERT: RBI Invaliding All 500 Rupee Currency Notes Tonight
+              </h4>
+              <p class="target-excerpt" id="targetBodyDisplay">
+                Urgent WhatsApp warning: Reserve Bank of India is withdrawing all 500 currency notes from circulation midnight. Secret exposed share immediately before ban!
+              </p>
+            </div>
+
+            <!-- ALGORITHM SELECTOR: 3 STRUCTURAL FAMILIES + BASELINE -->
+            <div class="unlearning-selector-box">
+              <div class="selector-header">
+                <span class="selector-title">Select Unlearning Algorithm to Execute:</span>
+                <button class="btn btn-amber btn-sm" onclick="executeSelectedUnlearning('all_benchmark')">
+                  <span>📊</span> Benchmark All 4 Concurrently
+                </button>
+              </div>
+
+              <div class="algorithm-cards-grid">
+                <!-- BASELINE RETRAIN -->
+                <button class="algo-card-btn" onclick="executeSelectedUnlearning('baseline_retrain')">
+                  <div class="algo-family-tag tag-gray">REFERENCE BASELINE</div>
+                  <div class="algo-name">🔄 Full Retraining</div>
+                  <div class="algo-family">Exhaustive Optimization</div>
+                  <div class="algo-complexity">O(N • epochs) • 100% Weights</div>
+                  <div class="algo-desc">Retrains model from scratch on D \ {x*}. Reference point.</div>
+                </button>
+
+                <!-- ALGORITHM 1: SISA -->
+                <button class="algo-card-btn active" onclick="executeSelectedUnlearning('algorithm_1_sisa')">
+                  <div class="algo-family-tag tag-purple">FAMILY 1: PARTITIONING</div>
+                  <div class="algo-name">🛡️ SISA Sharding</div>
+                  <div class="algo-family">Data-Partitioning System</div>
+                  <div class="algo-complexity">O((N/K) • epochs) • 80% Faster</div>
+                  <div class="algo-desc">Retrains only shard k containing x*. Other 4 shards untouched.</div>
+                </button>
+
+                <!-- ALGORITHM 2: DECREMENTAL SVM -->
+                <button class="algo-card-btn" onclick="executeSelectedUnlearning('algorithm_2_svm')">
+                  <div class="algo-family-tag tag-cyan">FAMILY 2: ALGEBRAIC</div>
+                  <div class="algo-name">⚡ Decremental SVM</div>
+                  <div class="algo-family">Closed-Form Matrix Updates</div>
+                  <div class="algo-complexity">O(1) Instant • Sub-Millisecond</div>
+                  <div class="algo-desc">Sherman-Morrison rank-1 downdate on inverse Hessian matrix.</div>
+                </button>
+
+                <!-- ALGORITHM 3: MODULAR LORA -->
+                <button class="algo-card-btn" onclick="executeSelectedUnlearning('algorithm_3_lora')">
+                  <div class="algo-family-tag tag-green">FAMILY 3: MODULAR PEFT</div>
+                  <div class="algo-name">🧩 Modular LoRA (S3T)</div>
+                  <div class="algo-family">Parameter Deactivation</div>
+                  <div class="algo-complexity">O(1) Pointer Drop • Base W₀ Frozen</div>
+                  <div class="algo-desc">Deactivates fine-tuned LoRA card. 0.0% damage to general domain.</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- SYSTEM BEHAVIOUR & EVALUATION METRICS TABLE -->
+            <div class="benchmark-results-box" id="benchmarkTableBox">
+              <div class="results-header">
+                <h4>System Behaviour & Model Evaluation Metrics (Before vs After)</h4>
+                <span class="badge-pill badge-green">0.00% Residual Influence</span>
+              </div>
+
+              <!-- RECOMMENDED BEST MODEL BANNER -->
+              <div class="recommended-model-banner" id="recommendedModelBanner">
+                <div class="rec-banner-badge">⭐ SYSTEM RECOMMENDATION</div>
+                <div class="rec-banner-content">
+                  <div class="rec-banner-title" id="recModelTitle">Algorithm 2: Decremental Closed-Form SVM (O(1) Algebraic)</div>
+                  <div class="rec-banner-desc" id="recModelDesc">Sherman-Morrison inverse Hessian downdate achieves mathematically instantaneous 0.27ms execution, >1,800x speedup, and 0.0000% residual influence without gradient re-training.</div>
+                </div>
+                <button class="btn btn-primary btn-rec-action" id="btnExecuteRecommended" onclick="executeRecommendedUnlearning()">
+                  <span>⚡</span> Execute Recommended Model
+                </button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="benchmark-table">
+                  <thead>
+                    <tr>
+                      <th>Algorithm</th>
+                      <th>Structural Family</th>
+                      <th>Latency</th>
+                      <th>Speedup</th>
+                      <th>Retain Acc (B/A)</th>
+                      <th>Precision (B/A)</th>
+                      <th>Recall (B/A)</th>
+                      <th>F1 (B/A)</th>
+                      <th>Influence</th>
+                      <th>Weights Mod</th>
+                    </tr>
+                  </thead>
+                  <tbody id="benchmarkTableBody">
+                    <!-- Rendered Dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 6-STEP PHYSICAL PURGE ANIMATION STEPPER -->
+            <div class="purge-stepper-box">
+              <div class="stepper-header">
+                <h4>6-Step Hardware & Cache Purge Verification Sequence</h4>
+                <span class="badge-pill badge-amber">Physical Disk & Memory Eviction</span>
+              </div>
+
+              <div class="stepper-grid" id="stepperContainer">
+                <div class="step-card" id="step1Card">
+                  <div class="step-badge">1</div>
+                  <div class="step-info">
+                    <div class="step-title">Metadata Shard Routing</div>
+                    <div class="step-desc" id="step1Desc">Locates shard containing sample x*</div>
+                  </div>
+                  <div class="step-time" id="step1Time">--</div>
+                </div>
+
+                <div class="step-card" id="step2Card">
+                  <div class="step-badge">2</div>
+                  <div class="step-info">
+                    <div class="step-title">Database Permanent Purge</div>
+                    <div class="step-desc" id="step2Desc">Drops x* permanently from partition D_X</div>
+                  </div>
+                  <div class="step-time" id="step2Time">--</div>
+                </div>
+
+                <div class="step-card" id="step3Card">
+                  <div class="step-badge">3</div>
+                  <div class="step-info">
+                    <div class="step-title">Disk Weight Eviction</div>
+                    <div class="step-desc" id="step3Desc">Executes rm -rf ./sisa_adapters/shard_X/</div>
+                  </div>
+                  <div class="step-time" id="step3Time">--</div>
+                </div>
+
+                <div class="step-card" id="step4Card">
+                  <div class="step-badge">4</div>
+                  <div class="step-info">
+                    <div class="step-title">Redis Signature Flush</div>
+                    <div class="step-desc" id="step4Desc">Evicts related SHA-256 keys from RAM</div>
+                  </div>
+                  <div class="step-time" id="step4Time">--</div>
+                </div>
+
+                <div class="step-card" id="step5Card">
+                  <div class="step-badge">5</div>
+                  <div class="step-info">
+                    <div class="step-title">Micro-Retraining Core</div>
+                    <div class="step-desc" id="step5Desc">Recalibrates sub-parameters (W₀ frozen)</div>
+                  </div>
+                  <div class="step-time" id="step5Time">--</div>
+                </div>
+
+                <div class="step-card" id="step6Card">
+                  <div class="step-badge">6</div>
+                  <div class="step-info">
+                    <div class="step-title">Post-Unlearning Audit</div>
+                    <div class="step-desc" id="step6Desc">Verifies 100.0% retain accuracy preservation</div>
+                  </div>
+                  <div class="step-time" id="step6Time">--</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SISA 5-SHARD PARTITION ARCHITECTURE VISUALIZER -->
+            <div class="shards-visualizer-box">
+              <div class="shards-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="shards-title">🧩 SISA Shard Partition Architecture (K=5 Independent Ensembles)</span>
+                  <span class="badge-pill badge-purple">Base W₀ Frozen • LoRA r=8 Cards</span>
+                </div>
+                <span style="font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono);">Isolated Stochastic Boundaries</span>
+              </div>
+              <div class="shards-grid">
+                <div class="shard-node-card" id="shardNode0">
+                  <div class="shard-node-top">
+                    <span class="shard-name">Shard 0 (D₀)</span>
+                    <span class="shard-status-tag tag-green" id="shardStatus0">✓ Active</span>
+                  </div>
+                  <div class="shard-stat-line"><span>Partition:</span> <strong>192 Samples</strong></div>
+                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_0/adapter.npz</code></div>
+                  <div class="shard-stat-line"><span>Weight State:</span> <strong class="accent-green">Preserved</strong></div>
+                </div>
+                <div class="shard-node-card" id="shardNode1">
+                  <div class="shard-node-top">
+                    <span class="shard-name">Shard 1 (D₁)</span>
+                    <span class="shard-status-tag tag-green" id="shardStatus1">✓ Active</span>
+                  </div>
+                  <div class="shard-stat-line"><span>Partition:</span> <strong>192 Samples</strong></div>
+                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_1/adapter.npz</code></div>
+                  <div class="shard-stat-line"><span>Weight State:</span> <strong class="accent-green">Preserved</strong></div>
+                </div>
+                <div class="shard-node-card" id="shardNode2">
+                  <div class="shard-node-top">
+                    <span class="shard-name">Shard 2 (D₂)</span>
+                    <span class="shard-status-tag tag-green" id="shardStatus2">✓ Active</span>
+                  </div>
+                  <div class="shard-stat-line"><span>Partition:</span> <strong>192 Samples</strong></div>
+                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_2/adapter.npz</code></div>
+                  <div class="shard-stat-line"><span>Weight State:</span> <strong class="accent-green">Preserved</strong></div>
+                </div>
+                <div class="shard-node-card" id="shardNode3">
+                  <div class="shard-node-top">
+                    <span class="shard-name">Shard 3 (D₃)</span>
+                    <span class="shard-status-tag tag-green" id="shardStatus3">✓ Active</span>
+                  </div>
+                  <div class="shard-stat-line"><span>Partition:</span> <strong>192 Samples</strong></div>
+                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_3/adapter.npz</code></div>
+                  <div class="shard-stat-line"><span>Weight State:</span> <strong class="accent-green">Preserved</strong></div>
+                </div>
+                <div class="shard-node-card" id="shardNode4">
+                  <div class="shard-node-top">
+                    <span class="shard-name">Shard 4 (D₄)</span>
+                    <span class="shard-status-tag tag-green" id="shardStatus4">✓ Active</span>
+                  </div>
+                  <div class="shard-stat-line"><span>Partition:</span> <strong>192 Samples</strong></div>
+                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_4/adapter.npz</code></div>
+                  <div class="shard-stat-line"><span>Weight State:</span> <strong class="accent-green">Preserved</strong></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- INTERACTIVE MODEL RESIDUAL MEMORY PROBE -->
+            <div class="probe-tester-box">
+              <div class="probe-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="probe-title">🔬 Interactive Model Residual Memory Probe</span>
+                  <span class="badge-pill badge-cyan">Zero-Presence Empirical Proof</span>
+                </div>
+                <span style="font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono);">Direct Weight Matrix Evaluator</span>
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">
+                Enter any headline or claim to evaluate whether unlearned text still exerts any mathematical gradient, margin influence, or active memory in the model parameters.
+              </p>
+              <div class="probe-input-row">
+                <input type="text" id="probeQueryInput" placeholder="Enter headline or claim to probe model parameters..." value="VIRAL ALERT: RBI Invaliding All 500 Rupee Currency Notes Tonight">
+                <button class="btn btn-secondary btn-sm" onclick="probeModelMemory()">
+                  <span>⚡</span> Probe Model Memory
+                </button>
+              </div>
+              <div class="probe-result-card" id="probeResultCard" style="display: none;">
+                <div class="probe-metric-grid">
+                  <div class="probe-metric">
+                    <span class="metric-label">Memory Status</span>
+                    <strong class="accent-green" id="probeStatus">ZERO_RESIDUAL_MEMORIZATION</strong>
+                  </div>
+                  <div class="probe-metric">
+                    <span class="metric-label">Residual Influence</span>
+                    <strong class="accent-green" id="probeInfluence">0.0000%</strong>
+                  </div>
+                  <div class="probe-metric">
+                    <span class="metric-label">SVM Margin (w·x)</span>
+                    <strong class="accent-cyan" id="probeMargin">0.0000</strong>
+                  </div>
+                  <div class="probe-metric">
+                    <span class="metric-label">Empirical Prediction</span>
+                    <strong class="accent-purple" id="probePrediction">OUT_OF_DISTRIBUTION_UNSEEN</strong>
+                  </div>
+                </div>
+                <div class="probe-guarantee-text" id="probeDetail">
+                  Verified: 0.00% presence in Gram matrix, Hessian inverse, and active LoRA adapters.
+                </div>
+              </div>
+            </div>
+
+            <!-- PERSISTENT UNLEARNING AUDIT LEDGER -->
+            <div class="ledger-box">
+              <div class="ledger-header">
+                <h4>📜 Persistent Unlearning Audit Ledger</h4>
+                <button class="btn btn-secondary btn-xs" onclick="loadUnlearningLedger()">Refresh Ledger</button>
+              </div>
+              <div class="ledger-table-wrapper">
+                <table class="ledger-table">
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>Sample ID</th>
+                      <th>Headline</th>
+                      <th>Algorithm Chosen</th>
+                      <th>Residual Influence</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ledgerTableBody">
+                    <tr><td colspan="6" style="text-align: center; color: var(--text-dim);">No unlearning operations executed yet.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         TAB 5: LIVE WEBSOCKET DISTRIBUTED AUDIT STREAM
+         ===================================================================== -->
+    <section class="view-section" id="viewAudit">
+      <div class="audit-terminal-panel">
+        <div class="panel-header">
+          <h2>Live Distributed WebSocket Audit Terminal</h2>
+          <span class="panel-tag tag-cyan">Real-Time Telemetry Broadcast</span>
+        </div>
+        <p class="panel-desc">
+          Continuous event ledger broadcasting incoming news submissions, dual-track verdicts, editorial approvals, and exact machine unlearning purges.
+        </p>
+        <div class="terminal-window" id="auditTerminal">
+          <div class="terminal-line"><span class="term-time">[System]</span> <span class="term-ev">SYSTEM_BOOT</span>: Enterprise Dual-Track & Multi-Model Unlearning Server Online.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- =====================================================================
+       FULL ARTICLE READER MODAL (WITH FACT-CHECK CERTIFICATE)
+       ===================================================================== -->
+  <div class="modal-backdrop" id="articleModal" style="display: none;" onclick="closeModalOnBackdrop(event, 'articleModal')">
+    <div class="article-modal-card broadsheet-modal-card">
+      <button class="modal-close-btn" onclick="closeArticleModal()">×</button>
+      
+      <!-- AUTHENTIC BROADSHEET MASTHEAD BANNER -->
+      <div class="broadsheet-paper-header">
+        <span class="paper-header-left">SMRITI SHUDDHI • DISPATCH ARCHIVE</span>
+        <span class="paper-header-center" id="modalPaperHeaderCenter">SPECIAL EDITORIAL CORRESPONDENT REPORT</span>
+        <span class="paper-header-right">PRINTED BROADSHEET EDITION • VOL. LXXIV</span>
+      </div>
+
+      <div class="modal-article-header">
+        <div class="modal-meta-row">
+          <span class="modal-category" id="modalCategory">Science & Space</span> • 
+          <span class="modal-date" id="modalDate">November 3, 2026</span> • 
+          <span class="modal-reading-time" id="modalReadingTime">3 min read</span>
+        </div>
+        <h1 class="modal-title broadsheet-headline" id="modalTitle">Article Headline Here</h1>
+        <div class="modal-author-row">
+          <span class="author-badge">BYLINE: <strong id="modalAuthor">Dr. S. Nair</strong>, Staff Correspondent</span> • 
+          <span class="source-badge">REGISTRY: <strong id="modalSource">ISRO Press Office</strong></span>
+        </div>
+
+        <!-- INTERACTIVE MULTILINGUAL AUDIO PLAYER CONSOLE -->
+        <div class="audio-player-console" id="audioPlayerConsole">
+          <div class="audio-console-top">
+            <div class="audio-status-pill">
+              <span class="audio-status-dot" id="audioLiveDot"></span>
+              <span id="audioStatusText">Audio Dispatch Narration Ready</span>
+            </div>
+            <div class="audio-lang-indicator" id="audioLangIndicator">
+              <span>🎙️ Voice Engine: Auto (English / हिन्दी / తెలుగు)</span>
+            </div>
+            <div class="audio-speed-group">
+              <span class="speed-label" id="lblSpeedLabel">Speed:</span>
+              <button class="speed-btn active" data-speed="1.0" onclick="setAudioPlaybackSpeed(1.0, this)">1.0x</button>
+              <button class="speed-btn" data-speed="1.25" onclick="setAudioPlaybackSpeed(1.25, this)">1.25x</button>
+              <button class="speed-btn" data-speed="1.5" onclick="setAudioPlaybackSpeed(1.5, this)">1.5x</button>
+            </div>
+          </div>
+          <div class="audio-console-controls">
+            <div class="audio-btn-cluster">
+              <button class="btn btn-audio-play" id="btnAudioSpeak" onclick="speakArticle()">
+                <span id="audioIcon">🔊</span> <span id="audioBtnText">Read Aloud</span>
+              </button>
+              <button class="btn btn-audio-stop" id="btnAudioStop" onclick="stopAudioNarration()" title="Stop narration">
+                <span>⏹</span> <span id="audioStopBtnText">Stop</span>
+              </button>
+            </div>
+            <!-- ANIMATED EQUALIZER BARS -->
+            <div class="audio-equalizer-bars" id="audioEqBars" title="Neural TTS Audio Spectrum">
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+            </div>
+            <div class="modal-utility-actions">
+              <button class="btn btn-secondary btn-sm" onclick="exportDossierReport()">
+                <span>📥</span> <span id="btnExportText">Export Fact Dossier</span>
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnBookmark" onclick="toggleBookmarkCurrent()">
+                <span id="bookmarkIcon">🔖</span> <span id="btnBookmarkText">Save Story</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-image-wrapper" id="modalImageWrapper">
+        <img src="" alt="Article Banner" id="modalImage" class="modal-banner-image">
+      </div>
+
+      <div class="modal-body-content broadsheet-body-content" id="modalBody">
+        <!-- Body paragraphs with drop cap and newspaper columns -->
+      </div>
+
+      <!-- CONSUMER/USER FACT-CHECK CERTIFICATE (CLEAN ABSTRACTION) -->
+      <div class="fact-certificate-box citizen-cert-box user-only-ui" id="userModalCertificate">
+        <div class="cert-header">
+          <div class="cert-seal">✓</div>
+          <div>
+            <h3 id="certHeadingText">SMRITI SHUDDHI EDITORIAL GUILD AUTHENTICITY CERTIFICATE</h3>
+            <span class="cert-subtext" id="certSubText">Verified Against Official Indian & International Public Registries</span>
+          </div>
+        </div>
+        <div class="cert-meters-row">
+          <div class="cert-meter">
+            <span class="cert-meter-name">Authenticity Rating</span>
+            <span class="cert-meter-val accent-green" id="userModalRealScore">96.0%</span>
+          </div>
+          <div class="cert-meter">
+            <span class="cert-meter-name">Editorial Gate</span>
+            <span class="cert-meter-val accent-green">Verified Real Dispatch</span>
+          </div>
+          <div class="cert-meter">
+            <span class="cert-meter-name">Official Wire Cross-Check</span>
+            <span class="cert-meter-val accent-cyan">PIB / RBI / ISRO Confirmed</span>
+          </div>
+          <div class="cert-meter">
+            <span class="cert-meter-name">Factual Integrity</span>
+            <span class="cert-meter-val accent-green">Consensus Approved</span>
+          </div>
+        </div>
+        <div class="cert-rationale" id="userModalRationale">
+          Verified against official public registries and wire services. Confirmed authentic factual reporting with zero evidence of synthetic deception.
+        </div>
+      </div>
+
+      <!-- ADMIN DUAL-TRACK XAI & UNLEARNING INSPECTOR -->
+      <div class="fact-certificate-box admin-cert-box admin-only-ui" id="adminModalCertificate">
+        <div class="cert-header">
+          <div class="cert-seal">🛡️</div>
+          <div>
+            <h3>ADMINISTRATIVE DUAL-TRACK XAI & MACHINE UNLEARNING INSPECTOR</h3>
+            <span class="cert-subtext">DeBERTa-v3 Stylometry + BGE-M3 Qdrant KNN + Neo4j Chronological Graph</span>
+          </div>
+        </div>
+        <div class="cert-meters-row">
+          <div class="cert-meter">
+            <span class="cert-meter-name">Authenticity Score</span>
+            <span class="cert-meter-val accent-green" id="modalRealScore">92.0%</span>
+          </div>
+          <div class="cert-meter">
+            <span class="cert-meter-name">Track A: DeBERTa Stylometry</span>
+            <span class="cert-meter-val accent-purple" id="modalStyleScore">0.08</span>
+          </div>
+          <div class="cert-meter">
+            <span class="cert-meter-name">Track B: Qdrant Fact Retrieval</span>
+            <span class="cert-meter-val accent-cyan" id="modalFactScore">Qdrant PIB Match</span>
+          </div>
+          <div class="cert-meter">
+            <span class="cert-meter-name">Neo4j Temporal Linearity</span>
+            <span class="cert-meter-val accent-green" id="modalGraphScore">Consistent</span>
+          </div>
+        </div>
+        <div class="cert-rationale" id="modalRationale">
+          Verified against official governmental and scientific registries. Zero indicators of deceptive intent detected.
+        </div>
+        <div class="admin-modal-actions" style="margin-top: 14px; display: flex; gap: 10px;">
+          <button class="btn btn-amber btn-sm" id="btnModalSendWorkbench" onclick="sendCurrentModalToWorkbench()">
+            <span>⚡</span> Load into 3-Family Unlearning Workbench
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       LOGIN / REGISTER MODAL
+       ===================================================================== -->
+  <div class="modal-backdrop" id="authModal" style="display: none;" onclick="closeModalOnBackdrop(event, 'authModal')">
+    <div class="auth-modal-card">
+      <button class="modal-close-btn" onclick="closeAuthModal()">×</button>
+      
+      <div class="auth-header">
+        <h2 id="authTitle">Sign In to Smriti Shuddhi News Wire</h2>
+        <p class="auth-sub" id="authSubText">Access journalist submission gateway or administrative unlearning controls.</p>
+      </div>
+
+      <!-- AUTH TABS -->
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tabSignIn" onclick="setAuthTab('login')">Sign In</button>
+        <button class="auth-tab-btn" id="tabSignUp" onclick="setAuthTab('register')">Register Account</button>
+      </div>
+
+      <!-- QUICK 1-CLICK DEMO LOGIN BUTTONS -->
+      <div class="demo-login-box">
+        <span class="demo-title">Quick 1-Click Role Switch:</span>
+        <div class="demo-buttons">
+          <button class="demo-btn demo-journalist" onclick="quickLogin('journalist')">
+            <span>👤</span> Citizen Journalist (Alex Rivera)
+          </button>
+          <button class="demo-btn demo-admin" onclick="quickLogin('admin')">
+            <span>🛡️</span> Chief Fact-Checker (Dr. Mitchell)
+          </button>
+        </div>
+      </div>
+
+      <!-- LOGIN / REGISTER FORM -->
+      <form id="loginForm" onsubmit="handleAuthSubmit(event)">
+        <div class="form-group" id="groupName" style="display: none;">
+          <label for="authNameInput">Full Name</label>
+          <input type="text" id="authNameInput" placeholder="Priya Sharma">
+        </div>
+
+        <div class="form-group" id="groupRole" style="display: none;">
+          <label for="authRoleSelect">Account Type / Platform Role</label>
+          <select id="authRoleSelect">
+            <option value="JOURNALIST">Citizen Journalist / Reader (Standard News Platform)</option>
+            <option value="ADMIN">Chief Fact-Checker (Admin ML & Machine Unlearning Engine)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="authEmailInput">Email Address</label>
+          <input type="email" id="authEmailInput" placeholder="reporter@times.com" required value="reporter@times.com">
+        </div>
+
+        <div class="form-group">
+          <label for="authPasswordInput">Password</label>
+          <input type="password" id="authPasswordInput" placeholder="••••••••" required value="user123">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="authSubmitBtn">
+          Sign In to Wire
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="/static/dashboard.js"></script>
+</body>
+</html>
