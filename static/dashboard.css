@@ -3861,244 +3861,485 @@ body {
 
 
 /* ==========================================================================
-   AUTHENTIC NEWSPAPER / PARCHMENT READING MODE STYLES
+   AUTHENTIC REAL-LIFE NEWSPAPER BROADSHEET MODE STYLING
    ========================================================================== */
-[data-theme="paper"] body {
-  background-color: #f5eedc;
-  background-image: radial-gradient(rgba(180, 160, 120, 0.25) 1px, transparent 1px);
-  background-size: 20px 20px;
+
+/* 1. Real-Life Unbleached Wood-Pulp Newsprint Texture across the entire page */
+[data-theme="paper"], [data-theme="newsprint"] {
+  --bg-dark: #eee4d1;
+  --bg-card: #faf5e8;
+  --bg-card-hover: #f3ecd9;
+  --bg-surface: #fdfaf2;
+  --bg-input: #f7f0e0;
+  --bg-header-bar: #e5dac1;
+  
+  --border-subtle: #cfbe9e;
+  --border-focus: #8b1e1e;
+  --border-newspaper: #bfae8f;
+  --shadow-card: 0 4px 15px rgba(58, 43, 23, 0.12);
+  --shadow-hover: 0 10px 28px rgba(58, 43, 23, 0.22);
+  
+  --text-main: #140f09;
+  --text-muted: #2f251a;
+  --text-dim: #5c4d3c;
+  --text-newspaper: #1c150c;
+  --text-headline: #110d08;
+  
+  --accent-green: #15803d;
+  --accent-green-glow: rgba(21, 128, 61, 0.18);
+  --accent-crimson: #8b1e1e;
+  --accent-crimson-glow: rgba(139, 30, 30, 0.2);
+  --accent-amber: #9a3412;
+  --accent-amber-glow: rgba(154, 52, 18, 0.18);
+  --accent-cyan: #075985;
+  --accent-cyan-glow: rgba(7, 89, 133, 0.18);
+  --accent-purple: #581c87;
+  --accent-purple-glow: rgba(88, 28, 135, 0.18);
+  --accent-blue: #1e3a8a;
+
+  --font-masthead: 'Cinzel', 'Playfair Display', Georgia, serif;
+  --font-editorial: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
+[data-theme="paper"] body {
+  background-color: #eee4d1;
+  background-image: 
+    /* High-frequency newsprint pulp and ink speckle texture */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='newsprintGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.18  0 0 0 0 0.14  0 0 0 0 0.09  0 0 0 0.085 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23newsprintGrain)'/%3E%3C/svg%3E"),
+    /* Organic paper fiber lighting and shading */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperFibers'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='5' stitchTiles='stitch' result='noise'/%3E%3CfeDiffuseLighting in='noise' lighting-color='%23ffffff' surfaceScale='1.6' result='light'%3E%3CfeDistantLight azimuth='65' elevation='55'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix type='matrix' values='0.93 0 0 0 0  0 0.88 0 0 0  0 0 0.80 0 0  0 0 0 0.45 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='%23f1ebdb' filter='url(%23paperFibers)' opacity='0.7'/%3E%3C/svg%3E"),
+    /* Authentic aged newsprint margin darkening and vignette */
+    radial-gradient(ellipse at 50% 20%, #f6f1e5 0%, #ece2cd 65%, #dacbb1 100%),
+    /* Broadsheet vertical printing press rule lines */
+    repeating-linear-gradient(90deg, transparent 0, transparent 159px, rgba(160, 140, 110, 0.05) 160px);
+  background-attachment: fixed;
+  color: #140f09;
+  font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
+}
+
+/* 2. Physical Printed Broadsheet Paper Container */
+[data-theme="paper"] .layout-container {
+  background-color: #faf5e8;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='sheetGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.18  0 0 0 0 0.13  0 0 0 0 0.08  0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23sheetGrain)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.6) 0%, rgba(245, 237, 220, 0.4) 80%, rgba(225, 212, 188, 0.5) 100%);
+  border: 1px solid #c9b99a;
+  border-top: 5px double #2b1f13;
+  border-bottom: 5px double #2b1f13;
+  box-shadow: 
+    0 12px 35px rgba(50, 36, 18, 0.22),
+    0 0 0 1px #cebea0,
+    0 0 0 5px #ebe0cd,
+    0 25px 60px rgba(45, 32, 16, 0.25);
+  margin-top: 14px;
+  margin-bottom: 50px;
+  padding: 24px 36px 60px;
+  position: relative;
+}
+
+/* Authentic newsprint broadsheet vertical fold down center */
+[data-theme="paper"] .layout-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, rgba(160, 140, 110, 0.18) 10%, rgba(160, 140, 110, 0.18) 90%, transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 3. Authentic Broadsheet Masthead with Ink Printing Aesthetic */
 [data-theme="paper"] .newspaper-masthead {
-  border-bottom: 3px double #b8a682;
+  border-top: 2px solid #2b1f13;
+  border-bottom: 4px double #2b1f13;
+  padding: 16px 0 14px;
+  background: transparent;
+}
+
+[data-theme="paper"] .masthead-meta-row {
+  border-bottom: 1px solid #2b1f13;
+  padding-bottom: 8px;
+  font-family: 'Cinzel', 'Newsreader', Georgia, serif;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  color: #2b1f13;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 [data-theme="paper"] .newspaper-title {
-  color: #1a140d;
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+  font-weight: 900;
+  color: #110d08;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
 }
 
 [data-theme="paper"] .devanagari-masthead-title {
-  color: #92400e;
+  color: #8b1e1e;
+  font-weight: 800;
+  letter-spacing: 0.06em;
 }
 
-[data-theme="paper"] .newspaper-dispatch-card {
-  background: #fdfaf2;
-  border: 1px solid #c5b595;
-  border-top: 3px double #a89570;
-  box-shadow: 0 2px 8px rgba(78, 59, 29, 0.08);
-}
-
-[data-theme="paper"] .newspaper-dispatch-card:hover {
-  border-color: #92400e;
-  box-shadow: 0 8px 24px rgba(78, 59, 29, 0.14);
-}
-
-[data-theme="paper"] .dispatch-header-line {
-  background: #f4ecda;
-  border-bottom: 1px solid #dcd0b8;
-}
-
-[data-theme="paper"] .dispatch-kicker {
-  color: #92400e;
-}
-
-[data-theme="paper"] .broadsheet-headline {
-  color: #1a140d;
-}
-
-[data-theme="paper"] .card-excerpt {
+[data-theme="paper"] .masthead-tagline {
+  border-top: 1px solid #2b1f13;
+  border-bottom: 1px solid #2b1f13;
+  padding: 4px 0;
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
   color: #382c1a;
+  letter-spacing: 0.05em;
+  font-size: 0.88rem;
 }
 
-[data-theme="paper"] .newspaper-card-rule {
-  background: #dcd0b8;
+[data-theme="paper"] .masthead-seal {
+  background: #faf5e8;
+  border: 2px double #8b1e1e;
+  color: #8b1e1e;
+  box-shadow: 0 0 0 1px #8b1e1e;
 }
 
-[data-theme="paper"] .anime-anchor-broadcast-card {
-  background: linear-gradient(135deg, #fdfaf2 0%, #f4ecda 100%);
-  border: 1px solid #c5b595;
-  box-shadow: 0 4px 16px rgba(78, 59, 29, 0.08);
+[data-theme="paper"] .masthead-seal span {
+  font-weight: 800;
+  color: #8b1e1e;
 }
 
-[data-theme="paper"] .anchor-name {
-  color: #1a140d;
-}
-
-[data-theme="paper"] .anchor-dialogue {
+/* 4. Top Market Ticker Bar in Broadsheet Mode */
+[data-theme="paper"] .market-ticker-bar {
+  background: #e5dac1;
+  border-bottom: 1px solid #2b1f13;
   color: #241c10;
-  background: rgba(180, 83, 9, 0.07);
-  border-left: 3px solid #b45309;
+  font-family: 'JetBrains Mono', 'Newsreader', monospace;
+  font-size: 0.74rem;
+  font-weight: 600;
 }
 
-[data-theme="paper"] .broadsheet-modal-card {
-  background: #fbf5e6;
-  border: 1px solid #b8a682;
-  box-shadow: 0 20px 60px rgba(50, 36, 18, 0.35);
+/* 5. Authentic Breaking News Banner (Telegraph Bulletin Edition) */
+[data-theme="paper"] .breaking-news-wrapper {
+  background: #7a1515;
+  border-top: 2px solid #2b1f13;
+  border-bottom: 2px solid #2b1f13;
+  color: #fff;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.4);
 }
 
-[data-theme="paper"] .broadsheet-paper-header {
-  background: #ede3cb;
-  border-bottom: 2px solid #c5b595;
-  color: #705e46;
+[data-theme="paper"] .breaking-news-label {
+  background: #500d0d;
+  color: #ffcccc;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.1em;
 }
 
-[data-theme="paper"] .broadsheet-body-content {
-  color: #241c10;
+[data-theme="paper"] .breaking-item {
+  color: #fff;
 }
 
-[data-theme="paper"] .newspaper-drop-cap {
-  color: #92400e;
-  text-shadow: 0 1px 4px rgba(146, 64, 14, 0.2);
+[data-theme="paper"] .live-sync-btn {
+  background: #500d0d;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
 }
 
-[data-theme="paper"] .broadsheet-pull-quote {
-  background: rgba(180, 83, 9, 0.08);
-  color: #6b2f0a;
-  border-left: 3px solid #b45309;
-  border-right: 3px solid #b45309;
+[data-theme="paper"] .live-sync-btn:hover {
+  background: #380909;
 }
 
-[data-theme="paper"] .broadsheet-printer-slug {
-  color: #705e46;
-  border-top-color: #c5b595;
+/* 6. Broadsheet Navigation Bar & Section Tabs */
+[data-theme="paper"] .newspaper-nav-bar {
+  border-top: 1px solid #2b1f13;
+  border-bottom: 2px solid #2b1f13;
+  background: #ede3cc;
 }
 
-[data-theme="paper"] .nav-tab.active {
-  color: #1a140d;
-  background: #fdfaf2;
-  border-color: #c5b595;
-  box-shadow: 0 2px 6px rgba(78, 59, 29, 0.1);
+[data-theme="paper"] .nav-tab {
+  font-family: 'Cinzel', 'Newsreader', Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #382c1a;
+  border-bottom: 3px solid transparent;
 }
 
 [data-theme="paper"] .nav-tab:hover {
-  background: #ede3cb;
-  color: #1a140d;
+  background: #e2d5bc;
+  color: #110d08;
 }
 
-[data-theme="paper"] .btn-secondary {
-  background: #fdfaf2;
+[data-theme="paper"] .nav-tab.active {
+  color: #110d08;
+  background: #faf5e8;
+  border-color: #8b1e1e;
+  border-bottom: 3px solid #8b1e1e;
+}
+
+/* 7. Lead Hero Article (Classic Broadsheet Front Page Lead Story) */
+[data-theme="paper"] .featured-hero-article {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid #b8a682;
+  border-top: 4px double #2b1f13;
+  box-shadow: 0 2px 10px rgba(60, 45, 25, 0.08);
+  border-radius: 2px;
+}
+
+[data-theme="paper"] .featured-hero-article:hover {
+  border-color: #8b1e1e;
+  box-shadow: 0 6px 20px rgba(60, 45, 25, 0.16);
+}
+
+[data-theme="paper"] .hero-title {
+  font-family: 'Newsreader', 'Playfair Display', Georgia, serif !important;
+  font-weight: 800;
+  font-size: 1.85rem;
+  line-height: 1.22;
+  color: #110d08 !important;
+}
+
+[data-theme="paper"] .hero-excerpt {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #211a12;
+  text-align: justify;
+}
+
+[data-theme="paper"] .hero-excerpt::first-letter {
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+  font-size: 3.4rem;
+  float: left;
+  line-height: 0.82;
+  margin: 4px 10px 0 0;
+  color: #8b1e1e;
+  font-weight: 800;
+}
+
+/* 8. Trending Wire Sidebar (Broadsheet Second Column) */
+[data-theme="paper"] .trending-wire-sidebar {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid #b8a682;
+  border-top: 4px double #2b1f13;
+  border-radius: 2px;
+  box-shadow: 0 2px 10px rgba(60, 45, 25, 0.08);
+}
+
+[data-theme="paper"] .sidebar-header {
+  border-bottom: 2px solid #2b1f13;
+}
+
+[data-theme="paper"] .sidebar-header h3 {
+  font-family: 'Cinzel', 'Newsreader', Georgia, serif;
+  font-weight: 800;
+  color: #110d08;
+  letter-spacing: 0.04em;
+}
+
+[data-theme="paper"] .trending-item {
+  border-bottom: 1px dashed #b8a682;
+  padding-bottom: 12px;
+}
+
+[data-theme="paper"] .trending-rank {
+  font-family: 'Cinzel', serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #8b1e1e;
+}
+
+[data-theme="paper"] .trending-title {
+  font-family: 'Newsreader', Georgia, serif;
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: #140f09;
+}
+
+/* 9. Authentic Newspaper Broadsheet Article Cards */
+[data-theme="paper"] .newspaper-dispatch-card {
+  background: rgba(255, 255, 255, 0.65);
   border: 1px solid #c5b595;
-  color: #1a140d;
+  border-top: 4px double #2b1f13;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(78, 59, 29, 0.07);
+}
+
+[data-theme="paper"] .newspaper-dispatch-card:hover {
+  border-color: #8b1e1e;
+  box-shadow: 0 6px 18px rgba(78, 59, 29, 0.15);
+  transform: translateY(-2px);
+}
+
+[data-theme="paper"] .dispatch-header-line {
+  background: #ede3cc;
+  border-bottom: 1px solid #c5b595;
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  color: #2b1f13;
+  font-weight: 700;
+}
+
+[data-theme="paper"] .dispatch-kicker {
+  color: #8b1e1e;
+  font-weight: 800;
+}
+
+[data-theme="paper"] .broadsheet-headline {
+  font-family: 'Newsreader', Georgia, serif;
+  font-weight: 800;
+  font-size: 1.15rem;
+  line-height: 1.3;
+  color: #110d08;
+}
+
+[data-theme="paper"] .card-excerpt {
+  font-family: 'Newsreader', Georgia, serif;
+  color: #241c10;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  text-align: justify;
+}
+
+[data-theme="paper"] .newspaper-dateline-row {
+  border-top: 1px dotted #b8a682;
+  border-bottom: 1px dotted #b8a682;
+  padding: 4px 0;
+  margin-bottom: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  color: #4a3b2c;
+  font-weight: 700;
+}
+
+[data-theme="paper"] .newspaper-location {
+  color: #8b1e1e;
+  font-weight: 800;
+}
+
+[data-theme="paper"] .card-meta-line {
+  border-top: 1px solid #c5b595;
+  padding-top: 8px;
+  font-family: 'Newsreader', Georgia, serif;
+}
+
+[data-theme="paper"] .newspaper-card-rule {
+  background: #b8a682;
+  height: 1px;
+}
+
+/* 10. Authentic Newsprint Offset Print Photo Effect */
+[data-theme="paper"] .dispatch-image-box img,
+[data-theme="paper"] .hero-image,
+[data-theme="paper"] .modal-hero-photo {
+  filter: sepia(0.24) contrast(1.15) brightness(0.96) grayscale(0.2);
+  border: 1px solid #2b1f13;
+}
+
+/* 11. Modal Reader (Authentic Broadsheet Extra Dispatch Edition) */
+[data-theme="paper"] .broadsheet-modal-card {
+  background-color: #faf5e8;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='modalGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.18  0 0 0 0 0.13  0 0 0 0 0.08  0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23modalGrain)'/%3E%3C/svg%3E");
+  border: 2px solid #2b1f13;
+  box-shadow: 0 25px 70px rgba(45, 30, 15, 0.45);
+}
+
+[data-theme="paper"] .broadsheet-paper-header {
+  background: #e5dac1;
+  border-bottom: 2px solid #2b1f13;
+  color: #2b1f13;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+}
+
+[data-theme="paper"] .broadsheet-body-content {
+  color: #140f09;
+  font-family: 'Newsreader', Georgia, serif;
+}
+
+[data-theme="paper"] .newspaper-lead-para::first-letter,
+[data-theme="paper"] .newspaper-drop-cap {
+  color: #8b1e1e;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 3.4rem;
+  font-weight: 800;
+  float: left;
+  line-height: 0.82;
+  margin-right: 10px;
+}
+
+[data-theme="paper"] .broadsheet-pull-quote {
+  background: rgba(139, 30, 30, 0.06);
+  color: #6b1414;
+  border-left: 3px solid #8b1e1e;
+  border-right: 3px solid #8b1e1e;
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+}
+
+[data-theme="paper"] .broadsheet-printer-slug {
+  border-top: 1px double #2b1f13;
+  color: #5c4d3c;
+  font-family: 'Cinzel', serif;
+}
+
+/* 12. Controls and Buttons in Paper Mode */
+[data-theme="paper"] .btn-secondary {
+  background: #faf5e8;
+  border: 1px solid #b8a682;
+  color: #140f09;
 }
 
 [data-theme="paper"] .btn-secondary:hover {
-  background: #ede3cb;
-  border-color: #a89570;
-}
-
-[data-theme="paper"] .audio-player-console {
-  background: linear-gradient(135deg, #fdfaf2 0%, #f4ecda 100%);
-  border: 1px solid #c5b595;
-  box-shadow: 0 4px 16px rgba(78, 59, 29, 0.08);
-}
-
-[data-theme="paper"] .audio-console-top {
-  border-bottom: 1px dashed #c5b595;
-}
-
-[data-theme="paper"] .audio-status-pill {
-  color: #705e46;
-}
-
-[data-theme="paper"] .speed-btn {
-  background: #ede3cb;
-  border-color: #c5b595;
-  color: #382c1a;
-}
-
-[data-theme="paper"] .speed-btn.active {
-  background: #b45309;
-  color: #ffffff;
-  border-color: #b45309;
-}
-
-[data-theme="paper"] .market-ticker-bar {
-  background: #ede3cb;
-  border-bottom: 1px solid #dcd0b8;
-  color: #382c1a;
+  background: #ede3cc;
+  border-color: #2b1f13;
 }
 
 [data-theme="paper"] .theme-ui-btn.active {
-  background: linear-gradient(135deg, #92400e 0%, #78350f 100%);
+  background: #8b1e1e;
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(146, 64, 14, 0.4);
+  box-shadow: 0 2px 8px rgba(139, 30, 30, 0.4);
 }
 
-[data-theme="paper"] .citizen-receipt-card {
-  background: linear-gradient(145deg, #fdfaf2, #f4ecda);
-  border: 1px solid #86efac;
+[data-theme="paper"] .audio-player-console {
+  background: #faf5e8;
+  border: 1px solid #b8a682;
   box-shadow: 0 4px 16px rgba(78, 59, 29, 0.08);
 }
 
-[data-theme="paper"] .citizen-tag-wrapper {
-  background: #faf5e8;
-  border: 1px solid #dcd0b8;
-}
-
 [data-theme="paper"] .matrix-table {
-  background: #fdfaf2;
-  color: #1c150c;
+  background: #faf5e8;
+  color: #140f09;
 }
 
 [data-theme="paper"] .matrix-table th {
-  background: #ede3cb;
-  color: #1a140d;
-  border-bottom: 2px solid #c5b595;
+  background: #ede3cc;
+  color: #110d08;
+  border-bottom: 2px solid #2b1f13;
 }
 
 [data-theme="paper"] .matrix-table td {
-  border-bottom: 1px solid #dcd0b8;
-  color: #241c10;
-}
-
-[data-theme="paper"] .matrix-row:hover {
-  background: #f7f0df;
-}
-
-[data-theme="paper"] .shard-node {
-  background: #fdfaf2;
-  border: 1px solid #c5b595;
-  color: #1a140d;
+  border-bottom: 1px solid #cfbe9e;
+  color: #140f09;
 }
 
 [data-theme="paper"] .auth-modal-card {
-  background: #fdfaf2;
-  border: 1px solid #c5b595;
-  color: #1a140d;
-}
-
-[data-theme="paper"] .auth-header h2 {
-  color: #1a140d;
-}
-
-[data-theme="paper"] .auth-sub {
-  color: #705e46;
-}
-
-[data-theme="paper"] .auth-tabs {
-  background: #ede3cb;
+  background: #faf5e8;
+  border: 2px solid #2b1f13;
+  color: #140f09;
 }
 
 [data-theme="paper"] .auth-tab-btn.active {
-  background: #fdfaf2;
-  color: #1a140d;
-}
-
-[data-theme="paper"] .demo-login-box {
   background: #faf5e8;
-  border: 1px solid #dcd0b8;
-}
-
-[data-theme="paper"] .demo-title {
-  color: #705e46;
+  color: #8b1e1e;
+  border-bottom: 2px solid #8b1e1e;
 }
 
 [data-theme="paper"] .demo-btn {
-  background: #fdfaf2;
-  border: 1px solid #c5b595;
-  color: #1a140d;
+  background: #faf5e8;
+  border: 1px solid #b8a682;
+  color: #140f09;
 }
 
 [data-theme="paper"] .demo-btn:hover {
-  background: #ede3cb;
+  background: #ede3cc;
 }

@@ -79,6 +79,543 @@
       "action_recommended": "FLAG_FOR_ADMIN_REVIEW_OR_REVOCATION",
       "created_at": "2026-11-03T13:20:24.011244+00:00",
       "_id": "news_1793712024014_4"
+    },
+    {
+      "news_id": "NEWS_B6DF3BE3",
+      "sample_id": "SYN_LIVE_85FF47",
+      "title": "Union Cabinet Approves Next-Phase Green Hydrogen National Grid Corridor (November 05, 2026)",
+      "text": "The Union Cabinet has sanctioned \u20b919,744 crore for the unified Green Energy Transmission Corridor to connect solar and wind power zones with major coastal hydrogen clusters. The project aims to eliminate 15 million tonnes of greenhouse gas emissions annually by 2030.",
+      "source": "PIB National Wire",
+      "author": "Bureau Chief R. Sen",
+      "category": "Governance & Policy",
+      "language": "English",
+      "region": "India National",
+      "image_url": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=800&q=80",
+      "reading_time": "2 min read",
+      "status": "PUBLISHED",
+      "fake_probability": 0.3194,
+      "real_probability": 0.6806,
+      "risk_band": "MODERATE_RISK",
+      "action_recommended": "MONITOR_USER_FEEDBACK",
+      "s_style": 0.2875,
+      "s_fact": 0.5,
+      "temporal_consistency": 0.9,
+      "xai": {
+        "primary_verdict_factors": [
+          "No direct official bulletin found; prediction guided by stylistic intention analysis."
+        ],
+        "stylistic_analysis": {
+          "s_style": 0.2875,
+          "framing_risk": "NORMAL",
+          "sensational_cue_count": 0,
+          "exclamation_density": 0.0,
+          "all_caps_word_ratio": 0.0,
+          "highlighted_html": "Union Cabinet Approves Next-Phase Green Hydrogen National Grid Corridor (November 05, 2026) The Union Cabinet has sanctioned \u20b919,744 crore for the unified Green Energy Transmission Corridor to connect solar and wind power zones with major coastal hydrogen clusters. The project aims to eliminate 15 million tonnes of greenhouse gas emissions annually by 2030.",
+          "emotional_arousal_score": 0.0,
+          "detected_cues": []
+        },
+        "factual_retrieval_analysis": {
+          "s_fact": 0.5,
+          "evidence_status": "NO_OFFICIAL_CORPUS_MATCH",
+          "official_matches": []
+        },
+        "chronological_graph_analysis": {
+          "temporal_score": 0.9,
+          "timeline_verdict": "CHRONOLOGICALLY_CONSISTENT",
+          "detected_contradictions": [],
+          "graph_backend": "embedded_networkx_graph"
+        },
+        "regional_linguistics": {
+          "detected_language": "English",
+          "hinglish_markers": []
+        }
+      },
+      "created_at": "2026-11-05T16:57:27.565689+00:00",
+      "_id": "news_1793897847565_5"
+    },
+    {
+      "news_id": "NEWS_156A16BF",
+      "sample_id": "SYN_LIVE_EDE032",
+      "title": "ISRO Announces New Lunar Polar Explorer Payload Integration at Bengaluru Facility",
+      "text": "Engineers at the UR Rao Satellite Centre have commenced structural mating for the high-resolution subsurface drilling and mass spectrometry module designed for the upcoming joint lunar polar exploration mission. Launch validation protocols remain ahead of schedule.",
+      "source": "ISRO Press Office",
+      "author": "Dr. V. K. Nambiar",
+      "category": "Science & Space",
+      "language": "English",
+      "region": "Space Technology Desk",
+      "image_url": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
+      "reading_time": "2 min read",
+      "status": "PUBLISHED",
+      "fake_probability": 0.3126,
+      "real_probability": 0.6874,
+      "risk_band": "MODERATE_RISK",
+      "action_recommended": "MONITOR_USER_FEEDBACK",
+      "s_style": 0.2795,
+      "s_fact": 0.5,
+      "temporal_consistency": 0.9,
+      "xai": {
+        "primary_verdict_factors": [
+          "No direct official bulletin found; prediction guided by stylistic intention analysis."
+        ],
+        "stylistic_analysis": {
+          "s_style": 0.2795,
+          "framing_risk": "NORMAL",
+          "sensational_cue_count": 0,
+          "exclamation_density": 0.0,
+          "all_caps_word_ratio": 0.0426,
+          "highlighted_html": "ISRO Announces New Lunar Polar Explorer Payload Integration at Bengaluru Facility Engineers at the UR Rao Satellite Centre have commenced structural mating for the high-resolution subsurface drilling and mass spectrometry module designed for the upcoming joint lunar polar exploration mission. Launch validation protocols remain ahead of schedule.",
+          "emotional_arousal_score": 0.021,
+          "detected_cues": []
+        },
+        "factual_retrieval_analysis": {
+          "s_fact": 0.5,
+          "evidence_status": "NO_OFFICIAL_CORPUS_MATCH",
+          "official_matches": []
+        },
+        "chronological_graph_analysis": {
+          "temporal_score": 0.9,
+          "timeline_verdict": "CHRONOLOGICALLY_CONSISTENT",
+          "detected_contradictions": [],
+          "graph_backend": "embedded_networkx_graph"
+        },
+        "regional_linguistics": {
+          "detected_language": "English",
+          "hinglish_markers": [
+            "ISRO"
+          ]
+        }
+      },
+      "created_at": "2026-11-05T16:57:27.568993+00:00",
+      "_id": "news_1793897847568_6"
+    },
+    {
+      "news_id": "NEWS_7A8EEDDD",
+      "sample_id": "SYN_LIVE_DA4B2C",
+      "title": "Reserve Bank of India Reports Foreign Exchange Reserves Rise to Record Peak",
+      "text": "India's foreign currency reserves reached a new historic milestone of $682.4 billion in the latest weekly statistical supplement, driven by foreign portfolio inflows into Indian manufacturing equities and bond markets.",
+      "source": "RBI Central Bulletin",
+      "author": "Economic Correspondent",
+      "category": "Banking & Economy",
+      "language": "English",
+      "region": "Financial & Markets",
+      "image_url": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80",
+      "reading_time": "2 min read",
+      "status": "PUBLISHED",
+      "fake_probability": 0.38,
+      "real_probability": 0.62,
+      "risk_band": "MODERATE_RISK",
+      "action_recommended": "MONITOR_USER_FEEDBACK",
+      "s_style": 0.2882,
+      "s_fact": 0.9,
+      "temporal_consistency": 0.15,
+      "xai": {
+        "primary_verdict_factors": [
+          "No direct official bulletin found; prediction guided by stylistic intention analysis.",
+          "Temporal graph detected chronological contradiction: Chronological Contradiction: RBI reaffirmed 500 Rupee notes are fully valid on 2024-04-02."
+        ],
+        "stylistic_analysis": {
+          "s_style": 0.2882,
+          "framing_risk": "NORMAL",
+          "sensational_cue_count": 0,
+          "exclamation_density": 0.0,
+          "all_caps_word_ratio": 0.0,
+          "highlighted_html": "Reserve Bank of India Reports Foreign Exchange Reserves Rise to Record Peak India&#x27;s foreign currency reserves reached a new historic milestone of $682.4 billion in the latest weekly statistical supplement, driven by foreign portfolio inflows into Indian manufacturing equities and bond markets.",
+          "emotional_arousal_score": 0.0,
+          "detected_cues": []
+        },
+        "factual_retrieval_analysis": {
+          "s_fact": 0.9,
+          "evidence_status": "NO_OFFICIAL_CORPUS_MATCH",
+          "official_matches": []
+        },
+        "chronological_graph_analysis": {
+          "temporal_score": 0.15,
+          "timeline_verdict": "TIMELINE_CONTRADICTION",
+          "detected_contradictions": [
+            "Chronological Contradiction: RBI reaffirmed 500 Rupee notes are fully valid on 2024-04-02."
+          ],
+          "graph_backend": "embedded_networkx_graph"
+        },
+        "regional_linguistics": {
+          "detected_language": "English",
+          "hinglish_markers": []
+        }
+      },
+      "created_at": "2026-11-05T16:57:27.572309+00:00",
+      "_id": "news_1793897847572_7"
+    },
+    {
+      "news_id": "NEWS_4D3A55D5",
+      "sample_id": "SYN_LIVE_6E944A",
+      "title": "\u0915\u0947\u0902\u0926\u094d\u0930\u0940\u092f \u092e\u0902\u0924\u094d\u0930\u093f\u092e\u0902\u0921\u0932 \u0928\u0947 \u0930\u093e\u0937\u094d\u091f\u094d\u0930\u0940\u092f \u0939\u0930\u093f\u0924 \u090a\u0930\u094d\u091c\u093e \u0917\u0932\u093f\u092f\u093e\u0930\u093e \u092a\u0930\u093f\u092f\u094b\u091c\u0928\u093e \u0915\u0947 \u0926\u0942\u0938\u0930\u0947 \u091a\u0930\u0923 \u0915\u094b \u092e\u0902\u091c\u0942\u0930\u0940 \u0926\u0940 (November 05, 2026)",
+      "text": "\u092a\u094d\u0930\u0927\u093e\u0928\u092e\u0902\u0924\u094d\u0930\u0940 \u0915\u0940 \u0905\u0927\u094d\u092f\u0915\u094d\u0937\u0924\u093e \u092e\u0947\u0902 \u0915\u0947\u0902\u0926\u094d\u0930\u0940\u092f \u092e\u0902\u0924\u094d\u0930\u093f\u092e\u0902\u0921\u0932 \u0928\u0947 \u0928\u0935\u0940\u0915\u0930\u0923\u0940\u092f \u090a\u0930\u094d\u091c\u093e \u091f\u094d\u0930\u093e\u0902\u0938\u092e\u093f\u0936\u0928 \u0915\u0947 \u0932\u093f\u090f \u0928\u0908 \u0905\u0902\u0924\u0930\u094d\u0930\u093e\u091c\u094d\u092f\u0940\u092f \u0917\u094d\u0930\u093f\u0921 \u092a\u0930\u093f\u092f\u094b\u091c\u0928\u093e \u0915\u094b \u0938\u094d\u0935\u0940\u0915\u0943\u0924\u093f \u092a\u094d\u0930\u0926\u093e\u0928 \u0915\u0940\u0964 \u0907\u0938\u0938\u0947 \u092a\u0935\u0928 \u090f\u0935\u0902 \u0938\u094c\u0930 \u090a\u0930\u094d\u091c\u093e \u0915\u093e \u0938\u0940\u0927\u093e \u0935\u093f\u0924\u0930\u0923 \u0938\u0902\u092d\u0935 \u0939\u094b \u0938\u0915\u0947\u0917\u093e\u0964",
+      "source": "\u092a\u0940\u0906\u0908\u092c\u0940 \u0938\u092e\u093e\u091a\u093e\u0930 \u092c\u094d\u092f\u0942\u0930\u094b",
+      "author": "\u0930\u093e\u0937\u094d\u091f\u094d\u0930\u0940\u092f \u0938\u092e\u093e\u091a\u093e\u0930 \u0921\u0947\u0938\u094d\u0915",
+      "category": "Governance & Policy",
+      "language": "Hindi (\u0939\u093f\u0902\u0926\u0940)",
+      "region": "\u0930\u093e\u0937\u094d\u091f\u094d\u0930\u0940\u092f \u0938\u092e\u093e\u091a\u093e\u0930",
+      "image_url": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=800&q=80",
+      "reading_time": "2 min read",
+      "status": "PUBLISHED",
+      "fake_probability": 0.3131,
+      "real_probability": 0.6869,
+      "risk_band": "MODERATE_RISK",
+      "action_recommended": "MONITOR_USER_FEEDBACK",
+      "s_style": 0.2801,
+      "s_fact": 0.5,
+      "temporal_consistency": 0.9,
+      "xai": {
+        "primary_verdict_factors": [
+          "No direct official bulletin found; prediction guided by stylistic intention analysis."
+        ],
+        "stylistic_analysis": {
+          "s_style": 0.2801,
+          "framing_risk": "NORMAL",
+          "sensational_cue_count": 0,
+          "exclamation_density": 0.0,
+          "all_caps_word_ratio": 0.0,
+          "highlighted_html": "\u0915\u0947\u0902\u0926\u094d\u0930\u0940\u092f \u092e\u0902\u0924\u094d\u0930\u093f\u092e\u0902\u0921\u0932 \u0928\u0947 \u0930\u093e\u0937\u094d\u091f\u094d\u0930\u0940\u092f \u0939\u0930\u093f\u0924 \u090a\u0930\u094d\u091c\u093e \u0917\u0932\u093f\u092f\u093e\u0930\u093e \u092a\u0930\u093f\u092f\u094b\u091c\u0928\u093e \u0915\u0947 \u0926\u0942\u0938\u0930\u0947 \u091a\u0930\u0923 \u0915\u094b \u092e\u0902\u091c\u0942\u0930\u0940 \u0926\u0940 (November 05, 2026) \u092a\u094d\u0930\u0927\u093e\u0928\u092e\u0902\u0924\u094d\u0930\u0940 \u0915\u0940 \u0905\u0927\u094d\u092f\u0915\u094d\u0937\u0924\u093e \u092e\u0947\u0902 \u0915\u0947\u0902\u0926\u094d\u0930\u0940\u092f \u092e\u0902\u0924\u094d\u0930\u093f\u092e\u0902\u0921\u0932 \u0928\u0947 \u0928\u0935\u0940\u0915\u0930\u0923\u0940\u092f \u090a\u0930\u094d\u091c\u093e \u091f\u094d\u0930\u093e\u0902\u0938\u092e\u093f\u0936\u0928 \u0915\u0947 \u0932\u093f\u090f \u0928\u0908 \u0905\u0902\u0924\u0930\u094d\u0930\u093e\u091c\u094d\u092f\u0940\u092f \u0917\u094d\u0930\u093f\u0921 \u092a\u0930\u093f\u092f\u094b\u091c\u0928\u093e \u0915\u094b \u0938\u094d\u0935\u0940\u0915\u0943\u0924\u093f \u092a\u094d\u0930\u0926\u093e\u0928 \u0915\u0940\u0964 \u0907\u0938\u0938\u0947 \u092a\u0935\u0928 \u090f\u0935\u0902 \u0938\u094c\u0930 \u090a\u0930\u094d\u091c\u093e \u0915\u093e \u0938\u0940\u0927\u093e \u0935\u093f\u0924\u0930\u0923 \u0938\u0902\u092d\u0935 \u0939\u094b \u0938\u0915\u0947\u0917\u093e\u0964",
+          "emotional_arousal_score": 0.0,
+          "detected_cues": []
+        },
+        "factual_retrieval_analysis": {
+          "s_fact": 0.5,
+          "evidence_status": "NO_OFFICIAL_CORPUS_MATCH",
+          "official_matches": []
+        },
+        "chronological_graph_analysis": {
+          "temporal_score": 0.9,
+          "timeline_verdict": "CHRONOLOGICALLY_CONSISTENT",
+          "detected_contradictions": [],
+          "graph_backend": "embedded_networkx_graph"
+        },
+        "regional_linguistics": {
+          "detected_language": "Hindi (Devanagari)",
+          "hinglish_markers": []
+        }
+      },
+      "created_at": "2026-11-05T16:57:27.577115+00:00",
+      "_id": "news_1793897847577_8"
+    },
+    {
+      "news_id": "NEWS_4E75BE0F",
+      "sample_id": "SYN_LIVE_4A6F4A",
+      "title": "\u0c1c\u0c3e\u0c24\u0c3f\u0c2f \u0c39\u0c30\u0c3f\u0c24 \u0c07\u0c02\u0c27\u0c28 \u0c15\u0c3e\u0c30\u0c3f\u0c21\u0c3e\u0c30\u0c4d \u0c35\u0c3f\u0c38\u0c4d\u0c24\u0c30\u0c23\u0c15\u0c41 \u0c15\u0c47\u0c02\u0c26\u0c4d\u0c30 \u0c2e\u0c02\u0c24\u0c4d\u0c30\u0c3f\u0c35\u0c30\u0c4d\u0c17\u0c02 \u0c06\u0c2e\u0c4b\u0c26\u0c02 (November 05, 2026)",
+      "text": "\u0c38\u0c4c\u0c30, \u0c2a\u0c35\u0c28 \u0c35\u0c3f\u0c26\u0c4d\u0c2f\u0c41\u0c24\u0c4d \u0c09\u0c24\u0c4d\u0c2a\u0c24\u0c4d\u0c24\u0c3f \u0c15\u0c47\u0c02\u0c26\u0c4d\u0c30\u0c3e\u0c32\u0c28\u0c41 \u0c05\u0c28\u0c41\u0c38\u0c02\u0c27\u0c3e\u0c28\u0c3f\u0c02\u0c1a\u0c47 \u0c05\u0c02\u0c24\u0c30\u0c4d\u0c30\u0c3e\u0c37\u0c4d\u0c1f\u0c4d\u0c30 \u0c35\u0c3f\u0c26\u0c4d\u0c2f\u0c41\u0c24\u0c4d \u0c35\u0c4d\u0c2f\u0c35\u0c38\u0c4d\u0c25\u0c15\u0c41 \u0c15\u0c47\u0c02\u0c26\u0c4d\u0c30\u0c02 \u0c2d\u0c3e\u0c30\u0c40 \u0c28\u0c3f\u0c27\u0c41\u0c32\u0c41 \u0c15\u0c47\u0c1f\u0c3e\u0c2f\u0c3f\u0c02\u0c1a\u0c3f\u0c02\u0c26\u0c3f. \u0c2a\u0c30\u0c3f\u0c36\u0c4d\u0c30\u0c2e\u0c32\u0c15\u0c41 \u0c15\u0c3e\u0c32\u0c41\u0c37\u0c4d\u0c2f \u0c30\u0c39\u0c3f\u0c24 \u0c07\u0c02\u0c27\u0c28\u0c3e\u0c28\u0c4d\u0c28\u0c3f \u0c24\u0c15\u0c4d\u0c15\u0c41\u0c35 \u0c27\u0c30\u0c15\u0c41 \u0c05\u0c02\u0c26\u0c3f\u0c02\u0c1a\u0c21\u0c2e\u0c47 \u0c08 \u0c2a\u0c4d\u0c30\u0c3e\u0c1c\u0c46\u0c15\u0c4d\u0c1f\u0c4d \u0c32\u0c15\u0c4d\u0c37\u0c4d\u0c2f\u0c02.",
+      "source": "\u0c08\u0c28\u0c3e\u0c21\u0c41 \u0c1c\u0c3e\u0c24\u0c40\u0c2f \u0c21\u0c46\u0c38\u0c4d\u0c15\u0c4d",
+      "author": "\u0c2a\u0c4d\u0c30\u0c24\u0c4d\u0c2f\u0c47\u0c15 \u0c2a\u0c4d\u0c30\u0c24\u0c3f\u0c28\u0c3f\u0c27\u0c3f",
+      "category": "Governance & Policy",
+      "language": "Telugu (\u0c24\u0c46\u0c32\u0c41\u0c17\u0c41)",
+      "region": "\u0c1c\u0c3e\u0c24\u0c40\u0c2f \u0c35\u0c3e\u0c30\u0c4d\u0c24\u0c3e \u0c35\u0c3f\u0c2d\u0c3e\u0c17\u0c02",
+      "image_url": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=800&q=80",
+      "reading_time": "2 min read",
+      "status": "PUBLISHED",
+      "fake_probability": 0.3119,
+      "real_probability": 0.6881,
+      "risk_band": "MODERATE_RISK",
+      "action_recommended": "MONITOR_USER_FEEDBACK",
+      "s_style": 0.2787,
+      "s_fact": 0.5,
+      "temporal_consistency": 0.9,
+      "xai": {
+        "primary_verdict_factors": [
+          "No direct official bulletin found; prediction guided by stylistic intention analysis."
+        ],
+        "stylistic_analysis": {
+          "s_style": 0.2787,
+          "framing_risk": "NORMAL",
+          "sensational_cue_count": 0,
+          "exclamation_density": 0.0,
+          "all_caps_word_ratio": 0.0,
+          "highlighted_html": "\u0c1c\u0c3e\u0c24\u0c3f\u0c2f \u0c39\u0c30\u0c3f\u0c24 \u0c07\u0c02\u0c27\u0c28 \u0c15\u0c3e\u0c30\u0c3f\u0c21\u0c3e\u0c30\u0c4d \u0c35\u0c3f\u0c38\u0c4d\u0c24\u0c30\u0c23\u0c15\u0c41 \u0c15\u0c47\u0c02\u0c26\u0c4d\u0c30 \u0c2e\u0c02\u0c24\u0c4d\u0c30\u0c3f\u0c35\u0c30\u0c4d\u0c17\u0c02 \u0c06\u0c2e\u0c4b\u0c26\u0c02 (November 05, 2026) \u0c38\u0c4c\u0c30, \u0c2a\u0c35\u0c28 \u0c35\u0c3f\u0c26\u0c4d\u0c2f\u0c41\u0c24\u0c4d \u0c09\u0c24\u0c4d\u0c2a\u0c24\u0c4d\u0c24\u0c3f \u0c15\u0c47\u0c02\u0c26\u0c4d\u0c30\u0c3e\u0c32\u0c28\u0c41 \u0c05\u0c28\u0c41\u0c38\u0c02\u0c27\u0c3e\u0c28\u0c3f\u0c02\u0c1a\u0c47 \u0c05\u0c02\u0c24\u0c30\u0c4d\u0c30\u0c3e\u0c37\u0c4d\u0c1f\u0c4d\u0c30 \u0c35\u0c3f\u0c26\u0c4d\u0c2f\u0c41\u0c24\u0c4d \u0c35\u0c4d\u0c2f\u0c35\u0c38\u0c4d\u0c25\u0c15\u0c41 \u0c15\u0c47\u0c02\u0c26\u0c4d\u0c30\u0c02 \u0c2d\u0c3e\u0c30\u0c40 \u0c28\u0c3f\u0c27\u0c41\u0c32\u0c41 \u0c15\u0c47\u0c1f\u0c3e\u0c2f\u0c3f\u0c02\u0c1a\u0c3f\u0c02\u0c26\u0c3f. \u0c2a\u0c30\u0c3f\u0c36\u0c4d\u0c30\u0c2e\u0c32\u0c15\u0c41 \u0c15\u0c3e\u0c32\u0c41\u0c37\u0c4d\u0c2f \u0c30\u0c39\u0c3f\u0c24 \u0c07\u0c02\u0c27\u0c28\u0c3e\u0c28\u0c4d\u0c28\u0c3f \u0c24\u0c15\u0c4d\u0c15\u0c41\u0c35 \u0c27\u0c30\u0c15\u0c41 \u0c05\u0c02\u0c26\u0c3f\u0c02\u0c1a\u0c21\u0c2e\u0c47 \u0c08 \u0c2a\u0c4d\u0c30\u0c3e\u0c1c\u0c46\u0c15\u0c4d\u0c1f\u0c4d \u0c32\u0c15\u0c4d\u0c37\u0c4d\u0c2f\u0c02.",
+          "emotional_arousal_score": 0.0,
+          "detected_cues": []
+        },
+        "factual_retrieval_analysis": {
+          "s_fact": 0.5,
+          "evidence_status": "NO_OFFICIAL_CORPUS_MATCH",
+          "official_matches": []
+        },
+        "chronological_graph_analysis": {
+          "temporal_score": 0.9,
+          "timeline_verdict": "CHRONOLOGICALLY_CONSISTENT",
+          "detected_contradictions": [],
+          "graph_backend": "embedded_networkx_graph"
+        },
+        "regional_linguistics": {
+          "detected_language": "Telugu",
+          "hinglish_markers": []
+        }
+      },
+      "created_at": "2026-11-05T16:57:27.580115+00:00",
+      "_id": "news_1793897847580_9"
+    },
+    {
+      "news_id": "NEWS_5F7C6F42",
+      "sample_id": "SYN_LIVE_796667",
+      "title": "Global AI Compute Standard Established for Edge Devices and Microcontrollers",
+      "text": "An international consortium of semiconductor fabricators has standardized ultra-low power neural quantized interfaces, enabling generative reasoning models to operate on low-power sensor microcontrollers without persistent cloud telemetry.",
+      "source": "Tech Chronicle Wire",
+      "author": "S. Chandrasekhar",
+      "category": "Technology & AI",
+      "language": "English",
+      "region": "Tech & AI Bureau",
+      "image_url": "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80",
+      "reading_time": "2 min read",
+      "status": "PUBLISHED",
+      "fake_probability": 0.3189,
+      "real_probability": 0.6811,
+      "risk_band": "MODERATE_RISK",
+      "action_recommended": "MONITOR_USER_FEEDBACK",
+      "s_style": 0.287,
+      "s_fact": 0.5,
+      "temporal_consistency": 0.9,
+      "xai": {
+        "primary_verdict_factors": [
+          "No direct official bulletin found; prediction guided by stylistic intention analysis."
+        ],
+        "stylistic_analysis": {
+          "s_style": 0.287,
+          "framing_risk": "NORMAL",
+          "sensational_cue_count": 0,
+          "exclamation_density": 0.0,
+          "all_caps_word_ratio": 0.027,
+          "highlighted_html": "Global AI Compute Standard Established for Edge Devices and Microcontrollers An international consortium of semiconductor fabricators has standardized ultra-low power neural quantized interfaces, enabling generative reasoning models to operate on low-power sensor microcontrollers without persistent cloud telemetry.",
+          "emotional_arousal_score": 0.014,
+          "detected_cues": []
+        },
+        "factual_retrieval_analysis": {
+          "s_fact": 0.5,
+          "evidence_status": "NO_OFFICIAL_CORPUS_MATCH",
+          "official_matches": []
+        },
+        "chronological_graph_analysis": {
+          "temporal_score": 0.9,
+          "timeline_verdict": "CHRONOLOGICALLY_CONSISTENT",
+          "detected_contradictions": [],
+          "graph_backend": "embedded_networkx_graph"
+        },
+        "regional_linguistics": {
+          "detected_language": "English",
+          "hinglish_markers": []
+        }
+      },
+      "created_at": "2026-11-05T16:57:27.583313+00:00",
+      "_id": "news_1793897847583_10"
+    },
+    {
+      "news_id": "NEWS_2857BF97",
+      "sample_id": "SYN_LIVE_8DDA8B",
+      "title": "India Meteorological Department Releases Early Monsoon Transition Assessment",
+      "text": "IMD radar networks indicate stable moisture streams across coastal peninsulas. Seasonal temperatures remain in normal ranges with adequate reservoir recharge noted across southern and central river basins.",
+      "source": "IMD Weather Bureau",
+      "author": "Dr. P. Mukherjee",
+      "category": "Weather & Safety",
+      "language": "English",
+      "region": "Climate & Safety Desk",
+      "image_url": "https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=800&q=80",
+      "reading_time": "2 min read",
+      "status": "PUBLISHED",
+      "fake_probability": 0.3122,
+      "real_probability": 0.6878,
+      "risk_band": "MODERATE_RISK",
+      "action_recommended": "MONITOR_USER_FEEDBACK",
+      "s_style": 0.2791,
+      "s_fact": 0.5,
+      "temporal_consistency": 0.9,
+      "xai": {
+        "primary_verdict_factors": [
+          "No direct official bulletin found; prediction guided by stylistic intention analysis."
+        ],
+        "stylistic_analysis": {
+          "s_style": 0.2791,
+          "framing_risk": "NORMAL",
+          "sensational_cue_count": 0,
+          "exclamation_density": 0.0,
+          "all_caps_word_ratio": 0.0286,
+          "highlighted_html": "India Meteorological Department Releases Early Monsoon Transition Assessment IMD radar networks indicate stable moisture streams across coastal peninsulas. Seasonal temperatures remain in normal ranges with adequate reservoir recharge noted across southern and central river basins.",
+          "emotional_arousal_score": 0.014,
+          "detected_cues": []
+        },
+        "factual_retrieval_analysis": {
+          "s_fact": 0.5,
+          "evidence_status": "NO_OFFICIAL_CORPUS_MATCH",
+          "official_matches": []
+        },
+        "chronological_graph_analysis": {
+          "temporal_score": 0.9,
+          "timeline_verdict": "CHRONOLOGICALLY_CONSISTENT",
+          "detected_contradictions": [],
+          "graph_backend": "embedded_networkx_graph"
+        },
+        "regional_linguistics": {
+          "detected_language": "English",
+          "hinglish_markers": []
+        }
+      },
+      "created_at": "2026-11-05T16:57:27.585313+00:00",
+      "_id": "news_1793897847585_11"
+    },
+    {
+      "news_id": "NEWS_6E9B4103",
+      "sample_id": "SYN_LIVE_F327B9",
+      "title": "\u0c2d\u0c3e\u0c30\u0c24 \u0c35\u0c3f\u0c26\u0c47\u0c36\u0c40 \u0c2e\u0c3e\u0c30\u0c15 \u0c26\u0c4d\u0c30\u0c35\u0c4d\u0c2f \u0c28\u0c3f\u0c32\u0c4d\u0c35\u0c32\u0c41 \u0c38\u0c30\u0c3f\u0c15\u0c4a\u0c24\u0c4d\u0c24 \u0c30\u0c3f\u0c15\u0c3e\u0c30\u0c4d\u0c21\u0c41 \u0c38\u0c4d\u0c25\u0c3e\u0c2f\u0c3f\u0c15\u0c3f \u0c1a\u0c47\u0c30\u0c3f\u0c15",
+      "text": "\u0c26\u0c47\u0c36 \u0c35\u0c3f\u0c26\u0c47\u0c36\u0c40 \u0c2e\u0c3e\u0c30\u0c15 \u0c26\u0c4d\u0c30\u0c35\u0c4d\u0c2f \u0c28\u0c3f\u0c32\u0c4d\u0c35\u0c32\u0c41 682 \u0c2c\u0c3f\u0c32\u0c3f\u0c2f\u0c28\u0c4d \u0c21\u0c3e\u0c32\u0c30\u0c4d\u0c32\u0c15\u0c41 \u0c2a\u0c46\u0c30\u0c3f\u0c17\u0c3f\u0c28\u0c1f\u0c4d\u0c32\u0c41 \u0c30\u0c3f\u0c1c\u0c30\u0c4d\u0c35\u0c4d \u0c2c\u0c4d\u0c2f\u0c3e\u0c02\u0c15\u0c4d \u0c35\u0c46\u0c32\u0c4d\u0c32\u0c21\u0c3f\u0c02\u0c1a\u0c3f\u0c02\u0c26\u0c3f. \u0c2d\u0c3e\u0c30\u0c24\u0c40\u0c2f \u0c06\u0c30\u0c4d\u0c25\u0c3f\u0c15 \u0c35\u0c4d\u0c2f\u0c35\u0c38\u0c4d\u0c25 \u0c38\u0c4d\u0c25\u0c3f\u0c30\u0c24\u0c4d\u0c35\u0c3e\u0c28\u0c3f\u0c15\u0c3f \u0c2e\u0c30\u0c3f\u0c2f\u0c41 \u0c30\u0c42\u0c2a\u0c3e\u0c2f\u0c3f \u0c35\u0c3f\u0c32\u0c41\u0c35 \u0c38\u0c4d\u0c25\u0c3f\u0c30\u0c40\u0c15\u0c30\u0c23\u0c15\u0c41 \u0c07\u0c26\u0c3f \u0c15\u0c40\u0c32\u0c15 \u0c38\u0c02\u0c15\u0c47\u0c24\u0c2e\u0c28\u0c3f \u0c35\u0c3f\u0c36\u0c4d\u0c32\u0c47\u0c37\u0c15\u0c41\u0c32\u0c41 \u0c2d\u0c3e\u0c35\u0c3f\u0c38\u0c4d\u0c24\u0c41\u0c28\u0c4d\u0c28\u0c3e\u0c30\u0c41.",
+      "source": "\u0c38\u0c3e\u0c15\u0c4d\u0c37\u0c3f \u0c2c\u0c3f\u0c1c\u0c3f\u0c28\u0c46\u0c38\u0c4d \u0c2c\u0c4d\u0c2f\u0c42\u0c30\u0c4b",
+      "author": "\u0c06\u0c30\u0c4d\u0c25\u0c3f\u0c15 \u0c35\u0c3f\u0c2d\u0c3e\u0c17\u0c02",
+      "category": "Banking & Economy",
+      "language": "Telugu (\u0c24\u0c46\u0c32\u0c41\u0c17\u0c41)",
+      "region": "\u0c35\u0c4d\u0c2f\u0c3e\u0c2a\u0c3e\u0c30\u0c02 & \u0c2e\u0c3e\u0c30\u0c4d\u0c15\u0c46\u0c1f\u0c4d\u0c32\u0c41",
+      "image_url": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80",
+      "reading_time": "2 min read",
+      "status": "PUBLISHED",
+      "fake_probability": 0.3197,
+      "real_probability": 0.6803,
+      "risk_band": "MODERATE_RISK",
+      "action_recommended": "MONITOR_USER_FEEDBACK",
+      "s_style": 0.2879,
+      "s_fact": 0.5,
+      "temporal_consistency": 0.9,
+      "xai": {
+        "primary_verdict_factors": [
+          "No direct official bulletin found; prediction guided by stylistic intention analysis."
+        ],
+        "stylistic_analysis": {
+          "s_style": 0.2879,
+          "framing_risk": "NORMAL",
+          "sensational_cue_count": 0,
+          "exclamation_density": 0.0,
+          "all_caps_word_ratio": 0.0,
+          "highlighted_html": "\u0c2d\u0c3e\u0c30\u0c24 \u0c35\u0c3f\u0c26\u0c47\u0c36\u0c40 \u0c2e\u0c3e\u0c30\u0c15 \u0c26\u0c4d\u0c30\u0c35\u0c4d\u0c2f \u0c28\u0c3f\u0c32\u0c4d\u0c35\u0c32\u0c41 \u0c38\u0c30\u0c3f\u0c15\u0c4a\u0c24\u0c4d\u0c24 \u0c30\u0c3f\u0c15\u0c3e\u0c30\u0c4d\u0c21\u0c41 \u0c38\u0c4d\u0c25\u0c3e\u0c2f\u0c3f\u0c15\u0c3f \u0c1a\u0c47\u0c30\u0c3f\u0c15 \u0c26\u0c47\u0c36 \u0c35\u0c3f\u0c26\u0c47\u0c36\u0c40 \u0c2e\u0c3e\u0c30\u0c15 \u0c26\u0c4d\u0c30\u0c35\u0c4d\u0c2f \u0c28\u0c3f\u0c32\u0c4d\u0c35\u0c32\u0c41 682 \u0c2c\u0c3f\u0c32\u0c3f\u0c2f\u0c28\u0c4d \u0c21\u0c3e\u0c32\u0c30\u0c4d\u0c32\u0c15\u0c41 \u0c2a\u0c46\u0c30\u0c3f\u0c17\u0c3f\u0c28\u0c1f\u0c4d\u0c32\u0c41 \u0c30\u0c3f\u0c1c\u0c30\u0c4d\u0c35\u0c4d \u0c2c\u0c4d\u0c2f\u0c3e\u0c02\u0c15\u0c4d \u0c35\u0c46\u0c32\u0c4d\u0c32\u0c21\u0c3f\u0c02\u0c1a\u0c3f\u0c02\u0c26\u0c3f. \u0c2d\u0c3e\u0c30\u0c24\u0c40\u0c2f \u0c06\u0c30\u0c4d\u0c25\u0c3f\u0c15 \u0c35\u0c4d\u0c2f\u0c35\u0c38\u0c4d\u0c25 \u0c38\u0c4d\u0c25\u0c3f\u0c30\u0c24\u0c4d\u0c35\u0c3e\u0c28\u0c3f\u0c15\u0c3f \u0c2e\u0c30\u0c3f\u0c2f\u0c41 \u0c30\u0c42\u0c2a\u0c3e\u0c2f\u0c3f \u0c35\u0c3f\u0c32\u0c41\u0c35 \u0c38\u0c4d\u0c25\u0c3f\u0c30\u0c40\u0c15\u0c30\u0c23\u0c15\u0c41 \u0c07\u0c26\u0c3f \u0c15\u0c40\u0c32\u0c15 \u0c38\u0c02\u0c15\u0c47\u0c24\u0c2e\u0c28\u0c3f \u0c35\u0c3f\u0c36\u0c4d\u0c32\u0c47\u0c37\u0c15\u0c41\u0c32\u0c41 \u0c2d\u0c3e\u0c35\u0c3f\u0c38\u0c4d\u0c24\u0c41\u0c28\u0c4d\u0c28\u0c3e\u0c30\u0c41.",
+          "emotional_arousal_score": 0.0,
+          "detected_cues": []
+        },
+        "factual_retrieval_analysis": {
+          "s_fact": 0.5,
+          "evidence_status": "NO_OFFICIAL_CORPUS_MATCH",
+          "official_matches": []
+        },
+        "chronological_graph_analysis": {
+          "temporal_score": 0.9,
+          "timeline_verdict": "CHRONOLOGICALLY_CONSISTENT",
+          "detected_contradictions": [],
+          "graph_backend": "embedded_networkx_graph"
+        },
+        "regional_linguistics": {
+          "detected_language": "Telugu",
+          "hinglish_markers": []
+        }
+      },
+      "created_at": "2026-11-05T16:57:27.588314+00:00",
+      "_id": "news_1793897847588_12"
+    },
+    {
+      "news_id": "NEWS_9418A7EB",
+      "sample_id": "SYN_LIVE_4D8746",
+      "title": "\u092d\u093e\u0930\u0924\u0940\u092f \u0905\u0902\u0924\u0930\u093f\u0915\u094d\u0937 \u0905\u0928\u0941\u0938\u0902\u0927\u093e\u0928 \u0938\u0902\u0917\u0920\u0928 (ISRO) \u0928\u0947 \u0928\u090f \u0909\u092a\u0917\u094d\u0930\u0939 \u092a\u094d\u0930\u0915\u094d\u0937\u0947\u092a\u0923 \u0915\u0940 \u0924\u0948\u092f\u093e\u0930\u0940 \u092a\u0942\u0930\u0940 \u0915\u0940",
+      "text": "\u0936\u094d\u0930\u0940\u0939\u0930\u093f\u0915\u094b\u091f\u093e \u0938\u094d\u0925\u093f\u0924 \u0938\u0924\u0940\u0936 \u0927\u0935\u0928 \u0905\u0902\u0924\u0930\u093f\u0915\u094d\u0937 \u0915\u0947\u0902\u0926\u094d\u0930 \u0938\u0947 \u0905\u0917\u0932\u0947 \u0938\u092a\u094d\u0924\u093e\u0939 \u0928\u090f \u092a\u0943\u0925\u094d\u0935\u0940 \u0905\u0935\u0932\u094b\u0915\u0928 \u0909\u092a\u0917\u094d\u0930\u0939 \u0915\u093e \u092a\u094d\u0930\u0915\u094d\u0937\u0947\u092a\u0923 \u0915\u093f\u092f\u093e \u091c\u093e\u090f\u0917\u093e\u0964 \u092f\u0939 \u0909\u092a\u0917\u094d\u0930\u0939 \u0915\u0943\u0937\u093f, \u0906\u092a\u0926\u093e \u092a\u094d\u0930\u092c\u0902\u0927\u0928 \u0914\u0930 \u0936\u0939\u0930\u0940 \u0928\u093f\u092f\u094b\u091c\u0928 \u0915\u0947 \u0932\u093f\u090f \u0909\u091a\u094d\u091a-\u0930\u093f\u091c\u093c\u0949\u0932\u094d\u092f\u0942\u0936\u0928 \u0921\u0947\u091f\u093e \u092a\u094d\u0930\u0926\u093e\u0928 \u0915\u0930\u0947\u0917\u093e\u0964",
+      "source": "\u092c\u0940\u092c\u0940\u0938\u0940 \u0939\u093f\u0902\u0926\u0940 \u092c\u094d\u092f\u0942\u0930\u094b",
+      "author": "\u0924\u0915\u0928\u0940\u0915 \u0938\u0902\u0935\u093e\u0926\u0926\u093e\u0924\u093e",
+      "category": "Science & Space",
+      "language": "Hindi (\u0939\u093f\u0902\u0926\u0940)",
+      "region": "\u0935\u093f\u091c\u094d\u091e\u093e\u0928 \u090f\u0935\u0902 \u0924\u0915\u0928\u0940\u0915",
+      "image_url": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
+      "reading_time": "2 min read",
+      "status": "PUBLISHED",
+      "fake_probability": 0.3148,
+      "real_probability": 0.6852,
+      "risk_band": "MODERATE_RISK",
+      "action_recommended": "MONITOR_USER_FEEDBACK",
+      "s_style": 0.2821,
+      "s_fact": 0.5,
+      "temporal_consistency": 0.9,
+      "xai": {
+        "primary_verdict_factors": [
+          "No direct official bulletin found; prediction guided by stylistic intention analysis."
+        ],
+        "stylistic_analysis": {
+          "s_style": 0.2821,
+          "framing_risk": "NORMAL",
+          "sensational_cue_count": 0,
+          "exclamation_density": 0.0,
+          "all_caps_word_ratio": 0.0227,
+          "highlighted_html": "\u092d\u093e\u0930\u0924\u0940\u092f \u0905\u0902\u0924\u0930\u093f\u0915\u094d\u0937 \u0905\u0928\u0941\u0938\u0902\u0927\u093e\u0928 \u0938\u0902\u0917\u0920\u0928 (ISRO) \u0928\u0947 \u0928\u090f \u0909\u092a\u0917\u094d\u0930\u0939 \u092a\u094d\u0930\u0915\u094d\u0937\u0947\u092a\u0923 \u0915\u0940 \u0924\u0948\u092f\u093e\u0930\u0940 \u092a\u0942\u0930\u0940 \u0915\u0940 \u0936\u094d\u0930\u0940\u0939\u0930\u093f\u0915\u094b\u091f\u093e \u0938\u094d\u0925\u093f\u0924 \u0938\u0924\u0940\u0936 \u0927\u0935\u0928 \u0905\u0902\u0924\u0930\u093f\u0915\u094d\u0937 \u0915\u0947\u0902\u0926\u094d\u0930 \u0938\u0947 \u0905\u0917\u0932\u0947 \u0938\u092a\u094d\u0924\u093e\u0939 \u0928\u090f \u092a\u0943\u0925\u094d\u0935\u0940 \u0905\u0935\u0932\u094b\u0915\u0928 \u0909\u092a\u0917\u094d\u0930\u0939 \u0915\u093e \u092a\u094d\u0930\u0915\u094d\u0937\u0947\u092a\u0923 \u0915\u093f\u092f\u093e \u091c\u093e\u090f\u0917\u093e\u0964 \u092f\u0939 \u0909\u092a\u0917\u094d\u0930\u0939 \u0915\u0943\u0937\u093f, \u0906\u092a\u0926\u093e \u092a\u094d\u0930\u092c\u0902\u0927\u0928 \u0914\u0930 \u0936\u0939\u0930\u0940 \u0928\u093f\u092f\u094b\u091c\u0928 \u0915\u0947 \u0932\u093f\u090f \u0909\u091a\u094d\u091a-\u0930\u093f\u091c\u093c\u0949\u0932\u094d\u092f\u0942\u0936\u0928 \u0921\u0947\u091f\u093e \u092a\u094d\u0930\u0926\u093e\u0928 \u0915\u0930\u0947\u0917\u093e\u0964",
+          "emotional_arousal_score": 0.011,
+          "detected_cues": []
+        },
+        "factual_retrieval_analysis": {
+          "s_fact": 0.5,
+          "evidence_status": "NO_OFFICIAL_CORPUS_MATCH",
+          "official_matches": []
+        },
+        "chronological_graph_analysis": {
+          "temporal_score": 0.9,
+          "timeline_verdict": "CHRONOLOGICALLY_CONSISTENT",
+          "detected_contradictions": [],
+          "graph_backend": "embedded_networkx_graph"
+        },
+        "regional_linguistics": {
+          "detected_language": "Hindi (Devanagari)",
+          "hinglish_markers": [
+            "ISRO"
+          ]
+        }
+      },
+      "created_at": "2026-11-05T16:57:27.593315+00:00",
+      "_id": "news_1793897847593_13"
+    },
+    {
+      "news_id": "NEWS_4DCD0781",
+      "sample_id": "SYN_LIVE_9E752E",
+      "title": "Ministry of Electronics and IT Expands Semiconductor Design Linked Incentive (DLI)",
+      "text": "Under the expanded design-linked incentive program, 12 indigenous fabless startup chipmakers will receive fiscal support and Electronic Design Automation tool access to design automotive and telecommunication microchips locally.",
+      "source": "National Tech Wire",
+      "author": "Anjali Deshmukh",
+      "category": "Technology & AI",
+      "language": "English",
+      "region": "Governance & Technology",
+      "image_url": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
+      "reading_time": "2 min read",
+      "status": "PUBLISHED",
+      "fake_probability": 0.3218,
+      "real_probability": 0.6782,
+      "risk_band": "MODERATE_RISK",
+      "action_recommended": "MONITOR_USER_FEEDBACK",
+      "s_style": 0.2903,
+      "s_fact": 0.5,
+      "temporal_consistency": 0.9,
+      "xai": {
+        "primary_verdict_factors": [
+          "No direct official bulletin found; prediction guided by stylistic intention analysis."
+        ],
+        "stylistic_analysis": {
+          "s_style": 0.2903,
+          "framing_risk": "NORMAL",
+          "sensational_cue_count": 0,
+          "exclamation_density": 0.0,
+          "all_caps_word_ratio": 0.0513,
+          "highlighted_html": "Ministry of Electronics and IT Expands Semiconductor Design Linked Incentive (DLI) Under the expanded design-linked incentive program, 12 indigenous fabless startup chipmakers will receive fiscal support and Electronic Design Automation tool access to design automotive and telecommunication microchips locally.",
+          "emotional_arousal_score": 0.026,
+          "detected_cues": []
+        },
+        "factual_retrieval_analysis": {
+          "s_fact": 0.5,
+          "evidence_status": "NO_OFFICIAL_CORPUS_MATCH",
+          "official_matches": []
+        },
+        "chronological_graph_analysis": {
+          "temporal_score": 0.9,
+          "timeline_verdict": "CHRONOLOGICALLY_CONSISTENT",
+          "detected_contradictions": [],
+          "graph_backend": "embedded_networkx_graph"
+        },
+        "regional_linguistics": {
+          "detected_language": "English",
+          "hinglish_markers": []
+        }
+      },
+      "created_at": "2026-11-05T16:57:27.596546+00:00",
+      "_id": "news_1793897847596_14"
     }
   ],
   "audit_logs": [

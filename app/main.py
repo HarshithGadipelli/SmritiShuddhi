@@ -2,6 +2,7 @@ import os
 import re
 import time
 import uuid
+import asyncio
 import logging
 from typing import Optional, Dict, Any, List
 from contextlib import asynccontextmanager
@@ -23,7 +24,14 @@ from app.unlearning.engine import unlearning_engine
 from app.unlearning.algorithms import multi_model_suite
 from db import init_db, news_col, training_col, unlearning_col, audit_col, users_col, unlearning_ledger_col, now
 from app.utils.document_parser import parse_base64_document
-from app.retrieval.news_feed import fetch_live_rss_feed, get_curated_live_stories, TOPIC_IMAGE_MAP, FALLBACK_IMAGE
+from app.retrieval.news_feed import (
+    fetch_realtime_news,
+    fetch_live_rss_feed,
+    get_curated_live_stories,
+    generate_dynamic_realtime_stories,
+    TOPIC_IMAGE_MAP,
+    FALLBACK_IMAGE
+)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("EnterpriseFakeNewsPipeline")
@@ -65,6 +73,11 @@ class RegisterRequest(BaseModel):
     email: str
     password: str
     role: Optional[str] = "JOURNALIST"
+
+
+class NewsApiConfigRequest(BaseModel):
+    news_api_key: Optional[str] = Field(None, description="API Key for NewsAPI.org")
+    gnews_api_key: Optional[str] = Field(None, description="API Key for GNews.io")
     title: Optional[str] = "Contributing Reporter"
 
 
@@ -268,9 +281,23 @@ def seed_initial_demo_news():
 # LIFESPAN & SERVICE INITIALIZATION
 # -----------------------------------------------------------------------------
 
+async def background_news_sync_loop():
+    """Periodically fetches and verifies live breaking news in the background."""
+    await asyncio.sleep(4)
+    while True:
+        try:
+            logger.info("Executing periodic live news background sync...")
+            res = perform_news_sync()
+            logger.info("Periodic news sync: %d new articles synced from %s", res.get("synced_count", 0), res.get("sources_used", []))
+        except Exception as e:
+            logger.warning("Periodic news sync iteration notice: %s", e)
+        await asyncio.sleep(max(5, config.NEWS_AUTO_SYNC_MINUTES) * 60)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Initializing Enterprise Fake News Detection & Multi-Model Unlearning Platform...")
+    sync_task = None
     try:
         init_db()
         seed_initial_demo_news()
@@ -282,9 +309,13 @@ async def lifespan(app: FastAPI):
             unlearning_engine.initialize_shards_from_dataset()
         # Initialize Multi-Model Unlearning Suite
         multi_model_suite._lazy_init()
+        # Launch automated background live news synchronizer
+        sync_task = asyncio.create_task(background_news_sync_loop())
     except Exception as e:
         logger.warning("Startup initialization notice: %s", e)
     yield
+    if sync_task:
+        sync_task.cancel()
     logger.info("Shutting down pipeline service...")
 
 
@@ -521,14 +552,13 @@ def extract_document(payload: DocumentExtractRequest):
         raise HTTPException(status_code=400, detail=f"Failed to parse document: {str(e)}")
 
 
-@app.post("/api/v1/news/sync-live")
-def sync_live_news_feed(background_tasks: BackgroundTasks):
-    """Fetches real-time live RSS stories, verifies them via Dual-Track Hybrid AI, and publishes to wire."""
-    stories = fetch_live_rss_feed(max_items=50)
-    if not stories:
-        stories = get_curated_live_stories()
-
+def perform_news_sync(background_tasks: Optional[BackgroundTasks] = None) -> Dict[str, Any]:
+    """Coordinates fetching real-time news across NewsAPI, GNews, public Google News/BBC RSS feeds,
+    runs Dual-Track Hybrid verification, and broadcasts new stories to connected clients."""
+    result = fetch_realtime_news(max_items=40)
+    stories = result.get("stories", [])
     synced_count = 0
+
     for story in stories:
         title = story.get("title", "").strip()
         if not title:
@@ -568,7 +598,7 @@ def sync_live_news_feed(background_tasks: BackgroundTasks):
         }
         news_col.insert_one(doc)
         synced_count += 1
-        if status == "PUBLISHED":
+        if status == "PUBLISHED" and background_tasks:
             background_tasks.add_task(
                 ws_manager.broadcast,
                 {"event": "LIVE_FEED_ITEM_SYNCED", "article": {**doc, "_id": str(doc.get("_id", ""))}}
@@ -577,7 +607,42 @@ def sync_live_news_feed(background_tasks: BackgroundTasks):
     return {
         "status": "SYNC_SUCCESS",
         "synced_count": synced_count,
-        "total_published": news_col.count_documents({"status": "PUBLISHED"})
+        "sources_used": result.get("sources_used", []),
+        "api_linked": result.get("api_linked", False),
+        "total_published": news_col.count_documents({"status": "PUBLISHED"}),
+        "synced_at": now()
+    }
+
+
+@app.post("/api/v1/news/sync-live")
+def sync_live_news_feed(background_tasks: BackgroundTasks):
+    """Fetches real-time live stories via linked APIs or RSS wire, verifies them via Dual-Track AI, and publishes."""
+    return perform_news_sync(background_tasks)
+
+
+@app.post("/api/v1/news/configure-api")
+def configure_news_api(payload: NewsApiConfigRequest):
+    """Configures official NewsAPI.org or GNews.io API keys dynamically from the UI or environment."""
+    if payload.news_api_key is not None:
+        config.NEWS_API_KEY = payload.news_api_key.strip()
+    if payload.gnews_api_key is not None:
+        config.GNEWS_API_KEY = payload.gnews_api_key.strip()
+    return {
+        "status": "CONFIG_SAVED",
+        "has_newsapi": bool(config.NEWS_API_KEY),
+        "has_gnews": bool(config.GNEWS_API_KEY),
+        "message": "Live news feed API credentials updated successfully."
+    }
+
+
+@app.get("/api/v1/news/status")
+def get_news_sync_status():
+    """Returns live news wire connection status, linked APIs, and total published dispatches."""
+    return {
+        "total_published": news_col.count_documents({"status": "PUBLISHED"}),
+        "has_newsapi": bool(config.NEWS_API_KEY),
+        "has_gnews": bool(config.GNEWS_API_KEY),
+        "auto_sync_interval_minutes": config.NEWS_AUTO_SYNC_MINUTES
     }
 
 

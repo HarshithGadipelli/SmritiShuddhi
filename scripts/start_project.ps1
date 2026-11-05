@@ -11,5 +11,5 @@ if (-not (Test-Path 'data\processed\train.csv')) {
 if (-not (Test-Path 'artifacts\sisa\active_manifest.json')) {
   & .\.venv\Scripts\python.exe training\train_sisa.py --data data\processed\train.csv
 }
-Write-Host 'Starting Flask application at http://127.0.0.1:5000'
-& .\.venv\Scripts\python.exe app.py
+Write-Host 'Starting Smriti Shuddhi Enterprise Platform at http://127.0.0.1:8000'
+& .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload

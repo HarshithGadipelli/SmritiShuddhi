@@ -12,4 +12,4 @@ if not exist .env copy .env.example .env
 python scripts\generate_demo_dataset.py --rows 1200
 python training\train_sisa.py --data data\processed\train.csv
 python evaluation\evaluate_model.py
-python app.py
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload

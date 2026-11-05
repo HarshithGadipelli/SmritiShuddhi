@@ -135,6 +135,9 @@
       <button class="live-sync-btn" onclick="syncLiveNews()" title="Fetch live real-time RSS news wire">
         <span id="syncIcon">🔄</span> <span id="syncBtnText">Sync Live Wire</span>
       </button>
+      <button class="live-sync-btn api-settings-btn" onclick="openApiConfigModal()" title="Configure external live news APIs (NewsAPI.org / GNews.io)" style="background: rgba(255,255,255,0.08); border: 1px solid var(--border-subtle); margin-left: 6px;">
+        <span>⚙️</span> <span>API Settings</span>
+      </button>
     </div>
 
     <!-- =====================================================================
@@ -1211,6 +1214,48 @@
         <button type="submit" class="btn btn-primary btn-block" id="authSubmitBtn">
           Sign In to Wire
         </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       LIVE NEWS API CONFIGURATION MODAL
+       ===================================================================== -->
+  <div class="modal-backdrop" id="apiConfigModal" style="display: none;" onclick="closeModalOnBackdrop(event, 'apiConfigModal')">
+    <div class="auth-modal-card" style="max-width: 520px;">
+      <button class="modal-close-btn" onclick="closeApiConfigModal()">×</button>
+      <div class="auth-header">
+        <h2>📡 Live Real-Time News API Settings</h2>
+        <p class="auth-sub">Link dedicated news APIs or use Smriti Shuddhi's built-in Google News & public RSS feed aggregator.</p>
+      </div>
+
+      <div style="background: rgba(2, 132, 199, 0.08); border-left: 3px solid var(--accent-cyan); padding: 12px; border-radius: 4px; margin-bottom: 18px; font-size: 0.85rem; line-height: 1.5;">
+        <strong>💡 Note on Live News Updates:</strong><br>
+        • Smriti Shuddhi automatically polls real-time Indian & global news feeds (Google News, BBC Hindi/Telugu/World, The Hindu, TOI) every 15 minutes.<br>
+        • For 100% direct REST API ingestion with guaranteed uptime, you can enter a free API key from <a href="https://newsapi.org" target="_blank" style="color: var(--accent-cyan); text-decoration: underline;">NewsAPI.org</a> or <a href="https://gnews.io" target="_blank" style="color: var(--accent-cyan); text-decoration: underline;">GNews.io</a> below.
+      </div>
+
+      <form id="apiConfigForm" onsubmit="saveApiConfig(event)">
+        <div class="form-group">
+          <label for="cfgNewsApiKey">NewsAPI.org Key (Optional)</label>
+          <input type="text" id="cfgNewsApiKey" placeholder="e.g. 8a34bc1234567890abcdef..." autocomplete="off">
+          <span style="font-size: 0.72rem; color: var(--text-dim); margin-top: 3px;">Free tier available at newsapi.org (provides 100 requests/day).</span>
+        </div>
+
+        <div class="form-group" style="margin-top: 14px;">
+          <label for="cfgGnewsApiKey">GNews.io Token (Optional)</label>
+          <input type="text" id="cfgGnewsApiKey" placeholder="e.g. d41d8cd98f00b204e9800998ecf8427e..." autocomplete="off">
+          <span style="font-size: 0.72rem; color: var(--text-dim); margin-top: 3px;">Free tier available at gnews.io.</span>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 22px;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">
+            Save & Sync Live Wire Now
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="closeApiConfigModal()">
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   </div>

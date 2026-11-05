@@ -172,14 +172,22 @@ document.addEventListener('DOMContentLoaded', () => {
   loadUnlearningLedger();
   loadUserSubmissions();
   initBenchmarkTable();
+  // Auto-sync real-time breaking news wire on page load
+  setTimeout(() => {
+    syncLiveNews(true);
+  }, 1200);
+  // Periodically refresh news wire in background every 15 minutes
+  setInterval(() => {
+    syncLiveNews(true);
+  }, 15 * 60 * 1000);
 });
 
 function initTheme() {
   const savedTheme = localStorage.getItem('smriti_shuddhi_theme') || 'light';
-  setTheme(savedTheme);
+  setTheme(savedTheme, false);
 }
 
-function setTheme(theme) {
+function setTheme(theme, isUserClick = true) {
   state.currentTheme = theme;
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('smriti_shuddhi_theme', theme);
@@ -189,6 +197,15 @@ function setTheme(theme) {
   if (btnLight) btnLight.classList.toggle('active', theme === 'light');
   if (btnPaper) btnPaper.classList.toggle('active', theme === 'paper');
   if (btnDark) btnDark.classList.toggle('active', theme === 'dark');
+  if (isUserClick && typeof showToast === 'function') {
+    if (theme === 'paper') {
+      showToast('📰 Real Life Newspaper Broadsheet Mode Active', 'info');
+    } else if (theme === 'light') {
+      showToast('☀️ Clean Light Mode Active', 'info');
+    } else if (theme === 'dark') {
+      showToast('🌙 Dark Terminal Mode Active', 'info');
+    }
+  }
 }
 
 function initDateDisplay() {
@@ -726,20 +743,70 @@ function renderNewsWire() {
   }
 }
 
-async function syncLiveNews() {
+async function syncLiveNews(silent = false) {
   const icon = document.getElementById('syncIcon');
+  const btnText = document.getElementById('syncBtnText');
   if (icon) icon.style.animation = 'spin 1s linear infinite';
+  if (btnText) btnText.innerText = 'Syncing Wire...';
   
-  logTerminal('SYNC_REQUEST', 'Contacting live real-time RSS feeds & running Dual-Track AI verification...');
+  logTerminal('SYNC_REQUEST', 'Contacting live real-time news sources & running Dual-Track AI verification...');
   try {
     const res = await fetch('/api/v1/news/sync-live', { method: 'POST' });
     const data = await res.json();
     if (icon) icon.style.animation = 'none';
-    logTerminal('SYNC_COMPLETE', `Ingested & verified ${data.synced_count} new real-time wire articles.`);
+    if (btnText) btnText.innerText = 'Sync Live Wire';
+
+    const srcStr = (data.sources_used && data.sources_used.length) ? data.sources_used.join(', ') : 'Live Wire';
+    logTerminal('SYNC_COMPLETE', `Ingested & verified ${data.synced_count} fresh wire articles from ${srcStr}.`);
+    
     await loadPublishedNews();
+
+    if (!silent && typeof showToast === 'function') {
+      if (data.synced_count > 0) {
+        showToast(`📰 Ingested ${data.synced_count} fresh real-time articles via ${srcStr}!`, 'success');
+      } else {
+        showToast(`✅ Live Wire up to date (${data.total_published} verified articles online). Sources: ${srcStr}`, 'info');
+      }
+    }
   } catch (err) {
     if (icon) icon.style.animation = 'none';
+    if (btnText) btnText.innerText = 'Sync Live Wire';
     console.error('Error syncing news:', err);
+    if (!silent && typeof showToast === 'function') {
+      showToast('⚠️ Unable to reach news wire. Check internet connection or API settings.', 'warning');
+    }
+  }
+}
+
+function openApiConfigModal() {
+  const modal = document.getElementById('apiConfigModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeApiConfigModal() {
+  const modal = document.getElementById('apiConfigModal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function saveApiConfig(e) {
+  if (e) e.preventDefault();
+  const newsApiKeyInput = document.getElementById('cfgNewsApiKey');
+  const gnewsApiKeyInput = document.getElementById('cfgGnewsApiKey');
+  const newsApiKey = newsApiKeyInput ? newsApiKeyInput.value.trim() : '';
+  const gnewsApiKey = gnewsApiKeyInput ? gnewsApiKeyInput.value.trim() : '';
+  
+  try {
+    const res = await fetch('/api/v1/news/configure-api', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ news_api_key: newsApiKey, gnews_api_key: gnewsApiKey })
+    });
+    const d = await res.json();
+    showToast('🔑 API credentials saved. Ingesting live feeds...', 'success');
+    closeApiConfigModal();
+    await syncLiveNews(false);
+  } catch (err) {
+    showToast('❌ Failed to update API credentials: ' + err.message, 'error');
   }
 }
 

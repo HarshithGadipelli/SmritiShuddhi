@@ -59,7 +59,10 @@ sync_training_registry()
 seed_demo_news()
 
 @app.route('/')
-def index(): return render_template('index.html')
+def index():
+    if (Path('templates') / 'enterprise_dashboard.html').exists():
+        return render_template('enterprise_dashboard.html')
+    return render_template('index.html')
 
 @app.route('/admin')
 def admin(): return render_template('admin.html')
