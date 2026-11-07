@@ -1427,7 +1427,24 @@ function executeRecommendedUnlearning() {
 // 4-Way Exact Machine Unlearning Execution & Comparative Evaluation
 async function executeSelectedUnlearning(strategy) {
   state.selectedStrategy = strategy;
-  const target = state.selectedTarget;
+  let target = state.selectedTarget;
+
+  // Fallback if no target explicitly selected
+  if (!target || !target.sampleId) {
+    if (state.adminBlockedList && state.adminBlockedList.length > 0) {
+      selectTargetArticleById(state.adminBlockedList[0].news_id);
+      target = state.selectedTarget;
+    } else {
+      target = {
+        sampleId: 'SYN_R_00445',
+        newsId: 'NEWS_DEFAULT',
+        title: 'VIRAL ALERT: RBI Invaliding All 500 Rupee Currency Notes Tonight',
+        text: 'Urgent WhatsApp warning: Reserve Bank of India is withdrawing all 500 currency notes from circulation midnight. Secret exposed share immediately before ban!',
+        riskBand: 'HIGH_RISK_FAKE'
+      };
+      state.selectedTarget = target;
+    }
+  }
 
   // Highlight active button in algorithm selector
   document.querySelectorAll('.algo-card-btn').forEach(btn => {
@@ -1466,9 +1483,25 @@ async function executeSelectedUnlearning(strategy) {
     loadAdminQueue();
     loadUnlearningLedger();
     loadPublishedNews();
-    showToast(`⚡ Exact Machine Unlearning executed via ${strategy}. Zero residual influence confirmed!`, 'success');
+
+    // Auto-populate Model Memory Probe input with target headline so admin can test right away
+    const probeInput = document.getElementById('probeQueryInput');
+    if (probeInput && target.title) {
+      probeInput.value = target.title;
+    }
+
+    const stratNames = {
+      'baseline_retrain': 'Baseline Full Retraining',
+      'algorithm_1_sisa': 'Algorithm 1: SISA Sharding',
+      'algorithm_2_svm': 'Algorithm 2: Decremental Closed-Form SVM',
+      'algorithm_3_lora': 'Algorithm 3: Modular LoRA / S3T',
+      'all_benchmark': 'All 4 Structural Families Concurrent Benchmark'
+    };
+    const stratName = stratNames[strategy] || strategy;
+    showToast(`⚡ Exact Machine Unlearning executed via ${stratName}. Zero residual influence confirmed!`, 'success');
   } catch (err) {
     console.error('Unlearn error:', err);
+    showToast(`Unlearning request error: ${err.message}`, 'error');
   }
 }
 
@@ -1481,7 +1514,15 @@ function renderBenchmarkTable(benchmarkData) {
     const titleEl = document.getElementById('recModelTitle');
     const descEl = document.getElementById('recModelDesc');
     if (titleEl) {
-      if (benchmarkData.recommended_algorithm === 'algorithm_2_svm') {
+      if (benchmarkData.executed_strategy && benchmarkData.executed_strategy !== 'all_benchmark') {
+        const stratLabels = {
+          'baseline_retrain': 'Executed: Full Retraining (Reference Baseline)',
+          'algorithm_1_sisa': 'Executed: Algorithm 1 - SISA Sharding',
+          'algorithm_2_svm': 'Executed: Algorithm 2 - Decremental Closed-Form SVM (⭐ RECOMMENDED)',
+          'algorithm_3_lora': 'Executed: Algorithm 3 - Modular LoRA / S3T Deactivation'
+        };
+        titleEl.innerText = stratLabels[benchmarkData.executed_strategy] || `Executed: ${benchmarkData.executed_strategy}`;
+      } else if (benchmarkData.recommended_algorithm === 'algorithm_2_svm') {
         titleEl.innerText = 'Algorithm 2: Decremental Closed-Form SVM (O(1) Algebraic)';
       } else if (benchmarkData.recommended_algorithm === 'algorithm_3_lora') {
         titleEl.innerText = 'Algorithm 3: Modular LoRA / S3T Deactivation (O(1) Pointer Drop)';
@@ -1496,6 +1537,7 @@ function renderBenchmarkTable(benchmarkData) {
 
   tbody.innerHTML = benchmarkData.results.map(row => {
     const isRec = row.is_recommended || row.algorithm_id === 'algorithm_2_svm';
+    const isExec = Boolean(row.is_executed);
     const precB = row.precision_before !== undefined ? (row.precision_before * 100).toFixed(1) + '%' : '98.5%';
     const precA = row.precision_after !== undefined ? (row.precision_after * 100).toFixed(1) + '%' : '98.5%';
     const recB = row.recall_before !== undefined ? (row.recall_before * 100).toFixed(1) + '%' : '98.8%';
@@ -1505,12 +1547,20 @@ function renderBenchmarkTable(benchmarkData) {
     const accB = row.retain_accuracy_before !== undefined ? (row.retain_accuracy_before * 100).toFixed(1) + '%' : '100%';
     const accA = row.retain_accuracy_after !== undefined ? (row.retain_accuracy_after * 100).toFixed(1) + '%' : '100%';
 
+    let badges = '';
+    if (isExec) {
+      badges += '<span class="badge-pill badge-green" style="font-weight: 800; margin-left: 6px;">⚡ ACTIVE / EXECUTED</span>';
+    }
+    if (isRec) {
+      badges += '<span class="rec-star-badge" style="margin-left: 6px;">⭐ BEST MODEL</span>';
+    }
+
     return `
-      <tr class="${isRec ? 'row-recommended' : ''}">
+      <tr class="${isRec ? 'row-recommended' : ''} ${isExec ? 'row-executed' : ''}">
         <td>
           <div class="algo-name-cell">
             <strong>${escapeHtml(row.algorithm_name)}</strong>
-            ${isRec ? '<span class="rec-star-badge">⭐ BEST MODEL</span>' : ''}
+            ${badges}
           </div>
         </td>
         <td><span class="algo-family-tag tag-cyan">${escapeHtml(row.structural_family)}</span></td>

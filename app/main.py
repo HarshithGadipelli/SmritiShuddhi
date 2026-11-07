@@ -775,9 +775,9 @@ def get_current_user(role: Optional[str] = "JOURNALIST"):
 @app.get("/api/v1/admin/queue")
 def get_admin_queue():
     """Returns articles requiring admin editorial action or unlearning, plus recently verified submissions."""
-    pending = list(news_col.find({"status": "PENDING_ADMIN_REVIEW"}).limit(20))
-    blocked = list(news_col.find({"status": "BLOCKED_HIGH_RISK_FAKE"}).limit(20))
-    verified = list(news_col.find({"status": "PUBLISHED"}).sort("created_at", -1).limit(15))
+    pending = list(news_col.find({"status": "PENDING_ADMIN_REVIEW"}).sort("created_at", -1).limit(30))
+    blocked = list(news_col.find({"status": "BLOCKED_HIGH_RISK_FAKE"}).sort("created_at", -1).limit(30))
+    verified = list(news_col.find({"status": "PUBLISHED"}).sort("created_at", -1).limit(20))
     for item in pending + blocked + verified:
         if "_id" in item:
             item["_id"] = str(item["_id"])
@@ -840,13 +840,9 @@ def execute_unlearning(payload: UnlearningExecutionRequest, background_tasks: Ba
 
     logger.info("[UNLEARN] Executing unlearning strategy '%s' for sample: %s", strategy, sample_id)
 
-    # Execute strategy
-    if strategy == "all_benchmark":
-        benchmark_report = multi_model_suite.run_all_benchmark(sample_id, title, text)
-        result = benchmark_report
-    else:
-        exec_res = multi_model_suite.run_strategy(strategy, sample_id, title, text)
-        result = {"target_sample_id": sample_id, "results": [exec_res.to_dict()]}
+    # Execute strategy: returns full comparative benchmark matrix with executed model flagged
+    benchmark_report = multi_model_suite.run_all_benchmark(sample_id, title, text, executed_strategy=strategy)
+    result = benchmark_report
 
     # Execute the 6-step physical shard purge on disk & Redis cache eviction
     unlearning_engine.execute_unlearning_sequence(sample_id=sample_id, sample_text=f"{title} {text}")
