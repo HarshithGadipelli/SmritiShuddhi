@@ -290,7 +290,12 @@
               Indian Space Research Organisation (ISRO) has officially opened the scientific payload repository on the Indian Space Science Data Centre for researchers globally. Datasets include elemental compositions and thermal readings.
             </p>
             <div class="hero-footer">
-              <span class="read-more-link">Read Full Report with Dual-Track Fact Certificate →</span>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="read-more-link">Read Full Report with Dual-Track Fact Certificate →</span>
+                <button class="admin-only-ui btn btn-secondary btn-xs" id="btnEditHeroStory" style="display: none;" onclick="event.stopPropagation(); if (state.allNews && state.allNews.length) openEditModal(state.allNews[0].news_id);" title="Edit front-page lead story">
+                  ✏️ Edit Lead Story
+                </button>
+              </div>
               <span class="publish-time-stamp" id="heroTime">Today • 14:10 IST</span>
             </div>
           </div>
@@ -688,7 +693,12 @@
             <div class="target-inspector">
               <div class="target-meta">
                 <span class="target-id" id="targetSampleIdDisplay">TARGET SAMPLE: SYN_R_00445</span>
-                <span class="badge-pill badge-crimson" id="targetRiskTag">HIGH_RISK_FAKE</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="badge-pill badge-crimson" id="targetRiskTag">HIGH_RISK_FAKE</span>
+                  <button class="btn btn-secondary btn-xs" id="btnEditTargetArticle" onclick="openEditTargetArticle()" title="Edit or review this target article">
+                    <span>✏️</span> Edit Target Article
+                  </button>
+                </div>
               </div>
               <h4 class="target-headline" id="targetTitleDisplay">
                 VIRAL ALERT: RBI Invaliding All 500 Rupee Currency Notes Tonight
@@ -1146,12 +1156,135 @@
         <div class="cert-rationale" id="modalRationale">
           Verified against official governmental and scientific registries. Zero indicators of deceptive intent detected.
         </div>
-        <div class="admin-modal-actions" style="margin-top: 14px; display: flex; gap: 10px;">
+        <div class="admin-modal-actions" style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn btn-primary btn-sm" onclick="openEditModalFromReader()">
+            <span>✏️</span> Edit & Review Article
+          </button>
           <button class="btn btn-amber btn-sm" id="btnModalSendWorkbench" onclick="sendCurrentModalToWorkbench()">
             <span>⚡</span> Load into 3-Family Unlearning Workbench
           </button>
+          <button class="btn btn-crimson btn-sm" onclick="directPurgeCurrentModalArticle()">
+            <span>🗑️</span> Direct Purge & Delete
+          </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       ADMIN EDITORIAL ARTICLE REVIEW & EDIT MODAL
+       ===================================================================== -->
+  <div class="modal-backdrop" id="editArticleModal" style="display: none;" onclick="closeModalOnBackdrop(event, 'editArticleModal')">
+    <div class="auth-modal-card editorial-edit-modal-card" style="max-width: 680px; width: 92%;">
+      <button class="modal-close-btn" onclick="closeEditModal()">×</button>
+      
+      <div class="auth-header">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px;">
+          <h2 style="font-size: 1.35rem; margin: 0;">📰 Editorial Review & Article Editor</h2>
+          <span class="badge-pill badge-green" id="editArticleStatusBadge">PUBLISHED</span>
+        </div>
+        <p class="auth-sub" style="margin: 0;">
+          Review story text, adjust editorial attribution, update publication status, or load into exact machine unlearning.
+        </p>
+      </div>
+
+      <form id="editArticleForm" onsubmit="handleSaveArticleEdit(event)" style="display: flex; flex-direction: column; gap: 14px; margin-top: 14px;">
+        <input type="hidden" id="editArticleId">
+        <input type="hidden" id="editArticleSampleId">
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 180px;" class="form-group">
+            <label style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px;">
+              Article ID
+            </label>
+            <input type="text" id="editArticleIdDisplay" readonly style="background: var(--bg-surface); opacity: 0.85; font-family: var(--font-mono); font-size: 0.8rem; cursor: not-allowed;">
+          </div>
+          <div style="flex: 1; min-width: 180px;" class="form-group">
+            <label style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px;">
+              Sample ID (Partition Hash)
+            </label>
+            <input type="text" id="editArticleSampleIdDisplay" readonly style="background: var(--bg-surface); opacity: 0.85; font-family: var(--font-mono); font-size: 0.8rem; cursor: not-allowed;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editArticleTitleInput" style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px;">
+            Article Headline / Title
+          </label>
+          <input type="text" id="editArticleTitleInput" required style="width: 100%; font-size: 1rem; font-weight: 700; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-headline);">
+        </div>
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 150px;" class="form-group">
+            <label for="editArticleCategorySelect" style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px;">
+              Category / Wire Desk
+            </label>
+            <select id="editArticleCategorySelect" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
+              <option value="Politics">Politics & Governance</option>
+              <option value="Economy">Economy & Business</option>
+              <option value="Technology">Technology & AI</option>
+              <option value="Science">Science & Space</option>
+              <option value="Health">Health & Medicine</option>
+              <option value="General">General Wire</option>
+            </select>
+          </div>
+
+          <div style="flex: 1; min-width: 150px;" class="form-group">
+            <label for="editArticleAuthorInput" style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px;">
+              Author / Byline
+            </label>
+            <input type="text" id="editArticleAuthorInput" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
+          </div>
+
+          <div style="flex: 1; min-width: 180px;" class="form-group">
+            <label for="editArticleStatusSelect" style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px;">
+              Editorial Review Status
+            </label>
+            <select id="editArticleStatusSelect" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" onchange="handleEditStatusChange()">
+              <option value="PUBLISHED">✓ PUBLISHED (Live on Wire)</option>
+              <option value="PENDING_ADMIN_REVIEW">⚖️ PENDING_ADMIN_REVIEW (Ambiguous)</option>
+              <option value="BLOCKED_HIGH_RISK_FAKE">🚨 BLOCKED_HIGH_RISK_FAKE (Quarantined)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label for="editArticleTextInput" style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim);">
+              Article Body / Content
+            </label>
+            <span id="editArticleCharCount" style="font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono);">0 words</span>
+          </div>
+          <textarea id="editArticleTextInput" rows="8" required style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-family: var(--font-editorial); font-size: 0.95rem; line-height: 1.5; resize: vertical;" oninput="updateEditCharCount()"></textarea>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(2, 132, 199, 0.06); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 6px;">
+          <input type="checkbox" id="editReverifyCheck" checked style="width: 16px; height: 16px; cursor: pointer;">
+          <label for="editReverifyCheck" style="font-size: 0.82rem; color: var(--text-main); cursor: pointer; margin: 0;">
+            <strong>Re-evaluate with Dual-Track AI:</strong> Automatically calculate new DeBERTa-v3 stylometry + BGE-M3 factual consistency scores upon save.
+          </label>
+        </div>
+
+        <!-- ACTION BUTTONS ROW -->
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="submit" class="btn btn-primary" id="btnSaveArticleEdit">
+              <span>💾</span> Save & Update Article
+            </button>
+            <button type="button" class="btn btn-amber" onclick="sendEditedToWorkbench()">
+              <span>⚡</span> Send to Unlearning Workbench
+            </button>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-crimson" onclick="deleteArticleFromEditor()">
+              <span>🗑️</span> Purge Story
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 

@@ -81,6 +81,16 @@ class NewsApiConfigRequest(BaseModel):
     title: Optional[str] = "Contributing Reporter"
 
 
+class NewsUpdateRequest(BaseModel):
+    title: Optional[str] = Field(None, description="Updated headline")
+    text: Optional[str] = Field(None, description="Updated article text")
+    category: Optional[str] = Field(None, description="Updated category")
+    author: Optional[str] = Field(None, description="Updated author")
+    source: Optional[str] = Field(None, description="Updated source")
+    status: Optional[str] = Field(None, description="PUBLISHED | PENDING_ADMIN_REVIEW | BLOCKED_HIGH_RISK_FAKE")
+    reverify: Optional[bool] = Field(True, description="Whether to re-evaluate with Dual-Track AI inference")
+
+
 class UnlearningExecutionRequest(BaseModel):
     sample_id: str = Field(..., description="Target sample ID to unlearn")
     news_id: Optional[str] = Field(None, description="Associated news article ID if present")
@@ -806,8 +816,9 @@ def approve_news(news_id: str, background_tasks: BackgroundTasks):
 
 
 @app.post("/api/v1/admin/reject/{news_id}")
+@app.delete("/api/v1/news/{news_id}")
 def reject_news(news_id: str, background_tasks: BackgroundTasks):
-    """Admin rejects an article."""
+    """Admin rejects and purges an article from the news platform."""
     doc = news_col.find_one({"news_id": news_id})
     if not doc:
         raise HTTPException(status_code=404, detail="Article not found")
@@ -817,6 +828,122 @@ def reject_news(news_id: str, background_tasks: BackgroundTasks):
         {"event": "ARTICLE_REJECTED", "news_id": news_id}
     )
     return {"status": "REJECTED", "news_id": news_id}
+
+
+@app.put("/api/v1/news/{news_id}")
+@app.post("/api/v1/admin/news/{news_id}/edit")
+def update_news_article(news_id: str, payload: NewsUpdateRequest, background_tasks: BackgroundTasks):
+    """Admin editorial update: edits article headline, content, category, author, or review status.
+    Optionally re-runs hybrid AI inference (DeBERTa-v3 stylometry + BGE-M3 factual consistency + Neo4j) to recalculate risk scores.
+    """
+    doc = news_col.find_one({"news_id": news_id})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Article not found")
+
+    old_title = doc.get("title", "")
+    old_text = doc.get("text", "")
+
+    new_title = payload.title.strip() if payload.title is not None else old_title
+    new_text = payload.text.strip() if payload.text is not None else old_text
+    new_category = payload.category if payload.category is not None else doc.get("category", "General")
+    new_author = payload.author if payload.author is not None else doc.get("author", "Editorial Bureau")
+    new_source = payload.source if payload.source is not None else doc.get("source", "Wire")
+    new_status = payload.status if payload.status is not None else doc.get("status", "PUBLISHED")
+
+    updates = {
+        "title": new_title,
+        "text": new_text,
+        "category": new_category,
+        "author": new_author,
+        "source": new_source,
+        "status": new_status,
+        "reading_time": f"{max(1, len(new_text.split()) // 55)} min read",
+        "updated_at": now()
+    }
+
+    # Language and regional tag detection
+    content_full = f"{new_title} {new_text}"
+    if re.search(r'[\u0C00-\u0C7F]', content_full):
+        updates["language"] = "Telugu (తెలుగు)"
+        updates["region"] = "Andhra Pradesh & Telangana"
+    elif re.search(r'[\u0900-\u097F]', content_full):
+        updates["language"] = "Hindi (हिंदी)"
+        updates["region"] = "India Regional"
+    else:
+        updates["language"] = "English"
+        updates["region"] = "India National"
+
+    reverified = False
+    if payload.reverify and (new_title != old_title or new_text != old_text):
+        verdict = execute_hybrid_inference(new_title, new_text)
+        risk_band = verdict["risk_band"]
+        if payload.status is None:
+            if risk_band == "LOW_RISK_FACTUAL":
+                updates["status"] = "PUBLISHED"
+                updates["tag"] = "REAL"
+                updates["tag_display"] = "REAL (VERIFIED FACTUAL)"
+            elif risk_band == "MODERATE_RISK":
+                updates["status"] = "PENDING_ADMIN_REVIEW"
+                updates["tag"] = "LIKELY_FAKE"
+                updates["tag_display"] = "LIKELY FAKE (UNDER EDITORIAL REVIEW)"
+            else:
+                updates["status"] = "BLOCKED_HIGH_RISK_FAKE"
+                updates["tag"] = "FAKE"
+                updates["tag_display"] = "FAKE (BLOCKED & QUARANTINED)"
+        else:
+            if new_status == "PUBLISHED":
+                updates["tag"] = "REAL"
+                updates["tag_display"] = "REAL (VERIFIED FACTUAL)"
+            elif new_status == "PENDING_ADMIN_REVIEW":
+                updates["tag"] = "LIKELY_FAKE"
+                updates["tag_display"] = "LIKELY FAKE (UNDER EDITORIAL REVIEW)"
+            else:
+                updates["tag"] = "FAKE"
+                updates["tag_display"] = "FAKE (BLOCKED & QUARANTINED)"
+
+        updates["fake_probability"] = verdict["fake_probability"]
+        updates["real_probability"] = verdict["real_probability"]
+        updates["risk_band"] = verdict["risk_band"]
+        updates["action_recommended"] = verdict["action_recommended"]
+        updates["s_style"] = verdict["s_style"]
+        updates["s_fact"] = verdict["s_fact"]
+        updates["temporal_consistency"] = verdict["temporal_consistency"]
+        updates["xai"] = verdict["xai"]
+        reverified = True
+
+        old_sig = cache_controller.generate_signature(old_title, old_text)
+        cache_controller.evict_signature(old_sig)
+        new_sig = cache_controller.generate_signature(new_title, new_text)
+        cache_controller.cache_verdict(new_sig, verdict, ttl=86400)
+    else:
+        if new_status == "PUBLISHED":
+            updates["tag"] = "REAL"
+            updates["tag_display"] = "REAL (VERIFIED FACTUAL)"
+        elif new_status == "PENDING_ADMIN_REVIEW":
+            updates["tag"] = "LIKELY_FAKE"
+            updates["tag_display"] = "LIKELY FAKE (UNDER EDITORIAL REVIEW)"
+        else:
+            updates["tag"] = "FAKE"
+            updates["tag_display"] = "FAKE (BLOCKED & QUARANTINED)"
+
+    news_col.update_one({"news_id": news_id}, {"$set": updates})
+    updated_doc = news_col.find_one({"news_id": news_id})
+    if updated_doc and "_id" in updated_doc:
+        updated_doc["_id"] = str(updated_doc["_id"])
+
+    background_tasks.add_task(
+        ws_manager.broadcast,
+        {"event": "ARTICLE_UPDATED", "article": updated_doc, "reverified": reverified}
+    )
+
+    logger.info("[ADMIN] Article %s successfully edited by admin. Reverified: %s, New status: %s", news_id, reverified, updates.get("status"))
+
+    return {
+        "success": True,
+        "message": "Article successfully updated and reviewed.",
+        "article": updated_doc,
+        "reverified": reverified
+    }
 
 
 # -----------------------------------------------------------------------------

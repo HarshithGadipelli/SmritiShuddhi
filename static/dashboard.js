@@ -408,6 +408,14 @@ function updateUserUI() {
   if (userModalCert) userModalCert.style.display = isAdmin ? 'none' : 'block';
   if (adminModalCert) adminModalCert.style.display = isAdmin ? 'block' : 'none';
 
+  // Toggle all generic role elements
+  document.querySelectorAll('.admin-only-ui').forEach(el => {
+    el.style.display = isAdmin ? '' : 'none';
+  });
+  document.querySelectorAll('.user-only-ui').forEach(el => {
+    el.style.display = isAdmin ? 'none' : '';
+  });
+
   // Update author input in submission form
   const authorInput = document.getElementById('authorInput');
   if (authorInput && state.currentUser.name) {
@@ -439,10 +447,12 @@ function switchUserRole(role) {
   if (role === 'ADMIN') {
     switchTab('admin');
     loadAdminQueue();
+    loadPublishedNews();
     showToast('🛡️ Switched to Chief Fact-Checker: Full Model Diagnostics & Machine Unlearning Unlocked.', 'info');
   } else {
     switchTab('wire');
     loadUserSubmissions();
+    loadPublishedNews();
     showToast('👤 Switched to Citizen Journalist: Clean Platform Experience with Full Abstraction.', 'info');
   }
 }
@@ -731,6 +741,11 @@ function renderNewsWire() {
           <div class="card-footer">
             <span class="card-author">By <strong>${escapeHtml(item.author || 'Editorial Bureau')}</strong></span>
             <div style="display:flex; align-items:center; gap:8px;">
+              ${state.currentRole === 'ADMIN' ? `
+                <button class="btn btn-secondary btn-xs admin-card-edit-btn" onclick="event.stopPropagation(); openEditModal('${item.news_id}')" title="Edit story headline, content, or status">
+                  ✏️ Edit
+                </button>
+              ` : ''}
               <button class="dispatch-audio-listen-btn" onclick="listenToDispatchCard('${item.news_id}', event)" title="Listen to this dispatch">
                 <span>🎧</span> Listen
               </button>
@@ -1286,7 +1301,10 @@ async function loadAdminQueue() {
             </div>
             <h5 class="queue-item-title">${escapeHtml(item.title)}</h5>
             <div class="queue-actions-row">
-              <button class="btn btn-crimson btn-xs" onclick="event.stopPropagation(); executeDirectUnlearnById('${item.news_id}')">
+              <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); openEditModal('${item.news_id}')" title="Edit story details & status">
+                ✏️ Edit & Review
+              </button>
+              <button class="btn btn-crimson btn-xs" onclick="event.stopPropagation(); executeDirectUnlearnById('${item.news_id}')" title="Unlearn this story from ML models">
                 ⚡ Unlearn Story
               </button>
             </div>
@@ -1315,8 +1333,11 @@ async function loadAdminQueue() {
             </div>
             <h5 class="queue-item-title">${escapeHtml(item.title)}</h5>
             <div class="queue-actions-row">
-              <button class="btn btn-primary btn-xs" onclick="event.stopPropagation(); approveArticle('${item.news_id}')">✓ Approve & Publish</button>
-              <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); rejectArticle('${item.news_id}')">✕ Reject & Purge</button>
+              <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); openEditModal('${item.news_id}')" title="Edit story details & status">
+                ✏️ Edit & Review
+              </button>
+              <button class="btn btn-primary btn-xs" onclick="event.stopPropagation(); approveArticle('${item.news_id}')">✓ Approve</button>
+              <button class="btn btn-crimson btn-xs" onclick="event.stopPropagation(); rejectArticle('${item.news_id}')">✕ Reject</button>
               <button class="btn btn-amber btn-xs" onclick="event.stopPropagation(); sendToWorkbench('${item.news_id}')">⚡ Send to Workbench</button>
             </div>
           </div>
@@ -1333,7 +1354,8 @@ async function loadAdminQueue() {
       if (verified.length === 0) {
         verifiedContainer.innerHTML = `<div style="text-align: center; padding: 24px; color: var(--text-dim);">No verified dispatches currently in history.</div>`;
       } else {
-        verifiedContainer.innerHTML = verified.slice(0, 6).map(item => `
+        verified.forEach(item => { state.adminBlockedMap[item.news_id] = item; });
+        verifiedContainer.innerHTML = verified.slice(0, 8).map(item => `
           <div class="queue-item-card" onclick="openArticleModal('${item.news_id}')" style="cursor: pointer;">
             <div class="queue-item-meta">
               <span>${item.sample_id || item.news_id}</span>
@@ -1344,6 +1366,14 @@ async function loadAdminQueue() {
               <span>By: <strong>${escapeHtml(item.author || 'Journalist')}</strong></span> • 
               <span>${escapeHtml(item.category || 'General')}</span> • 
               <span>${item.reading_time || '2 min read'}</span>
+            </div>
+            <div class="queue-actions-row" style="margin-top: 8px;">
+              <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); openEditModal('${item.news_id}')" title="Edit story details & status">
+                ✏️ Edit & Review
+              </button>
+              <button class="btn btn-amber btn-xs" onclick="event.stopPropagation(); sendToWorkbench('${item.news_id}')" title="Send to Unlearning Workbench">
+                ⚡ Send to Workbench
+              </button>
             </div>
           </div>
         `).join('');
@@ -1758,6 +1788,312 @@ function closeArticleModal() {
 }
 
 // ==========================================================================
+// ADMIN EDITORIAL ARTICLE REVIEW & EDIT ENGINE
+// ==========================================================================
+async function approveArticle(newsId) {
+  try {
+    const res = await fetch(`/api/v1/admin/approve/${newsId}`, { method: 'POST' });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`✓ Story ${newsId} approved and published to live news wire!`, 'success');
+      logTerminal('ARTICLE_APPROVED', `Article ${newsId} approved for live publication by Chief Fact-Checker.`);
+      await loadAdminQueue();
+      await loadPublishedNews();
+    } else {
+      showToast(`Approval failed: ${data.detail || 'Unknown error'}`, 'error');
+    }
+  } catch (err) {
+    console.error('Approve error:', err);
+    showToast('Network error during article approval.', 'error');
+  }
+}
+
+async function rejectArticle(newsId) {
+  if (!confirm(`Are you sure you want to permanently reject and purge story "${newsId}"?`)) {
+    return;
+  }
+  try {
+    const res = await fetch(`/api/v1/admin/reject/${newsId}`, { method: 'POST' });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`✕ Story ${newsId} rejected and permanently purged.`, 'info');
+      logTerminal('ARTICLE_REJECTED', `Article ${newsId} rejected and removed from all indexes.`);
+      await loadAdminQueue();
+      await loadPublishedNews();
+    } else {
+      showToast(`Rejection failed: ${data.detail || 'Unknown error'}`, 'error');
+    }
+  } catch (err) {
+    console.error('Reject error:', err);
+    showToast('Network error during article rejection.', 'error');
+  }
+}
+
+async function openEditModal(newsId) {
+  try {
+    let article = (state.adminBlockedMap && state.adminBlockedMap[newsId]) ? state.adminBlockedMap[newsId] : null;
+    if (!article && state.allNews) {
+      article = state.allNews.find(n => n.news_id === newsId || n.sample_id === newsId);
+    }
+
+    // Attempt fresh fetch from backend API
+    try {
+      const res = await fetch(`/api/v1/news/${newsId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.article) article = data.article;
+      }
+    } catch (e) {
+      console.warn('Fallback to local memory for article edit:', e);
+    }
+
+    if (!article) {
+      showToast(`Article "${newsId}" not found for editing.`, 'error');
+      return;
+    }
+
+    const idInput = document.getElementById('editArticleId');
+    const sampleInput = document.getElementById('editArticleSampleId');
+    const idDisp = document.getElementById('editArticleIdDisplay');
+    const sampleDisp = document.getElementById('editArticleSampleIdDisplay');
+    const titleInput = document.getElementById('editArticleTitleInput');
+    const authorInput = document.getElementById('editArticleAuthorInput');
+    const textInput = document.getElementById('editArticleTextInput');
+    const catSelect = document.getElementById('editArticleCategorySelect');
+    const statusSelect = document.getElementById('editArticleStatusSelect');
+
+    if (idInput) idInput.value = article.news_id || newsId;
+    if (sampleInput) sampleInput.value = article.sample_id || article.news_id || newsId;
+    if (idDisp) idDisp.value = article.news_id || newsId;
+    if (sampleDisp) sampleDisp.value = article.sample_id || article.news_id || newsId;
+    if (titleInput) titleInput.value = article.title || '';
+    if (authorInput) authorInput.value = article.author || 'Editorial Bureau';
+    if (textInput) textInput.value = article.text || '';
+
+    if (catSelect) {
+      const cat = article.category || 'General';
+      let matched = false;
+      for (let i = 0; i < catSelect.options.length; i++) {
+        if (catSelect.options[i].value.toLowerCase() === cat.toLowerCase()) {
+          catSelect.selectedIndex = i;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) catSelect.value = 'General';
+    }
+
+    if (statusSelect) {
+      statusSelect.value = article.status || 'PUBLISHED';
+    }
+
+    handleEditStatusChange();
+    updateEditCharCount();
+
+    const modal = document.getElementById('editArticleModal');
+    if (modal) modal.style.display = 'flex';
+  } catch (err) {
+    console.error('Error opening edit modal:', err);
+    showToast('Failed to open article editor.', 'error');
+  }
+}
+
+function openEditTargetArticle() {
+  if (state.selectedTarget && state.selectedTarget.newsId) {
+    openEditModal(state.selectedTarget.newsId);
+  } else if (state.selectedTarget && state.selectedTarget.sampleId) {
+    openEditModal(state.selectedTarget.sampleId);
+  } else {
+    showToast('No target article selected to review or edit.', 'warning');
+  }
+}
+
+function openEditModalFromReader() {
+  if (!state.currentModalArticle) return;
+  const newsId = state.currentModalArticle.news_id;
+  closeArticleModal();
+  openEditModal(newsId);
+}
+
+function closeEditModal() {
+  const modal = document.getElementById('editArticleModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function updateEditCharCount() {
+  const textEl = document.getElementById('editArticleTextInput');
+  const countEl = document.getElementById('editArticleCharCount');
+  if (!textEl || !countEl) return;
+  const text = textEl.value.trim();
+  const words = text ? text.split(/\s+/).length : 0;
+  const chars = text.length;
+  countEl.innerText = `${words} words • ${chars} chars`;
+}
+
+function handleEditStatusChange() {
+  const statusSelect = document.getElementById('editArticleStatusSelect');
+  const badge = document.getElementById('editArticleStatusBadge');
+  if (!statusSelect || !badge) return;
+  const val = statusSelect.value;
+  badge.innerText = val;
+  if (val === 'PUBLISHED') {
+    badge.className = 'badge-pill badge-green';
+  } else if (val === 'PENDING_ADMIN_REVIEW') {
+    badge.className = 'badge-pill badge-amber';
+  } else {
+    badge.className = 'badge-pill badge-crimson';
+  }
+}
+
+async function handleSaveArticleEdit(event) {
+  if (event) event.preventDefault();
+  const newsId = document.getElementById('editArticleId').value;
+  if (!newsId) {
+    showToast('Missing article ID.', 'error');
+    return;
+  }
+
+  const title = document.getElementById('editArticleTitleInput').value.trim();
+  const category = document.getElementById('editArticleCategorySelect').value;
+  const author = document.getElementById('editArticleAuthorInput').value.trim();
+  const status = document.getElementById('editArticleStatusSelect').value;
+  const text = document.getElementById('editArticleTextInput').value.trim();
+  const reverify = document.getElementById('editReverifyCheck').checked;
+
+  const btnSave = document.getElementById('btnSaveArticleEdit');
+  if (btnSave) {
+    btnSave.disabled = true;
+    btnSave.innerHTML = `<span>⏳</span> Saving & Re-evaluating...`;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/news/${newsId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        text,
+        category,
+        author,
+        status,
+        reverify
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.detail || 'Failed to save changes.');
+    }
+
+    const updated = data.article || {};
+    showToast(`✓ Article updated! ${reverify ? `Re-evaluated: ${Math.round((updated.real_probability || 0.9) * 100)}% Authentic` : ''}`, 'success');
+    logTerminal('ARTICLE_EDITED', `Article "${newsId}" saved by Chief Fact-Checker. New status: ${status}`);
+
+    closeEditModal();
+
+    // If active target in machine unlearning inspector matches, update inspector live
+    if (state.selectedTarget && (state.selectedTarget.newsId === newsId || state.selectedTarget.sampleId === newsId)) {
+      selectTargetArticle(
+        updated.sample_id || newsId,
+        newsId,
+        updated.title || title,
+        updated.text || text,
+        updated.risk_band || status
+      );
+    }
+
+    // Refresh active views
+    await loadAdminQueue();
+    await loadPublishedNews();
+
+  } catch (err) {
+    console.error('Error saving article edit:', err);
+    showToast(`Error updating article: ${err.message}`, 'error');
+  } finally {
+    if (btnSave) {
+      btnSave.disabled = false;
+      btnSave.innerHTML = `<span>💾</span> Save & Update Article`;
+    }
+  }
+}
+
+function sendEditedToWorkbench() {
+  const newsId = document.getElementById('editArticleId').value;
+  const title = document.getElementById('editArticleTitleInput').value.trim();
+  const text = document.getElementById('editArticleTextInput').value.trim();
+  const status = document.getElementById('editArticleStatusSelect').value;
+  const sampleId = document.getElementById('editArticleSampleId').value || newsId;
+
+  if (!title || !text) {
+    showToast('Please provide a headline and body text before loading into workbench.', 'warning');
+    return;
+  }
+
+  closeEditModal();
+  selectTargetArticle(
+    sampleId,
+    newsId,
+    title,
+    text,
+    status === 'BLOCKED_HIGH_RISK_FAKE' ? 'HIGH_RISK_FAKE' : (status === 'PENDING_ADMIN_REVIEW' ? 'MODERATE_RISK' : 'VERIFIED_REAL')
+  );
+  switchTab('admin');
+  const bench = document.getElementById('benchmarkTableBox');
+  if (bench) bench.scrollIntoView({ behavior: 'smooth' });
+  showToast(`Loaded edited story "${title.slice(0, 30)}..." into Machine Unlearning Workbench.`, 'info');
+}
+
+async function deleteArticleFromEditor() {
+  const newsId = document.getElementById('editArticleId').value;
+  if (!newsId) return;
+
+  if (!confirm(`Are you sure you want to permanently purge and reject story "${newsId}"?`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/admin/reject/${newsId}`, { method: 'POST' });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`Story ${newsId} purged from database and queues.`, 'info');
+      logTerminal('ARTICLE_PURGED', `Article ${newsId} removed by Chief Fact-Checker.`);
+      closeEditModal();
+      await loadAdminQueue();
+      await loadPublishedNews();
+    } else {
+      showToast(`Failed to purge article: ${data.detail || 'Unknown error'}`, 'error');
+    }
+  } catch (err) {
+    console.error('Purge error:', err);
+    showToast('Network error while purging article.', 'error');
+  }
+}
+
+async function directPurgeCurrentModalArticle() {
+  if (!state.currentModalArticle) return;
+  const newsId = state.currentModalArticle.news_id;
+  if (!confirm(`Permanently purge and delete story "${state.currentModalArticle.title.slice(0, 35)}..."?`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/admin/reject/${newsId}`, { method: 'POST' });
+    if (res.ok) {
+      showToast(`Story ${newsId} purged successfully.`, 'info');
+      logTerminal('ARTICLE_PURGED', `Article ${newsId} removed via Reader Modal.`);
+      closeArticleModal();
+      await loadAdminQueue();
+      await loadPublishedNews();
+    } else {
+      showToast('Error purging article.', 'error');
+    }
+  } catch (err) {
+    console.error('Purge error:', err);
+    showToast('Network error while purging article.', 'error');
+  }
+}
+
+// ==========================================================================
 // WEBSOCKET DISTRIBUTED STREAM
 // ==========================================================================
 function initWebSocket() {
@@ -1791,7 +2127,7 @@ function handleWebSocketMessage(data) {
 
   if (ev === 'NEW_ARTICLE_PUBLISHED' || ev === 'LIVE_FEED_ITEM_SYNCED') {
     loadPublishedNews();
-  } else if (ev === 'ALERT_HIGH_RISK_FAKE' || ev === 'ALERT_PENDING_REVIEW' || ev === 'ARTICLE_APPROVED_AND_PUBLISHED' || ev === 'NEWS_REVOKED_AND_UNLEARNED') {
+  } else if (ev === 'ALERT_HIGH_RISK_FAKE' || ev === 'ALERT_PENDING_REVIEW' || ev === 'ARTICLE_APPROVED_AND_PUBLISHED' || ev === 'NEWS_REVOKED_AND_UNLEARNED' || ev === 'ARTICLE_UPDATED' || ev === 'ARTICLE_REJECTED') {
     loadAdminQueue();
     loadPublishedNews();
     loadUnlearningLedger();
@@ -1975,6 +2311,11 @@ function renderCustomNewsGrid(items) {
         <div class="card-footer">
           <span class="card-author">By <strong>${escapeHtml(item.author || 'Editorial Bureau')}</strong></span>
           <div style="display:flex; align-items:center; gap:8px;">
+            ${state.currentRole === 'ADMIN' ? `
+              <button class="btn btn-secondary btn-xs admin-card-edit-btn" onclick="event.stopPropagation(); openEditModal('${item.news_id}')" title="Edit story headline, content, or status">
+                ✏️ Edit
+              </button>
+            ` : ''}
             <button class="dispatch-audio-listen-btn" onclick="listenToDispatchCard('${item.news_id}', event)" title="Listen to this dispatch">
               <span>🎧</span> Listen
             </button>
