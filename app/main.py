@@ -73,12 +73,12 @@ class RegisterRequest(BaseModel):
     email: str
     password: str
     role: Optional[str] = "JOURNALIST"
+    title: Optional[str] = "Independent Reporter"
 
 
 class NewsApiConfigRequest(BaseModel):
     news_api_key: Optional[str] = Field(None, description="API Key for NewsAPI.org")
     gnews_api_key: Optional[str] = Field(None, description="API Key for GNews.io")
-    title: Optional[str] = "Contributing Reporter"
 
 
 class NewsUpdateRequest(BaseModel):
@@ -747,7 +747,7 @@ def register(payload: RegisterRequest):
         "password": payload.password,
         "name": payload.name.strip(),
         "role": payload.role.upper() if payload.role else "JOURNALIST",
-        "title": payload.title or "Independent Reporter",
+        "title": getattr(payload, "title", None) or "Independent Reporter",
         "created_at": now()
     }
     users_col.insert_one(new_user)

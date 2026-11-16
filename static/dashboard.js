@@ -2581,17 +2581,24 @@ function showToast(message, type = 'info') {
   toast.className = `toast-message toast-${type}`;
   let icon = 'ℹ️';
   if (type === 'success') icon = '✓';
-  if (type === 'alert') icon = '🚨';
+  if (type === 'alert' || type === 'error') icon = '🚨';
+  if (type === 'warning') icon = '⚠️';
 
-  toast.innerHTML = `<span>${icon}</span> <span>${escapeHtml(message)}</span>`;
+  toast.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
+      <span class="toast-icon-badge">${icon}</span>
+      <span style="flex: 1; line-height: 1.4; font-weight: 500;">${escapeHtml(message)}</span>
+    </div>
+    <div class="toast-progress-bar"></div>
+  `;
   container.appendChild(toast);
 
   setTimeout(() => {
-    toast.style.animation = 'slideInRight 0.3s ease-out reverse';
+    toast.classList.add('toast-dismissing');
     setTimeout(() => {
       if (toast.parentNode) toast.parentNode.removeChild(toast);
-    }, 300);
-  }, 4000);
+    }, 350);
+  }, 3800);
 }
 
 function hashString(str) {
