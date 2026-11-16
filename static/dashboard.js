@@ -1088,7 +1088,7 @@ function renderScanResult(data) {
       confVal.className = 'gauge-value accent-crimson';
     }
     if (expTitle) expTitle.innerText = 'Editorial Status: Blocked by Platform Safety Standards';
-    if (expText) expText.innerText = data.message || 'Our verification engine detected false or manipulative claims. This article has been quarantined and blocked from public distribution.';
+    if (expText) expText.innerHTML = `${escapeHtml(data.message || 'Our verification engine detected false or manipulative claims. This article has been quarantined and blocked from public distribution.')}<div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;"><button class="btn btn-secondary btn-xs" onclick="switchTab('submissions')">📁 View in Citizen Submissions</button><button class="btn btn-crimson btn-xs" onclick="sendToWorkbench('${data.news_id}')">⚡ Machine Unlearning Workbench</button></div>`;
   }
 
   // -------------------------------------------------------------------------
@@ -1150,7 +1150,11 @@ function renderScanResult(data) {
     if (action) action.innerText = 'BLOCKED & FLAGGED FOR UNLEARNING';
     if (notice) {
       notice.className = 'submission-notice notice-blocked';
-      notice.innerHTML = `🚨 <strong>Quarantine Alert:</strong> Deceptive cues or false claims detected! Article blocked from publication and routed to the 3-Family Unlearning Workbench.`;
+      notice.innerHTML = `🚨 <strong>Quarantine Alert:</strong> Deceptive cues or false claims detected! Article blocked from publication and routed to the 3-Family Unlearning Workbench.
+      <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn btn-crimson btn-xs" onclick="sendToWorkbench('${data.news_id}')">⚡ Machine Unlearning Workbench</button>
+        <button class="btn btn-secondary btn-xs" onclick="switchTab('submissions')">📁 View Citizen Submissions</button>
+      </div>`;
     }
   }
 
@@ -1239,11 +1243,46 @@ async function loadUserSubmissions() {
 
     container.innerHTML = subs.map(item => {
       let statusBadge = '<span class="badge-pill badge-green">PUBLISHED</span>';
-      if (item.status === 'PENDING_ADMIN_REVIEW') statusBadge = '<span class="badge-pill badge-amber">UNDER EDITORIAL REVIEW</span>';
-      if (item.status === 'BLOCKED_HIGH_RISK_FAKE') statusBadge = '<span class="badge-pill badge-crimson">BLOCKED FAKE NEWS</span>';
+      let actionButtons = `
+        <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); openArticleModal('${item.news_id}')">
+          📜 Read Article
+        </button>
+      `;
+
+      if (item.status === 'PENDING_ADMIN_REVIEW') {
+        statusBadge = '<span class="badge-pill badge-amber">UNDER EDITORIAL REVIEW</span>';
+        actionButtons = `
+          <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); openArticleModal('${item.news_id}')">
+            📜 Diagnostic Details
+          </button>
+        `;
+      } else if (item.status === 'BLOCKED_HIGH_RISK_FAKE') {
+        statusBadge = '<span class="badge-pill badge-crimson">BLOCKED FAKE NEWS</span>';
+        actionButtons = `
+          <button class="btn btn-crimson btn-xs" onclick="event.stopPropagation(); executeDirectUnlearnById('${item.news_id}')" title="Execute unlearning across 3 models">
+            ⚡ Unlearn Story
+          </button>
+          <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); sendToWorkbench('${item.news_id}')" title="Send to Unlearning Workbench">
+            🔬 Workbench
+          </button>
+          <button class="btn btn-outline btn-xs" onclick="event.stopPropagation(); openArticleModal('${item.news_id}')">
+            📜 View Certificate
+          </button>
+        `;
+      } else if (item.status === 'REVOKED_AND_UNLEARNED') {
+        statusBadge = '<span class="badge-pill badge-purple" style="font-weight: 700;">⚡ UNLEARNED & PURGED (0.00% INFLUENCE)</span>';
+        actionButtons = `
+          <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); openArticleModal('${item.news_id}')">
+            📜 View Certificate
+          </button>
+          <button class="btn btn-primary btn-xs" onclick="event.stopPropagation(); switchTab('admin'); const b = document.getElementById('ledgerTableBox'); if (b) b.scrollIntoView({behavior:'smooth'});">
+            ⚡ Audit Ledger
+          </button>
+        `;
+      }
 
       return `
-        <div class="submission-card">
+        <div class="submission-card" onclick="openArticleModal('${item.news_id}')" style="cursor: pointer;">
           <div class="submission-card-header">
             <span class="card-category">${escapeHtml(item.category || 'General')}</span>
             ${statusBadge}
@@ -1253,6 +1292,9 @@ async function loadUserSubmissions() {
           <div class="submission-card-footer">
             <span>By: <strong>${escapeHtml(item.author || 'You')}</strong></span>
             <span>Fake Probability: <strong>${Math.round((item.fake_probability || 0.05) * 100)}%</strong></span>
+          </div>
+          <div class="submission-actions-row" style="margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap;">
+            ${actionButtons}
           </div>
         </div>
       `;
@@ -1271,6 +1313,8 @@ async function loadAdminQueue() {
     const data = await res.json();
     const blocked = data.blocked_fake_news || [];
     const pending = data.pending_review || [];
+    state.adminBlockedList = blocked;
+    state.adminPendingList = pending;
 
     // Badges
     const blockedCountEl = document.getElementById('adminBlockedCount');
@@ -1384,8 +1428,21 @@ async function loadAdminQueue() {
   }
 }
 
-function selectTargetArticleById(newsId) {
-  const item = (state.adminBlockedMap && state.adminBlockedMap[newsId]) ? state.adminBlockedMap[newsId] : null;
+async function selectTargetArticleById(newsId) {
+  let item = (state.adminBlockedMap && state.adminBlockedMap[newsId]) ? state.adminBlockedMap[newsId] : null;
+  if (!item) {
+    try {
+      const res = await fetch(`/api/v1/news/${newsId}`);
+      if (res.ok) {
+        const d = await res.json();
+        item = d.article;
+        if (!state.adminBlockedMap) state.adminBlockedMap = {};
+        state.adminBlockedMap[newsId] = item;
+      }
+    } catch (e) {
+      console.warn('Failed to fetch article detail for workbench:', e);
+    }
+  }
   if (!item) return;
 
   state.selectedTarget = {
@@ -1428,22 +1485,22 @@ function selectTargetArticle(sampleId, newsId, title, text, riskBand) {
   if (probeInput && title) probeInput.value = title;
 }
 
-function executeDirectUnlearnById(newsId) {
-  selectTargetArticleById(newsId);
+async function executeDirectUnlearnById(newsId) {
+  await selectTargetArticleById(newsId);
   executeSelectedUnlearning('all_benchmark');
 }
 
-function executeDirectUnlearn(sampleId, newsId) {
+async function executeDirectUnlearn(sampleId, newsId) {
   if (newsId && state.adminBlockedMap && state.adminBlockedMap[newsId]) {
-    executeDirectUnlearnById(newsId);
+    await executeDirectUnlearnById(newsId);
   } else {
     selectTargetArticle(sampleId, newsId, '', '', 'HIGH_RISK_FAKE');
     executeSelectedUnlearning('all_benchmark');
   }
 }
 
-function sendToWorkbench(newsId) {
-  selectTargetArticleById(newsId);
+async function sendToWorkbench(newsId) {
+  await selectTargetArticleById(newsId);
   switchTab('admin');
   const bench = document.getElementById('benchmarkTableBox');
   if (bench) bench.scrollIntoView({ behavior: 'smooth' });
@@ -1462,7 +1519,7 @@ async function executeSelectedUnlearning(strategy) {
   // Fallback if no target explicitly selected
   if (!target || !target.sampleId) {
     if (state.adminBlockedList && state.adminBlockedList.length > 0) {
-      selectTargetArticleById(state.adminBlockedList[0].news_id);
+      await selectTargetArticleById(state.adminBlockedList[0].news_id);
       target = state.selectedTarget;
     } else {
       target = {
@@ -1510,9 +1567,11 @@ async function executeSelectedUnlearning(strategy) {
     animateShardPurge(targetShard);
 
     renderBenchmarkTable(data.benchmark);
-    loadAdminQueue();
-    loadUnlearningLedger();
-    loadPublishedNews();
+    state.selectedTarget = null;
+    await loadAdminQueue();
+    await loadUnlearningLedger();
+    await loadPublishedNews();
+    await loadUserSubmissions();
 
     // Auto-populate Model Memory Probe input with target headline so admin can test right away
     const probeInput = document.getElementById('probeQueryInput');

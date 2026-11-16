@@ -37,6 +37,39 @@ class FallbackCursor:
         return self._items[:length] if length is not None else self._items
 
 
+def _match_val(item_val: Any, target_val: Any) -> bool:
+    if isinstance(target_val, dict):
+        if "$regex" in target_val:
+            import re
+            pattern = target_val["$regex"]
+            flags = re.IGNORECASE if "i" in target_val.get("$options", "") else 0
+            return bool(re.search(pattern, str(item_val or ""), flags))
+        if "$in" in target_val:
+            return item_val in target_val["$in"]
+        if "$nin" in target_val:
+            return item_val not in target_val["$nin"]
+        if "$ne" in target_val:
+            return item_val != target_val["$ne"]
+        if "$exists" in target_val:
+            exists = item_val is not None
+            return exists == bool(target_val["$exists"])
+    return item_val == target_val
+
+
+def _match_query(item: Dict[str, Any], query: Optional[Dict[str, Any]]) -> bool:
+    if not query:
+        return True
+    if "$or" in query:
+        if not any(_match_query(item, subq) for subq in query["$or"]):
+            return False
+    for k, v in query.items():
+        if k == "$or":
+            continue
+        if not _match_val(item.get(k), v):
+            return False
+    return True
+
+
 class LocalFallbackCollection:
     """Thread-safe, file-persisted JSON fallback collection when MongoDB is offline."""
     def __init__(self, name: str, db_ref: 'LocalFallbackDB'):
@@ -60,7 +93,7 @@ class LocalFallbackCollection:
     def find_one(self, query: Dict[str, Any] = None) -> Optional[Dict[str, Any]]:
         query = query or {}
         for item in reversed(self._get_items()):
-            if all(item.get(k) == v for k, v in query.items()):
+            if _match_query(item, query):
                 return dict(item)
         return None
 
@@ -68,17 +101,17 @@ class LocalFallbackCollection:
         query = query or {}
         matches = [
             dict(item) for item in reversed(self._get_items())
-            if all(item.get(k) == v for k, v in query.items())
+            if _match_query(item, query)
         ]
         return FallbackCursor(matches)
 
     def count_documents(self, query: Dict[str, Any] = None) -> int:
         query = query or {}
-        return sum(1 for item in self._get_items() if all(item.get(k) == v for k, v in query.items()))
+        return sum(1 for item in self._get_items() if _match_query(item, query))
 
     def update_one(self, query: Dict[str, Any], update: Dict[str, Any]):
         for item in self._get_items():
-            if all(item.get(k) == v for k, v in query.items()):
+            if _match_query(item, query):
                 if "$set" in update:
                     item.update(update["$set"])
                 else:
@@ -91,7 +124,7 @@ class LocalFallbackCollection:
         count = 0
         set_vals = update.get("$set", update)
         for item in self._get_items():
-            if all(item.get(k) == v for k, v in query.items()):
+            if _match_query(item, query):
                 item.update(set_vals)
                 count += 1
         if count > 0:
@@ -103,7 +136,7 @@ class LocalFallbackCollection:
     def delete_one(self, query: Dict[str, Any]):
         items = self._get_items()
         for idx, item in enumerate(items):
-            if all(item.get(k) == v for k, v in query.items()):
+            if _match_query(item, query):
                 del items[idx]
                 self.db.save()
                 return True
@@ -112,7 +145,7 @@ class LocalFallbackCollection:
     def delete_many(self, query: Dict[str, Any]):
         items = self._get_items()
         initial_len = len(items)
-        self.db.data[self.name] = [item for item in items if not all(item.get(k) == v for k, v in query.items())]
+        self.db.data[self.name] = [item for item in items if not _match_query(item, query)]
         self.db.save()
         return initial_len - len(self.db.data[self.name])
 
