@@ -93,6 +93,20 @@ INDIAN_NEWS_FEEDS = [
         "author_default": "తెలుగు వార్తా విభాగం"
     },
     {
+        "name": "Times of India National",
+        "url": "https://timesofindia.indiatimes.com/rssfeedstopstories.cms",
+        "language": "English",
+        "region": "India National",
+        "author_default": "Times of India Bureau"
+    },
+    {
+        "name": "Times of India Technology",
+        "url": "https://timesofindia.indiatimes.com/rssfeeds/66949542.cms",
+        "language": "English",
+        "region": "Tech & AI Bureau",
+        "author_default": "TOI Tech Bureau"
+    },
+    {
         "name": "The Hindu",
         "url": "https://www.thehindu.com/news/national/feeder/default.rss",
         "language": "English",

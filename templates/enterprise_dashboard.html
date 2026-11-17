@@ -292,6 +292,9 @@
             <div class="hero-footer">
               <div style="display: flex; align-items: center; gap: 10px;">
                 <span class="read-more-link">Read Full Report with Dual-Track Fact Certificate →</span>
+                <button class="btn btn-secondary btn-xs btn-listen-anchor" type="button" onclick="event.stopPropagation(); if (state.allNews && state.allNews.length) playArticleAnchor(state.allNews[0].news_id);" title="Listen to Lead Story read by AI News Anchor">
+                  🎙️ Listen
+                </button>
                 <button class="admin-only-ui btn btn-secondary btn-xs" id="btnEditHeroStory" style="display: none;" onclick="event.stopPropagation(); if (state.allNews && state.allNews.length) openEditModal(state.allNews[0].news_id);" title="Edit front-page lead story">
                   ✏️ Edit Lead Story
                 </button>
@@ -679,10 +682,57 @@
               <!-- Rendered Dynamically -->
             </div>
           </div>
+
+          <!-- QUEUE 4: OUTDATED NEWS & CITIZEN REMOVAL REQUESTS (RIGHT TO BE FORGOTTEN) -->
+          <div class="admin-card">
+            <div class="card-header header-amber" style="background: rgba(245, 158, 11, 0.08); border-left: 4px solid var(--accent-amber);">
+              <h3>🚩 Outdated & Removal Requests (Right to be Forgotten)</h3>
+              <span class="badge-pill badge-amber" id="removalQueueBadge">0 Requests</span>
+            </div>
+            <p class="card-caption">
+              Citizen requests for outdated, retracted, or contested dispatches. Approving executes exact machine unlearning across models and database.
+            </p>
+            <div class="queue-items-container" id="adminRemovalList">
+              <!-- Rendered Dynamically -->
+            </div>
+          </div>
         </div>
 
         <!-- RIGHT: 3-FAMILY MACHINE UNLEARNING WORKBENCH -->
         <div class="admin-column">
+          <!-- ADMIN AI COPILOT & EDITORIAL ASSISTANT -->
+          <div class="admin-card copilot-card" style="margin-bottom: 20px; border: 1px solid rgba(139, 92, 246, 0.35); background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(2, 132, 199, 0.05) 100%);">
+            <div class="card-header" style="border-bottom: 1px solid rgba(139, 92, 246, 0.2);">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.25rem;">🤖</span>
+                <h3 style="margin: 0; font-size: 1.05rem;">Chief Fact-Checker AI Copilot</h3>
+                <span class="pulse-indicator" style="width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; display: inline-block;"></span>
+              </div>
+              <span class="badge-pill badge-purple">ML Assistant Active</span>
+            </div>
+            <div class="copilot-body" style="padding: 14px 16px;">
+              <!-- QUICK SHORTCUT CHIPS -->
+              <div class="copilot-chips-row" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+                <button class="btn btn-secondary btn-xs" type="button" onclick="sendCopilotShortcut('recommend_model')">⭐ Recommend Best Model</button>
+                <button class="btn btn-secondary btn-xs" type="button" onclick="sendCopilotShortcut('analyze_mia')">🛡️ Analyze MIA Risk</button>
+                <button class="btn btn-secondary btn-xs" type="button" onclick="sendCopilotShortcut('queue_summary')">📊 Queue Summary</button>
+                <button class="btn btn-amber btn-xs" type="button" onclick="sendCopilotShortcut('unlearn_top')">⚡ Unlearn Top Story</button>
+                <button class="btn btn-secondary btn-xs" type="button" onclick="sendCopilotShortcut('inspect_db')">🔍 Inspect DB & Cache</button>
+              </div>
+              <!-- CONVERSATION / RESPONSE BOX -->
+              <div id="copilotResponseBox" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px 14px; font-size: 0.86rem; line-height: 1.55; color: var(--text-main); min-height: 70px; max-height: 240px; overflow-y: auto;">
+                👋 <strong>Hello, Chief Editor!</strong> I am your AI Copilot. Ask me to recommend the best unlearning algorithm, audit MIA resilience, summarize editorial queues, or execute one-click unlearning on quarantined stories.
+              </div>
+              <!-- PROMPT INPUT ROW -->
+              <form onsubmit="handleCopilotSubmit(event)" style="display: flex; gap: 8px; margin-top: 10px;">
+                <input type="text" id="copilotQueryInput" placeholder="Ask Copilot about models, queues, MIA risk, or database state..." style="flex: 1; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-size: 0.84rem;">
+                <button type="submit" class="btn btn-primary btn-sm" id="btnCopilotSend">
+                  <span>Send</span> ⚡
+                </button>
+              </form>
+            </div>
+          </div>
+
           <div class="admin-card unlearning-workbench">
             <div class="card-header header-green">
               <h3>Exact Machine Unlearning Workbench (3 Structural Families)</h3>
@@ -964,7 +1014,7 @@
             </div>
 
             <!-- PERSISTENT UNLEARNING AUDIT LEDGER -->
-            <div class="ledger-box">
+            <div class="ledger-box" id="ledgerTableBox">
               <div class="ledger-header">
                 <h4>📜 Persistent Unlearning Audit Ledger</h4>
                 <button class="btn btn-secondary btn-xs" onclick="loadUnlearningLedger()">Refresh Ledger</button>
@@ -985,6 +1035,24 @@
                     <tr><td colspan="6" style="text-align: center; color: var(--text-dim);">No unlearning operations executed yet.</td></tr>
                   </tbody>
                 </table>
+              </div>
+            </div>
+
+            <!-- LIVE DATABASE & SYSTEM TELEMETRY EXPLORER -->
+            <div class="admin-card" style="margin-top: 24px; border: 1px solid var(--border-subtle);">
+              <div class="card-header header-cyan" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>🔍 Live Database & System Telemetry Explorer</h3>
+                <button class="btn btn-secondary btn-xs" type="button" onclick="refreshDbExplorerTelemetry()">
+                  <span>🔄</span> Refresh Telemetry
+                </button>
+              </div>
+              <p class="card-caption" style="padding: 0 16px; margin-top: 8px;">
+                Inspect real-time state across MongoDB collections, in-memory Redis cache signatures, Qdrant truth vectors, and SISA shard physical disk adapters.
+              </p>
+              <div style="padding: 12px 16px 16px;">
+                <div class="db-telemetry-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px;" id="dbExplorerGrid">
+                  <!-- Rendered Dynamically -->
+                </div>
               </div>
             </div>
           </div>
@@ -1124,6 +1192,14 @@
         <div class="cert-rationale" id="userModalRationale">
           Verified against official public registries and wire services. Confirmed authentic factual reporting with zero evidence of synthetic deception.
         </div>
+        <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="btn btn-listen-anchor btn-xs" type="button" onclick="playCurrentModalAnchor()">
+            <span>🎙️</span> Listen to Dispatch
+          </button>
+          <button class="btn btn-outline btn-xs" type="button" onclick="openRemovalRequestModal()" style="border-color: var(--accent-amber); color: var(--accent-amber);">
+            <span>🚩</span> Request Removal / Outdated Story
+          </button>
+        </div>
       </div>
 
       <!-- ADMIN DUAL-TRACK XAI & UNLEARNING INSPECTOR -->
@@ -1157,6 +1233,12 @@
           Verified against official governmental and scientific registries. Zero indicators of deceptive intent detected.
         </div>
         <div class="admin-modal-actions" style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn btn-listen-anchor btn-sm" type="button" onclick="playCurrentModalAnchor()" title="Listen to this broadsheet dispatch read by the AI anchor">
+            <span>🎙️</span> Listen to Dispatch
+          </button>
+          <button class="btn btn-outline btn-sm" type="button" onclick="openRemovalRequestModal()" style="border-color: var(--accent-amber); color: var(--accent-amber);" title="Flag outdated or request removal under Right to be Forgotten">
+            <span>🚩</span> Request Removal
+          </button>
           <button class="btn btn-primary btn-sm" onclick="openEditModalFromReader()">
             <span>✏️</span> Edit & Review Article
           </button>
@@ -1387,6 +1469,102 @@
           </button>
           <button type="button" class="btn btn-secondary" onclick="closeApiConfigModal()">
             Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       REAL-TIME NEWS READER AUDIO ANCHOR (BROADSHEET TTS)
+       ===================================================================== -->
+  <div id="newsReaderAnchorBar" class="news-reader-anchor-bar" style="display: none;">
+    <div class="anchor-profile">
+      <div class="anchor-avatar-pulse">
+        <span class="anchor-icon">🎙️</span>
+        <div class="audio-waves" id="anchorWaves">
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+        </div>
+      </div>
+      <div class="anchor-details">
+        <div class="anchor-label">SMRITI SHUDDHI BROADSHEET AUDIO ANCHOR</div>
+        <div class="anchor-headline" id="anchorReadingHeadline">Loading audio dispatch...</div>
+        <div class="anchor-byline" id="anchorReadingByline">Official Wire Audio Broadcast</div>
+      </div>
+    </div>
+    <div class="anchor-controls">
+      <button class="anchor-ctrl-btn" id="anchorPlayPauseBtn" type="button" onclick="toggleAnchorAudio()" title="Play / Pause">
+        <span id="anchorPlayIcon">⏸️</span>
+      </button>
+      <button class="anchor-ctrl-btn" type="button" onclick="stopAnchorAudio()" title="Stop Audio">
+        <span>⏹️</span>
+      </button>
+      <div class="anchor-rate-selector">
+        <span class="rate-label">Speed:</span>
+        <select id="anchorSpeedSelect" onchange="changeAnchorSpeed(this.value)">
+          <option value="0.85">0.85x</option>
+          <option value="1.0" selected>1.0x (Normal)</option>
+          <option value="1.15">1.15x (Brisk)</option>
+          <option value="1.25">1.25x (Fast)</option>
+        </select>
+      </div>
+      <button class="anchor-close-btn" type="button" onclick="closeAnchorBar()" title="Close Player">✕</button>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       CITIZEN OUTDATED / REMOVAL REQUEST MODAL (RIGHT TO BE FORGOTTEN)
+       ===================================================================== -->
+  <div class="modal-backdrop" id="removalRequestModal" style="display: none;" onclick="closeModalOnBackdrop(event, 'removalRequestModal')">
+    <div class="auth-modal-card" style="max-width: 540px; width: 92%;">
+      <button class="modal-close-btn" onclick="closeRemovalRequestModal()">×</button>
+      <div class="auth-header">
+        <h2 style="font-size: 1.35rem; margin: 0;">🚩 Request News Retraction / Removal</h2>
+        <p class="auth-sub" style="margin-top: 4px;">
+          Exercise your Right to be Forgotten. Submit this story to the Chief Fact-Checking Editor for machine unlearning review.
+        </p>
+      </div>
+      <form id="removalRequestForm" onsubmit="handleRemovalRequestSubmit(event)" style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
+        <input type="hidden" id="removalModalNewsId">
+        <div class="form-group">
+          <label style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px;">
+            Target Article
+          </label>
+          <input type="text" id="removalModalTitle" readonly style="background: var(--bg-surface); opacity: 0.85; font-size: 0.86rem; cursor: not-allowed;">
+        </div>
+        <div class="form-group">
+          <label for="removalReasonSelect" style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px;">
+            Removal Grounds / Mandate
+          </label>
+          <select id="removalReasonSelect" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
+            <option value="OUTDATED_INFO">Outdated or Superseded Information</option>
+            <option value="DEFAMATORY_RETRACTED">Retracted / Disputed Factual Allegation</option>
+            <option value="PRIVACY_REQUEST">Privacy Request (Right to be Forgotten)</option>
+            <option value="CITIZEN_CONTEST">Citizen Factual Contest / Correction</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <div style="flex: 1;" class="form-group">
+            <label for="removalRequesterName" style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px;">Your Name / Alias</label>
+            <input type="text" id="removalRequesterName" placeholder="Concerned Reader" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
+          </div>
+          <div style="flex: 1;" class="form-group">
+            <label for="removalRequesterEmail" style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px;">Email (For Audit Receipt)</label>
+            <input type="email" id="removalRequesterEmail" placeholder="reader@domain.com" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="removalDetailsInput" style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px;">Additional Context or Evidence</label>
+          <textarea id="removalDetailsInput" rows="3" placeholder="Explain why this article is outdated, retracted, or infringes privacy..." style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.85rem;"></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+          <button type="button" class="btn btn-secondary" onclick="closeRemovalRequestModal()">Cancel</button>
+          <button type="submit" class="btn btn-amber" id="btnSubmitRemoval">
+            <span>🚩</span> Submit Removal Request
           </button>
         </div>
       </form>

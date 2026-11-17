@@ -1423,6 +1423,10 @@ async function loadAdminQueue() {
         `).join('');
       }
     }
+
+    // Refresh removal requests & telemetry alongside admin queue
+    await loadRemovalRequests();
+    await refreshDbExplorerTelemetry();
   } catch (err) {
     console.error('Error loading admin queue:', err);
   }
@@ -2559,10 +2563,7 @@ function speakArticle(overrideText = null) {
 
 function listenToDispatchCard(newsId, event) {
   if (event) event.stopPropagation();
-  openArticleModal(newsId);
-  setTimeout(() => {
-    speakArticle();
-  }, 350);
+  playArticleAnchor(newsId);
 }
 
 function exportDossierReport() {
@@ -2667,4 +2668,397 @@ function hashString(str) {
     hash |= 0;
   }
   return hash;
+}
+
+// ==========================================================================
+// REAL-TIME NEWS READER AUDIO ANCHOR ENGINE (BROADSHEET TTS)
+// ==========================================================================
+const anchorAudioState = {
+  currentNewsId: null,
+  article: null,
+  isPaused: false,
+  rate: 1.0,
+  utterance: null
+};
+
+function playArticleAnchor(newsId) {
+  let item = (state.allNews || []).find(n => n.news_id === newsId);
+  if (!item && state.adminBlockedMap) item = state.adminBlockedMap[newsId];
+  if (!item && state.currentModalArticle && state.currentModalArticle.news_id === newsId) {
+    item = state.currentModalArticle;
+  }
+  if (!item) {
+    fetch(`/api/v1/news/${newsId}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.article) startAnchorBroadcast(d.article);
+      })
+      .catch(err => {
+        console.error('Failed to fetch article for anchor:', err);
+      });
+  } else {
+    startAnchorBroadcast(item);
+  }
+}
+
+function playCurrentModalAnchor() {
+  if (state.currentModalArticle) {
+    startAnchorBroadcast(state.currentModalArticle);
+  } else {
+    showToast('No active article loaded in reader.', 'warning');
+  }
+}
+
+function startAnchorBroadcast(article) {
+  if (!('speechSynthesis' in window)) {
+    showToast('Your browser does not support Speech Synthesis audio.', 'warning');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  anchorAudioState.currentNewsId = article.news_id;
+  anchorAudioState.article = article;
+  anchorAudioState.isPaused = false;
+
+  const bar = document.getElementById('newsReaderAnchorBar');
+  if (bar) bar.style.display = 'flex';
+
+  const headlineEl = document.getElementById('anchorReadingHeadline');
+  const bylineEl = document.getElementById('anchorReadingByline');
+  const playIcon = document.getElementById('anchorPlayIcon');
+  const waves = document.getElementById('anchorWaves');
+
+  if (headlineEl) headlineEl.innerText = article.title;
+  if (bylineEl) bylineEl.innerText = `${article.source || 'National Wire'} • By ${article.author || 'Editorial Bureau'}`;
+  if (playIcon) playIcon.innerText = '⏸️';
+  if (waves) waves.classList.add('playing');
+
+  // Formulate natural broadcaster script
+  const fullText = `Smriti Shuddhi Broadsheet Dispatch. Headline: ${article.title}. Reported by ${article.author || 'Editorial Bureau'}, from ${article.region || article.source || 'National Bureau'}. ${article.text || ''}`;
+  const utterance = new SpeechSynthesisUtterance(fullText);
+  anchorAudioState.utterance = utterance;
+
+  const rateSelect = document.getElementById('anchorSpeedSelect');
+  utterance.rate = rateSelect ? parseFloat(rateSelect.value) : anchorAudioState.rate;
+  utterance.pitch = 1.02;
+
+  const isTelugu = /[\u0C00-\u0C7F]/.test(fullText);
+  const isHindi = /[\u0900-\u097F]/.test(fullText);
+  utterance.lang = isTelugu ? 'te-IN' : (isHindi ? 'hi-IN' : 'en-IN');
+
+  utterance.onend = () => {
+    stopAnchorAudio();
+    showToast('Broadsheet audio broadcast complete.', 'info');
+  };
+  utterance.onerror = () => {
+    stopAnchorAudio();
+  };
+
+  window.speechSynthesis.speak(utterance);
+  showToast(`🎙️ Broadcaster On Air: "${article.title.slice(0, 30)}..."`, 'info');
+}
+
+function toggleAnchorAudio() {
+  if (!window.speechSynthesis) return;
+  const playIcon = document.getElementById('anchorPlayIcon');
+  const waves = document.getElementById('anchorWaves');
+
+  if (window.speechSynthesis.speaking) {
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+      anchorAudioState.isPaused = false;
+      if (playIcon) playIcon.innerText = '⏸️';
+      if (waves) waves.classList.add('playing');
+    } else {
+      window.speechSynthesis.pause();
+      anchorAudioState.isPaused = true;
+      if (playIcon) playIcon.innerText = '▶️';
+      if (waves) waves.classList.remove('playing');
+    }
+  } else if (anchorAudioState.article) {
+    startAnchorBroadcast(anchorAudioState.article);
+  }
+}
+
+function stopAnchorAudio() {
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+  anchorAudioState.isPaused = false;
+  const playIcon = document.getElementById('anchorPlayIcon');
+  const waves = document.getElementById('anchorWaves');
+  if (playIcon) playIcon.innerText = '▶️';
+  if (waves) waves.classList.remove('playing');
+}
+
+function changeAnchorSpeed(val) {
+  anchorAudioState.rate = parseFloat(val);
+  if (window.speechSynthesis && window.speechSynthesis.speaking && anchorAudioState.article) {
+    startAnchorBroadcast(anchorAudioState.article);
+  }
+}
+
+function closeAnchorBar() {
+  stopAnchorAudio();
+  const bar = document.getElementById('newsReaderAnchorBar');
+  if (bar) bar.style.display = 'none';
+}
+
+// ==========================================================================
+// CITIZEN RETRACTION / REMOVAL REQUESTS (RIGHT TO BE FORGOTTEN)
+// ==========================================================================
+function openRemovalRequestModal() {
+  const article = state.currentModalArticle;
+  if (!article) {
+    showToast('Please open an article before requesting removal.', 'warning');
+    return;
+  }
+  const modal = document.getElementById('removalRequestModal');
+  const idInput = document.getElementById('removalModalNewsId');
+  const titleInput = document.getElementById('removalModalTitle');
+  if (idInput) idInput.value = article.news_id;
+  if (titleInput) titleInput.value = article.title;
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeRemovalRequestModal() {
+  const modal = document.getElementById('removalRequestModal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function handleRemovalRequestSubmit(e) {
+  e.preventDefault();
+  const newsId = document.getElementById('removalModalNewsId').value;
+  const reason = document.getElementById('removalReasonSelect').value;
+  const requesterName = document.getElementById('removalRequesterName').value || 'Concerned Reader';
+  const requesterEmail = document.getElementById('removalRequesterEmail').value || 'reader@domain.com';
+  const details = document.getElementById('removalDetailsInput').value || '';
+
+  const btn = document.getElementById('btnSubmitRemoval');
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await fetch(`/api/v1/news/${newsId}/request-removal`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        reason: reason,
+        details: details,
+        requester_name: requesterName,
+        requester_email: requesterEmail
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast('🚩 Removal request submitted for Chief Editor review.', 'success');
+      logTerminal('CITIZEN_REMOVAL_REQUEST', `Removal requested for story ${newsId}: ${reason}`);
+      closeRemovalRequestModal();
+      if (state.currentRole === 'ADMIN') {
+        await loadRemovalRequests();
+      }
+    } else {
+      showToast(`Submission error: ${data.detail || 'Failed to submit'}`, 'error');
+    }
+  } catch (err) {
+    console.error('Removal request error:', err);
+    showToast(`Error: ${err.message}`, 'error');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function loadRemovalRequests() {
+  try {
+    const res = await fetch('/api/v1/admin/removal-requests');
+    if (!res.ok) return;
+    const data = await res.json();
+    const requests = data.requests || [];
+    const container = document.getElementById('adminRemovalList');
+    const badge = document.getElementById('removalQueueBadge');
+
+    if (badge) badge.innerText = `${requests.length} Pending`;
+
+    if (!container) return;
+    if (requests.length === 0) {
+      container.innerHTML = `<div style="text-align: center; padding: 24px; color: var(--text-dim);">No pending citizen removal requests. All archives compliant.</div>`;
+      return;
+    }
+
+    container.innerHTML = requests.map(req => `
+      <div class="queue-item-card" id="removalCard_${req.request_id}">
+        <div class="queue-item-meta">
+          <span>${req.request_id}</span>
+          <span class="badge-pill badge-amber">${escapeHtml(req.reason)}</span>
+        </div>
+        <h5 class="queue-item-title">${escapeHtml(req.title)}</h5>
+        <div class="queue-meta-line" style="margin-bottom: 6px;">
+          <span>Citizen: <strong>${escapeHtml(req.requester_name)}</strong></span> • 
+          <span>Date: ${new Date(req.created_at).toLocaleDateString()}</span>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 8px; background: rgba(0,0,0,0.15); padding: 6px 8px; border-radius: 4px;">
+          “${escapeHtml(req.details || 'Factual obsolescence / citizen request under Right to be Forgotten.')}”
+        </div>
+        <div class="queue-actions-row">
+          <button class="btn btn-crimson btn-xs" onclick="approveRemovalRequest('${req.request_id}')" title="Execute Exact Machine Unlearning across models & database">
+            ⚡ Approve & Unlearn
+          </button>
+          <button class="btn btn-secondary btn-xs" onclick="rejectRemovalRequest('${req.request_id}')" title="Dismiss citizen request">
+            ✕ Reject
+          </button>
+          <button class="btn btn-outline btn-xs" onclick="openArticleModal('${req.news_id}')">
+            📖 View Story
+          </button>
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    console.error('Error loading removal requests:', err);
+  }
+}
+
+async function approveRemovalRequest(requestId) {
+  if (!confirm(`Execute Exact Machine Unlearning and revoke this article across models and database?`)) return;
+  try {
+    const res = await fetch(`/api/v1/admin/removal-requests/${requestId}/approve`, {
+      method: 'POST'
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast(`⚡ Article unlearned and removed from system via Decremental SVM!`, 'success');
+      logTerminal('CITIZEN_REMOVAL_APPROVED', `Unlearned story for request ${requestId} (0.00% residual influence)`);
+      await loadRemovalRequests();
+      await loadAdminQueue();
+      await loadUnlearningLedger();
+      await loadPublishedNews();
+      await refreshDbExplorerTelemetry();
+    } else {
+      showToast(`Approval error: ${data.detail || 'Failed'}`, 'error');
+    }
+  } catch (err) {
+    console.error('Approve removal error:', err);
+  }
+}
+
+async function rejectRemovalRequest(requestId) {
+  try {
+    const res = await fetch(`/api/v1/admin/removal-requests/${requestId}/reject`, {
+      method: 'POST'
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast(`Removal request ${requestId} dismissed.`, 'info');
+      await loadRemovalRequests();
+    }
+  } catch (err) {
+    console.error('Reject removal error:', err);
+  }
+}
+
+// ==========================================================================
+// ADMIN AI COPILOT & EDITORIAL ASSISTANT
+// ==========================================================================
+async function sendCopilotShortcut(action) {
+  const box = document.getElementById('copilotResponseBox');
+  if (box) box.innerHTML = `<em>Consulting Chief Fact-Checker AI Copilot...</em>`;
+
+  try {
+    const res = await fetch('/api/v1/admin/copilot', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: action })
+    });
+    const data = await res.json();
+    if (box) {
+      box.innerHTML = formatCopilotReply(data.reply);
+    }
+    if (action === 'unlearn_top') {
+      await loadAdminQueue();
+      await loadUnlearningLedger();
+      await loadPublishedNews();
+      await refreshDbExplorerTelemetry();
+    }
+  } catch (err) {
+    if (box) box.innerText = `Copilot error: ${err.message}`;
+  }
+}
+
+async function handleCopilotSubmit(e) {
+  e.preventDefault();
+  const input = document.getElementById('copilotQueryInput');
+  const query = input ? input.value.trim() : '';
+  if (!query) return;
+
+  const box = document.getElementById('copilotResponseBox');
+  if (box) box.innerHTML = `<em>Querying Copilot: "${escapeHtml(query)}"...</em>`;
+  if (input) input.value = '';
+
+  try {
+    const res = await fetch('/api/v1/admin/copilot', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: query })
+    });
+    const data = await res.json();
+    if (box) {
+      box.innerHTML = formatCopilotReply(data.reply);
+    }
+  } catch (err) {
+    if (box) box.innerText = `Copilot error: ${err.message}`;
+  }
+}
+
+function formatCopilotReply(text) {
+  if (!text) return 'No response received.';
+  let formatted = escapeHtml(text)
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+  return formatted;
+}
+
+// ==========================================================================
+// LIVE DATABASE & TELEMETRY EXPLORER
+// ==========================================================================
+async function refreshDbExplorerTelemetry() {
+  const grid = document.getElementById('dbExplorerGrid');
+  if (!grid) return;
+
+  try {
+    const res = await fetch('/api/v1/admin/db-explorer');
+    if (!res.ok) return;
+    const data = await res.json();
+    const d = data.telemetry;
+
+    grid.innerHTML = `
+      <div class="telemetry-stat-card" style="background: var(--bg-surface); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+        <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">MongoDB Primary Store</div>
+        <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-cyan); margin: 4px 0;">${d.mongodb_collections.published_news} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-dim);">Records</span></div>
+        <div style="font-size: 0.78rem; color: var(--text-main);">Quarantined: <strong>${d.mongodb_collections.quarantined_fake_news}</strong> | Ledgers: <strong>${d.mongodb_collections.unlearning_ledger_records}</strong></div>
+      </div>
+
+      <div class="telemetry-stat-card" style="background: var(--bg-surface); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+        <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Redis Cache Memory</div>
+        <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green); margin: 4px 0;">${d.redis_cache.cached_keys_count} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-dim);">Keys</span></div>
+        <div style="font-size: 0.78rem; color: var(--text-main);">Hit Ratio: <strong>${d.redis_cache.hit_ratio}</strong> | Evictions: <strong>${d.redis_cache.evictions_on_unlearn}</strong></div>
+      </div>
+
+      <div class="telemetry-stat-card" style="background: var(--bg-surface); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+        <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Qdrant Vector Database</div>
+        <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-purple); margin: 4px 0;">${d.qdrant_vector_store.total_vectors} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-dim);">Vectors</span></div>
+        <div style="font-size: 0.78rem; color: var(--text-main);">Dimensions: <strong>${d.qdrant_vector_store.dimensions}</strong> (BGE-M3) | Metric: <strong>${d.qdrant_vector_store.metric}</strong></div>
+      </div>
+
+      <div class="telemetry-stat-card" style="background: var(--bg-surface); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+        <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">SISA Shard Memory Footprint</div>
+        <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-amber); margin: 4px 0;">5 <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-dim);">Shards</span></div>
+        <div style="font-size: 0.78rem; color: var(--text-main);">Adapters: <strong>${d.sisa_sharding.active_shards}</strong> | Memory: <strong>${d.sisa_sharding.total_adapter_memory_kb} KB</strong></div>
+      </div>
+    `;
+
+    const lastUpdated = document.getElementById('telemetryLastUpdated');
+    if (lastUpdated) {
+      lastUpdated.innerText = `Last Refreshed: ${new Date().toLocaleTimeString()}`;
+    }
+  } catch (err) {
+    console.error('Error refreshing telemetry:', err);
+  }
 }
