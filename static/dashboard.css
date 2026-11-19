@@ -631,7 +631,7 @@ body {
 }
 
 .role-btn:hover {
-  color: #fff;
+  color: var(--text-headline);
 }
 
 .role-btn.active {
@@ -810,7 +810,7 @@ body {
 }
 
 .breaking-item:hover {
-  color: #ffffff;
+  color: var(--text-headline);
   text-decoration: underline;
 }
 
@@ -885,8 +885,9 @@ body {
   font-family: var(--font-mono);
   padding: 1px 6px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
 }
 
 .nav-meters {
@@ -958,8 +959,8 @@ body {
 }
 
 .cat-pill:hover {
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-headline);
+  border-color: var(--border-focus);
 }
 
 .cat-pill.active {
@@ -3575,8 +3576,9 @@ body {
 }
 
 .lang-pill:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: var(--bg-card-hover);
+  color: var(--text-headline);
+  border-color: var(--border-focus);
 }
 
 .lang-pill.active {
@@ -3966,7 +3968,7 @@ body {
 }
 
 .lang-ui-btn:hover {
-  color: #fff;
+  color: var(--text-headline);
 }
 
 .lang-ui-btn.active {
@@ -4046,9 +4048,9 @@ body {
 }
 
 .speed-btn {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  color: #cbd5e1;
+  color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 600;
@@ -4060,7 +4062,7 @@ body {
 
 .speed-btn:hover {
   border-color: var(--accent-cyan);
-  color: #fff;
+  color: var(--text-headline);
 }
 
 .speed-btn.active {
