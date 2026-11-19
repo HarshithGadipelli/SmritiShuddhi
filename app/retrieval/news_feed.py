@@ -509,6 +509,39 @@ def generate_dynamic_realtime_stories() -> List[Dict[str, Any]]:
             "region": "Governance & Technology",
             "image_url": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
             "mins_ago": 180
+        },
+        {
+            "title": f"Indian Carrier SpiceJet Raises $589 Million to Support Fleet Expansion and Drive Revival",
+            "text": f"India's budget carrier SpiceJet has finalized plans to raise approximately $589 million through institutional placement and warrants to fund aircraft re-induction and operational revival across domestic and regional routes.",
+            "source": "Reuters India",
+            "author": "Reuters New Delhi Bureau",
+            "category": "Technology & AI",
+            "language": "English",
+            "region": "Aviation & Logistics",
+            "image_url": "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80",
+            "mins_ago": 40
+        },
+        {
+            "title": f"Indian State Energy Corporation Finalizes Multi-Million Sovereign Loan Agreement",
+            "text": f"Indian state-owned Power Finance Corporation has signed a bilateral financial loan agreement to fund modernization of interstate ultra-high-voltage power transmission lines across four northern states.",
+            "source": "Reuters India",
+            "author": "Reuters Financial Desk",
+            "category": "Banking & Economy",
+            "language": "English",
+            "region": "Banking & Energy",
+            "image_url": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80",
+            "mins_ago": 75
+        },
+        {
+            "title": f"India Agricultural Ministry Releases Official Assessment on Monsoon Kharif Crop Acreage",
+            "text": f"Official statistical bulletins released by the Ministry of Agriculture indicate that total sowing area under Kharif crops has expanded by 3.2% compared to the previous season, driven by favorable distribution of southwest monsoon rains.",
+            "source": "Reuters India",
+            "author": "Reuters Agriculture Desk",
+            "category": "Governance & Policy",
+            "language": "English",
+            "region": "Agriculture & Commodities",
+            "image_url": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80",
+            "mins_ago": 110
         }
     ]
 

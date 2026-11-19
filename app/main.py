@@ -436,7 +436,7 @@ def get_published_news(q: Optional[str] = None):
         elif not d.get("language"):
             d["language"] = "English"
         unique_docs.append(d)
-    return {"news": unique_docs[:80]}
+    return {"news": unique_docs[:150]}
 
 
 @app.post("/api/v1/news/submit")
