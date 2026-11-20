@@ -6,7 +6,7 @@
 // Translation dictionary for Multilingual UI (English & Hindi)
 const UI_TRANSLATIONS = {
   en: {
-    title: "Smriti Shuddhi",
+    title: "SMRITI SHUDDHI",
     edition: "THE WORLD'S FIRST MACHINE-UNLEARNING NEWS PLATFORM",
     tagline1: "NATIONAL MULTILINGUAL NEWS WIRE & EXACT MACHINE UNLEARNING ENGINE",
     tagline2: "DUAL-TRACK HYBRID FACT VERIFICATION",
@@ -47,7 +47,7 @@ const UI_TRANSLATIONS = {
     certSub: "Verified Against Official Indian & International Public Registries"
   },
   hi: {
-    title: "Smriti Shuddhi",
+    title: "SMRITI SHUDDHI",
     edition: "संसार का प्रथम मशीन-अनलर्निंग समाचार मंच",
     tagline1: "राष्ट्रीय बहुभाषी समाचार वायर एवं यथार्थ मशीन अनलर्निंग इंजन",
     tagline2: "द्वि-मार्गी हाइब्रिड तथ्य सत्यापन प्रणाली",
@@ -88,7 +88,7 @@ const UI_TRANSLATIONS = {
     certSub: "आधिकारिक भारतीय एवं अंतर्राष्ट्रीय सार्वजनिक अभिलेखों से सत्यापित"
   },
   te: {
-    title: "Smriti Shuddhi",
+    title: "SMRITI SHUDDHI",
     scriptTitle: "స్మృతి శుద్ధి",
     edition: "ప్రపంచంలోనే మొట్టమొదటి మెషిన్ అన్‌లెర్నింగ్ వార్తా వేదిక",
     tagline1: "జాతీయ బహుభాషా వార్తా వైర్ & ఖచ్చితమైన మెషిన్ అన్‌లెర్నింగ్ ఇంజిన్",
@@ -562,7 +562,8 @@ function closeModalOnBackdrop(e, modalId) {
 }
 
 // ==========================================================================
-// TAB NAVIGATION
+// ==========================================================================
+// TAB NAVIGATION & REALISTIC BROADSHEET PAGE-TURN TRANSITION
 // ==========================================================================
 function switchTab(tabId) {
   state.currentTab = tabId;
@@ -571,9 +572,24 @@ function switchTab(tabId) {
   tabs.forEach(t => {
     const view = document.getElementById(`view${capitalize(t)}`);
     const btn = document.getElementById(`tab${capitalize(t)}Btn`);
-    if (view) view.classList.toggle('active', t === tabId);
+    if (view) {
+      const willBeActive = (t === tabId);
+      if (willBeActive) {
+        view.classList.remove('active');
+        void view.offsetWidth; // Force reflow to re-trigger physical paperPageTurnIn transition
+        view.classList.add('active');
+      } else {
+        view.classList.remove('active');
+      }
+    }
     if (btn) btn.classList.toggle('active', t === tabId);
   });
+
+  // Smooth scroll to top of newspaper fold if scrolled down
+  const navBar = document.querySelector('.newspaper-nav-bar');
+  if (navBar && window.scrollY > 380) {
+    navBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   if (tabId === 'wire') loadPublishedNews();
   if (tabId === 'admin') loadAdminQueue();
