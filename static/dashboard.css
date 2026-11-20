@@ -3498,6 +3498,297 @@ body {
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
+/* ==========================================================================
+   CONSOLIDATED PROFILE & READER SETTINGS DRAWER
+   ========================================================================== */
+.profile-settings-wrapper {
+  position: relative;
+  display: inline-block;
+  z-index: 100;
+}
+
+.profile-settings-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
+  padding: 5px 14px 5px 8px;
+  cursor: pointer;
+  color: var(--text-headline);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.profile-settings-btn:hover {
+  background: var(--bg-card);
+  border-color: var(--accent-blue);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
+  transform: translateY(-1px);
+}
+
+.user-avatar-mini {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.user-name-label {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-headline);
+}
+
+.settings-gear-icon {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  transition: transform 0.3s ease;
+}
+
+.profile-settings-btn:hover .settings-gear-icon {
+  transform: rotate(45deg);
+  opacity: 1;
+}
+
+/* BROADSHEET PROFILE DRAWER DROPDOWN */
+.profile-settings-drawer {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-newspaper);
+  border-radius: 10px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: profileDrawerSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes profileDrawerSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.drawer-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.drawer-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  flex-shrink: 0;
+}
+
+.drawer-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.drawer-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-headline);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drawer-email {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drawer-role-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.drawer-role-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.drawer-role-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+
+.drawer-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 2px 0;
+}
+
+.drawer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.drawer-section-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
+.drawer-mode-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.drawer-mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.drawer-mode-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-blue);
+  transform: translateX(2px);
+}
+
+.drawer-mode-btn.active {
+  background: rgba(2, 132, 199, 0.08);
+  border-color: var(--accent-blue);
+}
+
+.mode-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.mode-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.mode-info strong {
+  font-size: 0.8rem;
+  color: var(--text-headline);
+}
+
+.mode-info small {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.mode-check {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--accent-blue);
+  opacity: 0;
+}
+
+.drawer-mode-btn.active .mode-check {
+  opacity: 1;
+}
+
+.drawer-lang-grid {
+  display: flex;
+  gap: 6px;
+}
+
+.drawer-lang-btn {
+  flex: 1;
+  padding: 6px 4px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.drawer-lang-btn:hover {
+  border-color: var(--accent-blue);
+  background: var(--bg-card-hover);
+}
+
+.drawer-lang-btn.active {
+  background: var(--accent-blue);
+  color: #fff;
+  border-color: var(--accent-blue);
+}
+
+.drawer-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 4px;
+}
+
+/* REALISTIC BROADSHEET SCROLLING PAGE-TURN TRANSITIONS */
+.newspaper-dispatch-card,
+.featured-hero-article,
+.trending-item,
+.submission-card {
+  opacity: 0;
+  transform: perspective(1400px) rotateX(8deg) translateY(28px) scale(0.975);
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s ease,
+              border-color 0.25s ease;
+  will-change: transform, opacity;
+}
+
+.newspaper-dispatch-card.paper-scrolled-in,
+.featured-hero-article.paper-scrolled-in,
+.trending-item.paper-scrolled-in,
+.submission-card.paper-scrolled-in {
+  opacity: 1;
+  transform: perspective(1400px) rotateX(0deg) translateY(0) scale(1);
+}
+
 .user-profile-widget {
   display: flex;
   align-items: center;

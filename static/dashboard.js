@@ -191,22 +191,53 @@ function setTheme(theme, isUserClick = true) {
   state.currentTheme = theme;
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('smriti_shuddhi_theme', theme);
+
   const btnLight = document.getElementById('btnThemeLight');
   const btnPaper = document.getElementById('btnThemePaper');
   const btnDark = document.getElementById('btnThemeDark');
   if (btnLight) btnLight.classList.toggle('active', theme === 'light');
   if (btnPaper) btnPaper.classList.toggle('active', theme === 'paper');
   if (btnDark) btnDark.classList.toggle('active', theme === 'dark');
+
+  // Drawer buttons & checks
+  const dModePaper = document.getElementById('btnModePaper');
+  const dModeLight = document.getElementById('btnModeLight');
+  const dModeDark = document.getElementById('btnModeDark');
+  if (dModePaper) dModePaper.classList.toggle('active', theme === 'paper');
+  if (dModeLight) dModeLight.classList.toggle('active', theme === 'light');
+  if (dModeDark) dModeDark.classList.toggle('active', theme === 'dark');
+
   if (isUserClick && typeof showToast === 'function') {
     if (theme === 'paper') {
-      showToast('📰 Real Life Newspaper Broadsheet Mode Active', 'info');
+      showToast('📜 Realistic Newsprint Broadsheet Mode Active', 'info');
     } else if (theme === 'light') {
-      showToast('☀️ Clean Light Mode Active', 'info');
+      showToast('☀️ Classic Light Mode Active', 'info');
     } else if (theme === 'dark') {
-      showToast('🌙 Dark Terminal Mode Active', 'info');
+      showToast('🌙 Obsidian Night Mode Active', 'info');
     }
   }
 }
+
+function toggleProfileDrawer(e) {
+  if (e) e.stopPropagation();
+  const drawer = document.getElementById('profileSettingsDrawer');
+  if (drawer) {
+    const isShown = drawer.style.display !== 'none';
+    drawer.style.display = isShown ? 'none' : 'flex';
+  }
+}
+
+function closeProfileDrawer() {
+  const drawer = document.getElementById('profileSettingsDrawer');
+  if (drawer) drawer.style.display = 'none';
+}
+
+document.addEventListener('click', (e) => {
+  const wrapper = document.getElementById('profileSettingsWrapper');
+  if (wrapper && !wrapper.contains(e.target)) {
+    closeProfileDrawer();
+  }
+});
 
 function initDateDisplay() {
   const el = document.getElementById('currentDateStr');
@@ -232,6 +263,14 @@ function setUiLanguage(lang) {
   if (btnEn) btnEn.classList.toggle('active', lang === 'en');
   if (btnHi) btnHi.classList.toggle('active', lang === 'hi');
   if (btnTe) btnTe.classList.toggle('active', lang === 'te');
+
+  // Drawer language pills
+  const dLangEn = document.getElementById('btnLangEn');
+  const dLangHi = document.getElementById('btnLangHi');
+  const dLangTe = document.getElementById('btnLangTe');
+  if (dLangEn) dLangEn.classList.toggle('active', lang === 'en');
+  if (dLangHi) dLangHi.classList.toggle('active', lang === 'hi');
+  if (dLangTe) dLangTe.classList.toggle('active', lang === 'te');
 
   const scriptTitle = document.getElementById('mastheadScriptTitle');
   if (scriptTitle) {
@@ -350,6 +389,25 @@ function updateUserUI() {
     badgeEl.className = `user-role-badge ${isAdmin ? 'badge-crimson' : 'badge-green'}`;
   }
   if (avatarEl) avatarEl.innerText = isAdmin ? '🛡️' : '👤';
+
+  // Update Drawer User Card
+  const dName = document.getElementById('drawerUserName');
+  const dEmail = document.getElementById('drawerUserEmail');
+  const dAvatar = document.getElementById('drawerAvatar');
+  const dRoleBadge = document.getElementById('drawerUserRoleBadge');
+  if (dName) dName.innerText = state.currentUser.name || (isAdmin ? 'Dr. Sarah Mitchell' : 'Alex Rivera');
+  if (dEmail) dEmail.innerText = state.currentUser.email || (isAdmin ? 'chief.editor@smritishuddhi.org' : 'reporter@times.com');
+  if (dAvatar) dAvatar.innerText = isAdmin ? '🛡️' : '👤';
+  if (dRoleBadge) {
+    dRoleBadge.innerText = isAdmin ? 'CHIEF FACT-CHECKER (ADMIN)' : 'CITIZEN JOURNALIST';
+    dRoleBadge.className = `drawer-role-badge ${isAdmin ? 'badge-crimson' : 'badge-green'}`;
+  }
+
+  // Pre-fill submit authorInput with user's name
+  const authorInput = document.getElementById('authorInput');
+  if (authorInput && !authorInput.value) {
+    authorInput.value = state.currentUser.name || (isAdmin ? 'Dr. Sarah Mitchell' : 'Alex Rivera');
+  }
 
   if (btnJournalist && btnAdmin) {
     if (isAdmin) {
@@ -621,12 +679,93 @@ function deduplicateArticles(list) {
 // ==========================================================================
 // TAB 1: FRONT PAGE NEWS WIRE & LIVE RSS SYNC
 // ==========================================================================
+let scrollPaperObserver = null;
+
+function initScrollPaperTurns() {
+  if (scrollPaperObserver) {
+    scrollPaperObserver.disconnect();
+  }
+
+  const cards = document.querySelectorAll(
+    '.newspaper-dispatch-card, .featured-hero-article, .trending-item, .submission-card'
+  );
+
+  if (!cards.length) return;
+
+  if (!('IntersectionObserver' in window)) {
+    cards.forEach(c => c.classList.add('paper-scrolled-in'));
+    return;
+  }
+
+  scrollPaperObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('paper-scrolled-in');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.08,
+    rootMargin: '0px 0px -25px 0px'
+  });
+
+  cards.forEach(card => {
+    const rect = card.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      card.classList.add('paper-scrolled-in');
+    } else {
+      card.classList.remove('paper-scrolled-in');
+      scrollPaperObserver.observe(card);
+    }
+  });
+}
+
+function renderBreakingNewsTicker() {
+  const marquee = document.getElementById('breakingTickerMarquee');
+  if (!marquee) return;
+
+  const validStories = (state.allNews || []).filter(n => {
+    const title = (n.title || '').trim();
+    return title.length > 15 && 
+           !title.includes('Headline goes here') &&
+           !title.includes('undefined') &&
+           !title.includes('null');
+  });
+
+  if (validStories.length === 0) {
+    marquee.innerHTML = `
+      <span class="breaking-item" onclick="openFeaturedLeadArticle()">🚨 <strong>PIB FACT CHECK:</strong> Viral WhatsApp claim on currency demonetization is fake and unsubstantiated.</span>
+      <span class="breaking-item">🛰️ <strong>ISRO ARCHIVE:</strong> Lunar elemental spectrometry repository released on ISSDC portal for global researchers.</span>
+      <span class="breaking-item">📈 <strong>REUTERS INDIA:</strong> Indian capital markets register steady foreign institutional inflows across infrastructure.</span>
+      <span class="breaking-item">⚡ <strong>MACHINE UNLEARNING:</strong> 3 structural families active: SISA Partitioning, Decremental SVM, and Modular LoRA.</span>
+    `;
+    return;
+  }
+
+  const items = validStories.slice(0, 6);
+  marquee.innerHTML = items.map(item => {
+    const cat = escapeHtml((item.category || 'NEWS WIRE').toUpperCase());
+    const source = escapeHtml((item.source || 'WIRE').toUpperCase());
+    const title = escapeHtml(item.title);
+    let icon = '📰';
+    if (cat.includes('SCIENCE') || cat.includes('SPACE')) icon = '🛰️';
+    else if (cat.includes('ECONOMY') || cat.includes('BANKING')) icon = '📈';
+    else if (cat.includes('GOVERNANCE') || cat.includes('POLICY')) icon = '🏛️';
+    else if (cat.includes('WEATHER')) icon = '🌦️';
+    else if (source.includes('PIB') || source.includes('FACT')) icon = '🚨';
+
+    return `<span class="breaking-item" onclick="openArticleModal('${item.news_id}')">${icon} <strong>${source}:</strong> ${title}</span>`;
+  }).join('');
+}
+
 async function loadPublishedNews() {
   try {
     const res = await fetch('/api/v1/news');
     const data = await res.json();
     state.allNews = deduplicateArticles(data.news || []);
     renderNewsWire();
+    renderBreakingNewsTicker();
+    initScrollPaperTurns();
   } catch (err) {
     console.error('Error loading news feed:', err);
   }
@@ -781,6 +920,7 @@ function renderNewsWire() {
         </div>
       </article>
     `).join('');
+    initScrollPaperTurns();
   }
 }
 
@@ -1759,6 +1899,7 @@ async function loadUnlearningLedger() {
         <td><span class="badge-pill badge-green">PURGED</span></td>
       </tr>
     `).join('');
+    initScrollPaperTurns();
   } catch (err) {
     console.error('Ledger error:', err);
   }
@@ -2520,6 +2661,7 @@ function renderCustomNewsGrid(items) {
       </div>
     </article>
   `).join('');
+  initScrollPaperTurns();
 }
 
 function animateShardPurge(shardId) {
@@ -3042,6 +3184,7 @@ async function loadRemovalRequests() {
         </div>
       </div>
     `).join('');
+    initScrollPaperTurns();
   } catch (err) {
     console.error('Error loading removal requests:', err);
   }

@@ -35,57 +35,93 @@
         <div class="masthead-date" id="currentDateStr">Tuesday, November 3, 2026 • Vol. LXXIV No. 248</div>
         <div class="masthead-edition">THE WORLD'S FIRST MACHINE-UNLEARNING NEWS PLATFORM</div>
         <div class="masthead-user-controls">
-          <!-- THEME TOGGLE (LIGHT / PAPER / DARK) -->
-          <div class="theme-switch-group" title="Toggle Reading Aesthetic">
-            <button class="theme-ui-btn active" id="btnThemeLight" onclick="setTheme('light')" title="Clean modern light mode">
-              <span>☀️</span> <span id="themeLightText">Light</span>
-            </button>
-            <button class="theme-ui-btn" id="btnThemePaper" onclick="setTheme('paper')" title="Authentic newsprint paper reading mode">
-              <span>📰</span> <span id="themePaperText">Paper</span>
-            </button>
-            <button class="theme-ui-btn" id="btnThemeDark" onclick="setTheme('dark')" title="Dark mode">
-              <span>🌙</span> <span id="themeDarkText">Dark</span>
-            </button>
-          </div>
-
-          <!-- MULTILINGUAL UI TOGGLE (ENGLISH / HINDI / TELUGU) -->
-          <div class="lang-switch-group" title="Switch interface language / భాష మార్చండి / भाषा बदलें">
-            <button class="lang-ui-btn active" id="btnUiEn" onclick="setUiLanguage('en')">EN</button>
-            <button class="lang-ui-btn" id="btnUiHi" onclick="setUiLanguage('hi')">हिंदी</button>
-            <button class="lang-ui-btn" id="btnUiTe" onclick="setUiLanguage('te')">తెలుగు</button>
-          </div>
-
-          <!-- AUTH ACTION BUTTONS (ALWAYS VISIBLE & PROMINENT) -->
-          <div class="auth-actions-group">
-            <button class="nav-auth-btn btn-signin" id="btnNavSignIn" onclick="openAuthModal('login')" title="Sign in to your account">
-              <span>🔑</span> <span id="navSignInText">Sign In</span>
-            </button>
-            <button class="nav-auth-btn btn-register" id="btnNavRegister" onclick="openAuthModal('register')" title="Register a new platform account">
-              <span>📝</span> <span id="navRegisterText">Register</span>
-            </button>
-          </div>
-
-          <!-- LOGGED-IN USER PROFILE & LOGOUT -->
-          <div class="user-profile-widget" id="userProfileBox">
-            <button class="auth-profile-btn" id="authBtn" onclick="openAuthModal('login')" title="Account details">
-              <span class="user-avatar" id="navAvatar">👤</span>
-              <span class="user-name" id="navUserName">Alex Rivera</span>
+          <!-- SINGLE PROFILE & SETTINGS MENU BUTTON -->
+          <div class="profile-settings-wrapper" id="profileSettingsWrapper">
+            <button type="button" class="profile-settings-btn" id="btnProfileSettings" onclick="toggleProfileDrawer(event)" title="Account, Reading Modes & Language Settings">
+              <span class="user-avatar-mini" id="navAvatar">👤</span>
+              <span class="user-name-label" id="navUserName">Alex Rivera</span>
               <span class="user-role-badge badge-green" id="navUserBadge">JOURNALIST</span>
+              <span class="settings-gear-icon">⚙️</span>
             </button>
-            <button class="btn-logout" id="btnLogout" onclick="handleLogout()" title="Sign out / Switch account">
-              <span>🚪</span> <span id="navLogoutText">Sign Out</span>
-            </button>
-          </div>
 
-          <!-- QUICK ROLE SWITCHER -->
-          <div class="role-pill-switch" title="Toggle between Citizen Journalist and Chief Fact-Checker">
-            <span class="switch-label" id="roleSwitchLabel">Role:</span>
-            <button class="role-btn active" id="btnRoleJournalist" onclick="switchUserRole('JOURNALIST')">
-              <span>👤</span> <span id="roleJournalistText">Journalist</span>
-            </button>
-            <button class="role-btn" id="btnRoleAdmin" onclick="switchUserRole('ADMIN')">
-              <span>🛡️</span> <span id="roleAdminText">Admin</span>
-            </button>
+            <!-- ELEGANT BROADSHEET PROFILE & SETTINGS DRAWER -->
+            <div class="profile-settings-drawer" id="profileSettingsDrawer" style="display: none;" onclick="event.stopPropagation()">
+              <!-- USER IDENTITY CARD -->
+              <div class="drawer-user-card">
+                <div class="drawer-avatar" id="drawerAvatar">👤</div>
+                <div class="drawer-user-info">
+                  <div class="drawer-name" id="drawerUserName">Alex Rivera</div>
+                  <div class="drawer-email" id="drawerUserEmail">reporter@times.com</div>
+                  <div class="drawer-role-line">
+                    <span class="drawer-role-label">Assigned Role:</span>
+                    <span class="drawer-role-badge badge-green" id="drawerUserRoleBadge">CITIZEN JOURNALIST</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="drawer-divider"></div>
+
+              <!-- READING AESTHETIC & PAGE MODES -->
+              <div class="drawer-section">
+                <div class="drawer-section-title">📰 Broadsheet Page Modes:</div>
+                <div class="drawer-mode-grid">
+                  <button type="button" class="drawer-mode-btn" id="btnModePaper" onclick="setTheme('paper')">
+                    <span class="mode-icon">📜</span>
+                    <span class="mode-info">
+                      <strong>Realistic Paper Mode</strong>
+                      <small>Unbleached newsprint & ink grain</small>
+                    </span>
+                    <span class="mode-check" id="checkModePaper">✓</span>
+                  </button>
+                  <button type="button" class="drawer-mode-btn" id="btnModeLight" onclick="setTheme('light')">
+                    <span class="mode-icon">☀️</span>
+                    <span class="mode-info">
+                      <strong>Classic Light Mode</strong>
+                      <small>Crisp high-contrast day broadsheet</small>
+                    </span>
+                    <span class="mode-check" id="checkModeLight">✓</span>
+                  </button>
+                  <button type="button" class="drawer-mode-btn" id="btnModeDark" onclick="setTheme('dark')">
+                    <span class="mode-icon">🌙</span>
+                    <span class="mode-info">
+                      <strong>Obsidian Night Mode</strong>
+                      <small>Deep dark broadsheet reading</small>
+                    </span>
+                    <span class="mode-check" id="checkModeDark">✓</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="drawer-divider"></div>
+
+              <!-- MULTILINGUAL WIRE LANGUAGE -->
+              <div class="drawer-section">
+                <div class="drawer-section-title">🌐 Wire & Interface Language:</div>
+                <div class="drawer-lang-grid">
+                  <button type="button" class="drawer-lang-btn active" id="btnLangEn" onclick="setUiLanguage('en')">
+                    <span>🇮🇳 English</span>
+                  </button>
+                  <button type="button" class="drawer-lang-btn" id="btnLangHi" onclick="setUiLanguage('hi')">
+                    <span>🇮🇳 हिंदी (Hindi)</span>
+                  </button>
+                  <button type="button" class="drawer-lang-btn" id="btnLangTe" onclick="setUiLanguage('te')">
+                    <span>🇮🇳 తెలుగు (Telugu)</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="drawer-divider"></div>
+
+              <!-- ACCOUNT ACTIONS (SIGN IN / REGISTER / SIGN OUT) -->
+              <div class="drawer-actions-row">
+                <button type="button" class="btn btn-secondary btn-xs" onclick="openAuthModal('login'); closeProfileDrawer();" title="Switch User or Re-authenticate">
+                  <span>🔄</span> Switch Account
+                </button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="handleLogout(); closeProfileDrawer();" style="border-color: var(--accent-crimson); color: var(--accent-crimson);">
+                  <span>🚪</span> Sign Out
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
