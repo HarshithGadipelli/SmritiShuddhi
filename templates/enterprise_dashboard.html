@@ -243,6 +243,28 @@
         </div>
       </div>
 
+      <!-- PROMINENT FRONT-PAGE NEWS WIRE SEARCH & TOPIC BAR -->
+      <div class="wire-search-bar-wrap">
+        <div class="wire-search-input-group">
+          <span class="wire-search-icon">🔍</span>
+          <input type="text" id="frontPageSearchInput" class="wire-search-input" 
+                 placeholder="Search verified news dispatches, topics, fact-checks, authors, entities (e.g., 'Sensex', 'ISRO', 'RBI', 'Gold')..." 
+                 oninput="handleFrontPageSearch(event)">
+          <button type="button" class="btn-clear-search" id="btnClearFrontSearch" onclick="clearFrontPageSearch()" title="Clear search" style="display: none;">✕</button>
+        </div>
+        <div class="wire-search-stats" id="wireSearchStats">
+          <span class="search-badge" id="wireSearchCountBadge">Showing All Stories</span>
+        </div>
+        <div class="wire-search-quick-tags">
+          <span class="quick-tag-label">Trending Topics:</span>
+          <button type="button" class="quick-topic-tag" onclick="quickFilterTopic('ISRO')">🛰️ ISRO Science</button>
+          <button type="button" class="quick-topic-tag" onclick="quickFilterTopic('Sensex')">📈 BSE Sensex</button>
+          <button type="button" class="quick-topic-tag" onclick="quickFilterTopic('RBI')">🏦 RBI Currency</button>
+          <button type="button" class="quick-topic-tag" onclick="quickFilterTopic('Gold')">🪙 24K Gold</button>
+          <button type="button" class="quick-topic-tag" onclick="quickFilterTopic('Weather')">🌦️ IMD Weather</button>
+        </div>
+      </div>
+
       <!-- FILTER CONTROLS: SECTIONS & LANGUAGES -->
       <div class="filter-controls-row">
         <!-- CATEGORY FILTER PILLS -->
@@ -1207,8 +1229,8 @@
         <div class="cert-header">
           <div class="cert-seal">🛡️</div>
           <div>
-            <h3>ADMINISTRATIVE DUAL-TRACK XAI & MACHINE UNLEARNING INSPECTOR</h3>
-            <span class="cert-subtext">DeBERTa-v3 Stylometry + BGE-M3 Qdrant KNN + Neo4j Chronological Graph</span>
+            <h3>ADMINISTRATIVE 5-PILLAR XAI & MACHINE UNLEARNING INSPECTOR</h3>
+            <span class="cert-subtext">DeBERTa-v3 Stylometry • BGE-M3 Vector Store • Neo4j Graph • Quantitative Anomaly • Viral Propagation</span>
           </div>
         </div>
         <div class="cert-meters-row">
@@ -1221,16 +1243,27 @@
             <span class="cert-meter-val accent-purple" id="modalStyleScore">0.08</span>
           </div>
           <div class="cert-meter">
-            <span class="cert-meter-name">Track B: Qdrant Fact Retrieval</span>
+            <span class="cert-meter-name">Track B: Fact Retrieval</span>
             <span class="cert-meter-val accent-cyan" id="modalFactScore">Qdrant PIB Match</span>
           </div>
           <div class="cert-meter">
-            <span class="cert-meter-name">Neo4j Temporal Linearity</span>
+            <span class="cert-meter-name">Track C: Neo4j Linearity</span>
             <span class="cert-meter-val accent-green" id="modalGraphScore">Consistent</span>
+          </div>
+          <div class="cert-meter">
+            <span class="cert-meter-name">Track D: Quantitative Base</span>
+            <span class="cert-meter-val accent-amber" id="modalQuantScore">Nominal Range</span>
+          </div>
+          <div class="cert-meter">
+            <span class="cert-meter-name">Track E: Viral Propagation</span>
+            <span class="cert-meter-val accent-purple" id="modalPropScore">Standard Wire</span>
           </div>
         </div>
         <div class="cert-rationale" id="modalRationale">
           Verified against official governmental and scientific registries. Zero indicators of deceptive intent detected.
+        </div>
+        <div class="modal-xai-breakdown-box" id="modalXaiBreakdown" style="display: none; margin-top: 10px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 10px 14px; font-size: 0.8rem; line-height: 1.5;">
+          <!-- Dynamically populated if anomalies or evidence matches occur -->
         </div>
         <div class="admin-modal-actions" style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
           <button class="btn btn-listen-anchor btn-sm" type="button" onclick="playCurrentModalAnchor()" title="Listen to this broadsheet dispatch read by the AI anchor">

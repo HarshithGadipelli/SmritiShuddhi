@@ -20,6 +20,11 @@ from app.retrieval.vector_store import vector_store, INITIAL_OFFICIAL_CORPUS
 from app.retrieval.graph_store import graph_engine
 from app.models.lora_sisa import lora_sisa_engine
 from app.models.fusion import fusion_layer
+from app.retrieval.knowledge_base import (
+    quantitative_anomaly_engine,
+    propagation_analyzer,
+    internal_evidence_engine
+)
 from app.unlearning.engine import unlearning_engine
 from app.unlearning.algorithms import multi_model_suite
 from db import init_db, news_col, training_col, requests_col, unlearning_col, audit_col, users_col, unlearning_ledger_col, using_mongo, now
@@ -367,27 +372,45 @@ if static_path.exists():
 # DUAL-TRACK HYBRID INFERENCE LOGIC
 # -----------------------------------------------------------------------------
 
-def execute_hybrid_inference(title: str, text: str) -> Dict[str, Any]:
-    """Concurrent Dual-Track Inference:
+def execute_hybrid_inference(title: str, text: str, source: str = "", author: str = "") -> Dict[str, Any]:
+    """Concurrent Multi-Aspect Hybrid Inference:
     Track A: Stylistic Intention Parsing (DeBERTa-v3 frozen base + LoRA adapters)
-    Track B: Real-Time Fact Cross-Referencing (BGE-M3 + Qdrant KNN + Neo4j Graph)
-    Fusion: Ensemble weighting + Explainable AI (XAI) rationale
+    Track B: Real-Time Fact Cross-Referencing (BGE-M3 + Qdrant KNN vector search)
+    Track C: Chronological Linearity (Neo4j Temporal Knowledge Graph)
+    Track D: Quantitative Time-Series Knowledge Base (Stocks, Gold, Weather, Currency anomalies)
+    Track E: Context & Viral Propagation Dynamics (Source Credibility + Coercive Sharing cues)
+    Track F: Stored Internal Evidence Archive (Official Past Verification Proof)
+    Fusion: 5-pillar Multi-Aspect Weighted Ensemble + Explainable AI (XAI) rationale
     """
-    # Track A
+    # Track A: Stylistic & Linguistic Intention
     style_res = lora_sisa_engine.predict_style(title, text)
 
-    # Track B
+    # Track B: Semantic Vector Space Evidence
     combined_text = f"{title} {text}".strip()
     regional_info = regional_encoder.detect_regional_cues(combined_text)
     retrieval_res = vector_store.search_evidence(combined_text, top_k=3)
+
+    # Track C: Temporal Knowledge Graph
     graph_res = graph_engine.verify_timeline(title, text)
 
-    # Fusion
+    # Track D: Quantitative Knowledge Base & Anomaly Detection
+    quant_res = quantitative_anomaly_engine.analyze_quantities(title, text)
+
+    # Track E: Context & Viral Propagation Dynamics
+    prop_res = propagation_analyzer.analyze_context_and_propagation(source, author, title, text)
+
+    # Track F: Stored Internal Evidence Archive
+    int_evid_res = internal_evidence_engine.query_evidence(title, text)
+
+    # Multi-Aspect 5-Pillar Fusion
     verdict = fusion_layer.fuse(
         style_result=style_res,
         retrieval_result=retrieval_res,
         graph_result=graph_res,
-        regional_info=regional_info
+        regional_info=regional_info,
+        quant_result=quant_res,
+        propagation_result=prop_res,
+        internal_evidence_result=int_evid_res
     )
     return verdict
 
@@ -457,11 +480,11 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
             verdict = cached_verdict
             cache_hit = True
         else:
-            verdict = execute_hybrid_inference(payload.title, payload.text)
+            verdict = execute_hybrid_inference(payload.title, payload.text, source=payload.source, author=payload.author)
             cache_hit = False
             cache_controller.cache_verdict(signature, verdict, ttl=86400)
     else:
-        verdict = execute_hybrid_inference(payload.title, payload.text)
+        verdict = execute_hybrid_inference(payload.title, payload.text, source=payload.source, author=payload.author)
         cache_hit = False
         cache_controller.cache_verdict(signature, verdict, ttl=86400)
 
@@ -520,6 +543,8 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "action_recommended": verdict["action_recommended"],
         "s_style": verdict["s_style"],
         "s_fact": verdict["s_fact"],
+        "s_quant": verdict.get("s_quant", 0.10),
+        "s_propagation": verdict.get("s_propagation", 0.10),
         "temporal_consistency": verdict["temporal_consistency"],
         "xai": verdict["xai"],
         "created_at": now()
@@ -593,7 +618,9 @@ def perform_news_sync(background_tasks: Optional[BackgroundTasks] = None) -> Dic
             continue
 
         text = story.get("text", "")
-        verdict = execute_hybrid_inference(title, text)
+        source_name = story.get("source", "Real-Time News Wire")
+        author_name = story.get("author", "Wire Bureau")
+        verdict = execute_hybrid_inference(title, text, source=source_name, author=author_name)
         status = "PUBLISHED" if verdict["risk_band"] != "HIGH_RISK_FAKE" else "BLOCKED_HIGH_RISK_FAKE"
         news_id = f"NEWS_{uuid.uuid4().hex[:8].upper()}"
         sample_id = f"SYN_LIVE_{uuid.uuid4().hex[:6].upper()}"
@@ -603,8 +630,8 @@ def perform_news_sync(background_tasks: Optional[BackgroundTasks] = None) -> Dic
             "sample_id": sample_id,
             "title": title,
             "text": text,
-            "source": story.get("source", "Real-Time News Wire"),
-            "author": story.get("author", "Wire Bureau"),
+            "source": source_name,
+            "author": author_name,
             "category": story.get("category", "General"),
             "language": story.get("language", "English"),
             "region": story.get("region", "India National"),
@@ -1001,7 +1028,7 @@ def update_news_article(news_id: str, payload: NewsUpdateRequest, background_tas
 
     reverified = False
     if payload.reverify and (new_title != old_title or new_text != old_text):
-        verdict = execute_hybrid_inference(new_title, new_text)
+        verdict = execute_hybrid_inference(new_title, new_text, source=new_source, author=new_author)
         risk_band = verdict["risk_band"]
         if payload.status is None:
             if risk_band == "LOW_RISK_FACTUAL":
@@ -1033,6 +1060,8 @@ def update_news_article(news_id: str, payload: NewsUpdateRequest, background_tas
         updates["action_recommended"] = verdict["action_recommended"]
         updates["s_style"] = verdict["s_style"]
         updates["s_fact"] = verdict["s_fact"]
+        updates["s_quant"] = verdict.get("s_quant", 0.10)
+        updates["s_propagation"] = verdict.get("s_propagation", 0.10)
         updates["temporal_consistency"] = verdict["temporal_consistency"]
         updates["xai"] = verdict["xai"]
         reverified = True

@@ -668,6 +668,16 @@ function renderNewsWire() {
     });
   }
 
+  // Update front-page search badge count
+  const countBadge = document.getElementById('wireSearchCountBadge');
+  if (countBadge) {
+    if (state.selectedCategory !== 'All' || (state.selectedLanguage && state.selectedLanguage !== 'All')) {
+      countBadge.innerText = `Showing ${filtered.length} Dispatches (${state.selectedCategory} • ${state.selectedLanguage || 'All'})`;
+    } else {
+      countBadge.innerText = `Showing All ${filtered.length} Dispatches`;
+    }
+  }
+
   // 1. Featured Hero Story
   let hero = null;
   if (filtered.length > 0) {
@@ -1803,15 +1813,68 @@ async function openArticleModal(newsId) {
         : "Classified as unverified or contested dispatch. Editorial oversight review required.";
     }
 
-    // Admin Certificate (Full XAI Transparency)
+    // Admin Certificate (Full 5-Pillar XAI Transparency)
     const adminRealEl = document.getElementById('modalRealScore');
     const adminStyleEl = document.getElementById('modalStyleScore');
     const adminFactEl = document.getElementById('modalFactScore');
     const adminGraphEl = document.getElementById('modalGraphScore');
+    const adminQuantEl = document.getElementById('modalQuantScore');
+    const adminPropEl = document.getElementById('modalPropScore');
+    const xaiBox = document.getElementById('modalXaiBreakdown');
+
     if (adminRealEl) adminRealEl.innerText = `${realPct}%`;
     if (adminStyleEl) adminStyleEl.innerText = (article.s_style || 0.08).toFixed(2);
     if (adminFactEl) adminFactEl.innerText = (article.s_fact !== undefined && article.s_fact < 0.25) ? 'Qdrant PIB Match (Factual)' : 'Qdrant Semantic Dissimilarity';
     if (adminGraphEl) adminGraphEl.innerText = `${Math.round((article.temporal_consistency || 0.95) * 100)}% Consistent`;
+
+    const xai = article.xai || {};
+    const quantAnalysis = xai.quantitative_knowledge_base || {};
+    const propAnalysis = xai.context_and_propagation || {};
+    const factors = xai.primary_verdict_factors || [];
+
+    if (adminQuantEl) {
+      if (quantAnalysis.has_anomaly) {
+        adminQuantEl.innerHTML = `<span class="accent-crimson">⚠️ Anomaly (${escapeHtml(quantAnalysis.anomaly_severity || 'HIGH')})</span>`;
+      } else if (article.s_quant !== undefined && article.s_quant > 0.4) {
+        adminQuantEl.innerHTML = `<span class="accent-amber">Elevated (${Number(article.s_quant).toFixed(2)})</span>`;
+      } else {
+        adminQuantEl.innerText = 'Nominal Range';
+      }
+    }
+
+    if (adminPropEl) {
+      if (propAnalysis.propagation_band === 'HIGH_COERCIVE_VIRALITY') {
+        adminPropEl.innerHTML = `<span class="accent-crimson">🚨 Coercive Viral</span>`;
+      } else if (propAnalysis.source_verdict === 'VERIFIED_INSTITUTIONAL_WIRE') {
+        adminPropEl.innerHTML = `<span class="accent-green">✓ Verified Wire</span>`;
+      } else {
+        adminPropEl.innerText = 'Standard Feed';
+      }
+    }
+
+    if (xaiBox) {
+      let breakdownHtml = '';
+      if (factors && factors.length > 0) {
+        breakdownHtml += `<div style="font-weight:700; color:var(--text-headline); margin-bottom:4px;">🔍 Multi-Aspect Synthesized Verdict Factors:</div><ul style="margin:0 0 8px 18px; padding:0;">`;
+        factors.forEach(f => {
+          breakdownHtml += `<li>${escapeHtml(f)}</li>`;
+        });
+        breakdownHtml += `</ul>`;
+      }
+      if (quantAnalysis.detected_anomalies && quantAnalysis.detected_anomalies.length > 0) {
+        breakdownHtml += `<div style="margin-top:6px; color:var(--accent-crimson); font-weight:700;">⚠️ Quantitative Knowledge Base Discrepancies:</div><ul style="margin:0 0 6px 18px; padding:0;">`;
+        quantAnalysis.detected_anomalies.forEach(a => {
+          breakdownHtml += `<li><strong>${escapeHtml(a.dimension)}:</strong> ${escapeHtml(a.discrepancy)}</li>`;
+        });
+        breakdownHtml += `</ul>`;
+      }
+      if (breakdownHtml) {
+        xaiBox.innerHTML = breakdownHtml;
+        xaiBox.style.display = 'block';
+      } else {
+        xaiBox.style.display = 'none';
+      }
+    }
 
     document.getElementById('articleModal').style.display = 'flex';
   } catch (err) {
@@ -2329,20 +2392,73 @@ async function initBenchmarkTable() {
 }
 
 function handleNewsSearch(e) {
-  const query = (e.target.value || '').trim().toLowerCase();
+  const query = (e.target.value || '').trim();
+  const frontInput = document.getElementById('frontPageSearchInput');
+  if (frontInput && frontInput.value !== query) {
+    frontInput.value = query;
+  }
+  const clearBtn = document.getElementById('btnClearFrontSearch');
+  if (clearBtn) {
+    clearBtn.style.display = query ? 'inline-flex' : 'none';
+  }
+  executeUnifiedSearch(query);
+}
+
+function handleFrontPageSearch(e) {
+  const query = (e.target.value || '').trim();
+  const navInput = document.getElementById('newsSearchInput');
+  if (navInput && navInput.value !== query) {
+    navInput.value = query;
+  }
+  const clearBtn = document.getElementById('btnClearFrontSearch');
+  if (clearBtn) {
+    clearBtn.style.display = query ? 'inline-flex' : 'none';
+  }
+  executeUnifiedSearch(query);
+}
+
+function clearFrontPageSearch() {
+  const frontInput = document.getElementById('frontPageSearchInput');
+  const navInput = document.getElementById('newsSearchInput');
+  const clearBtn = document.getElementById('btnClearFrontSearch');
+  if (frontInput) frontInput.value = '';
+  if (navInput) navInput.value = '';
+  if (clearBtn) clearBtn.style.display = 'none';
+  executeUnifiedSearch('');
+}
+
+function quickFilterTopic(topic) {
+  const frontInput = document.getElementById('frontPageSearchInput');
+  const navInput = document.getElementById('newsSearchInput');
+  const clearBtn = document.getElementById('btnClearFrontSearch');
+  if (frontInput) frontInput.value = topic;
+  if (navInput) navInput.value = topic;
+  if (clearBtn) clearBtn.style.display = 'inline-flex';
+  executeUnifiedSearch(topic);
+}
+
+function executeUnifiedSearch(query) {
+  const q = (query || '').trim().toLowerCase();
+  const badge = document.getElementById('wireSearchCountBadge');
   if (state.currentTab !== 'wire') {
     switchTab('wire');
   }
-  if (!query) {
+  if (!q) {
+    if (badge) badge.innerText = `Showing All ${state.allNews ? state.allNews.length : 0} Stories`;
     renderNewsWire();
     return;
   }
-  const filtered = state.allNews.filter(n =>
-    (n.title || '').toLowerCase().includes(query) ||
-    (n.text || '').toLowerCase().includes(query) ||
-    (n.category || '').toLowerCase().includes(query) ||
-    (n.source || '').toLowerCase().includes(query)
+  const filtered = (state.allNews || []).filter(n =>
+    (n.title || '').toLowerCase().includes(q) ||
+    (n.text || '').toLowerCase().includes(q) ||
+    (n.category || '').toLowerCase().includes(q) ||
+    (n.source || '').toLowerCase().includes(q) ||
+    (n.author || '').toLowerCase().includes(q) ||
+    (n.region || '').toLowerCase().includes(q)
   );
+  if (badge) {
+    badge.innerText = `${filtered.length} Dispatches Matching "${query}"`;
+  }
   renderCustomNewsGrid(filtered);
 }
 

@@ -225,6 +225,66 @@ assert t.get("qdrant_vector_store", {}).get("total_vectors", 0) > 0
 assert t.get("sisa_sharding", {}).get("active_shards") == 5
 print("  PASSED ✓ Real-time database telemetry accurately reflects platform state!")
 
+# TEST 10: Quantitative Knowledge Base & Anomaly Engine
+print("\n[TEST 10] Quantitative Knowledge Base & Anomaly Detection (/api/v1/news/submit)...")
+# 10a: Stock Crash Anomaly (>7000 pts drop claimed)
+stock_anomaly = {
+    "title": "BSE Sensex Plunges 9,500 Points in Shock Morning Crash",
+    "text": "Unprecedented panic on Dalal Street as BSE Sensex crashed 9500 points in early trading wiping out trillions in market value.",
+    "category": "Banking & Economy",
+    "source": "Market Panic Telegram",
+    "author": "Trader Alert",
+    "bypass_cache": True
+}
+res_stock = post("/api/v1/news/submit", stock_anomaly)
+print("  [10a Sensex Anomaly]:", res_stock.get("tag"), "| Risk Band:", res_stock.get("risk_band"))
+assert res_stock.get("tag") in ["FAKE", "LIKELY_FAKE"]
+quant_info = res_stock.get("xai", {}).get("quantitative_knowledge_base", {})
+print("  Quantitative has_anomaly:", quant_info.get("has_anomaly"))
+assert quant_info.get("has_anomaly") == True
+
+# 10b: Gold Price Collapse Anomaly (₹20,000 claimed vs ₹78,500 baseline)
+gold_anomaly = {
+    "title": "Gold Price Collapses to 20,000 Rupees per 10 Grams Nationwide",
+    "text": "Massive gold price crash reported across bullion markets with 24k gold crashing to just 20000 rupees today.",
+    "category": "Banking & Economy",
+    "source": "Bullion WhatsApp Channel",
+    "author": "Gold Watcher",
+    "bypass_cache": True
+}
+res_gold = post("/api/v1/news/submit", gold_anomaly)
+print("  [10b Gold Anomaly]:", res_gold.get("tag"), "| Risk Band:", res_gold.get("risk_band"))
+assert res_gold.get("xai", {}).get("quantitative_knowledge_base", {}).get("has_anomaly") == True
+print("  PASSED ✓ Quantitative Knowledge Base detected numerical anomalies against historical baselines!")
+
+# TEST 11: Front-Page News Wire Search Filtering
+print("\n[TEST 11] Public News Wire Search Filtering (/api/v1/news?q=...)...")
+res_isro = get("/api/v1/news?q=ISRO")
+isro_articles = res_isro.get("news", [])
+print(f"  Searched for 'ISRO': found {len(isro_articles)} dispatches.")
+assert len(isro_articles) > 0, "Query 'ISRO' must return matching dispatches!"
+assert any("isro" in (a.get("title", "") + a.get("text", "")).lower() for a in isro_articles)
+
+res_reuters = get("/api/v1/news?q=Reuters")
+reuters_search = res_reuters.get("news", [])
+print(f"  Searched for 'Reuters': found {len(reuters_search)} dispatches.")
+assert len(reuters_search) > 0, "Query 'Reuters' must return matching wire stories!"
+print("  PASSED ✓ Live search filtering across dispatches, titles, and sources verified!")
+
+# TEST 12: Interactive Model Residual Memory Probe
+print("\n[TEST 12] Interactive Model Residual Memory Probe (/api/v1/admin/model-probe)...")
+probe_query = "URGENT ALERT: RBI Invaliding All 500 Rupee Currency Notes Tonight!!"
+probe_res = post("/api/v1/admin/model-probe", {"query_text": probe_query})
+print("  Probe Query:", probe_res.get("query"))
+print("  Memorization Status:", probe_res.get("memorization_status"))
+print("  Residual Influence Score:", probe_res.get("residual_influence_score"))
+print("  SVM Margin:", probe_res.get("svm_margin"))
+print("  Empirical Prediction:", probe_res.get("empirical_prediction"))
+assert probe_res.get("memorization_status") == "ZERO_RESIDUAL_MEMORIZATION"
+assert probe_res.get("residual_influence_score") == 0.0000
+assert probe_res.get("empirical_prediction") == "OUT_OF_DISTRIBUTION_UNSEEN"
+print("  PASSED ✓ Mathematical zero residual memorization confirmed by direct weight probe!")
+
 print("\n" + "=" * 80)
-print("ALL 9 COMPREHENSIVE END-TO-END TESTS COMPLETED SUCCESSFULLY! ✓✓✓")
+print("ALL 12 COMPREHENSIVE END-TO-END TESTS COMPLETED SUCCESSFULLY! ✓✓✓")
 print("=" * 80)
