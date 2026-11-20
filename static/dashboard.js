@@ -182,6 +182,103 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 15 * 60 * 1000);
 });
 
+// ==========================================================================
+// PROCEDURAL PHYSICAL PAPER SOUND GENERATOR (WEB AUDIO API)
+// Authentic tactile newsprint sound synthesis without external audio files
+// ==========================================================================
+let paperAudioCtx = null;
+
+function getPaperAudioContext() {
+  if (!paperAudioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      paperAudioCtx = new AudioContextClass();
+    }
+  }
+  if (paperAudioCtx && paperAudioCtx.state === 'suspended') {
+    paperAudioCtx.resume().catch(() => {});
+  }
+  return paperAudioCtx;
+}
+
+function playPaperRustleSound(type = 'unfold') {
+  try {
+    const ctx = getPaperAudioContext();
+    if (!ctx) return;
+
+    const sampleRate = ctx.sampleRate;
+    const duration = type === 'unfold' ? 0.42 : (type === 'flip' ? 0.28 : 0.32);
+    const bufferSize = Math.floor(sampleRate * duration);
+    const buffer = ctx.createBuffer(1, bufferSize, sampleRate);
+    const data = buffer.getChannelData(0);
+
+    // Multi-pole pink noise generator + discrete fiber friction crackles
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      b0 = 0.99886 * b0 + white * 0.0555179;
+      b1 = 0.99332 * b1 + white * 0.0750759;
+      b2 = 0.96900 * b2 + white * 0.1538520;
+      b3 = 0.86650 * b3 + white * 0.3104856;
+      b4 = 0.55000 * b4 + white * 0.5329522;
+      b5 = -0.7616 * b5 - white * 0.0168980;
+      const pink = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.12;
+      b6 = white * 0.115926;
+
+      // Realistic physical paper fiber friction spikes (broadsheet fold creasing)
+      const crackle = (Math.random() > 0.985) ? (Math.random() * 1.6 - 0.8) : 0;
+      data[i] = pink + crackle;
+    }
+
+    const noiseSource = ctx.createBufferSource();
+    noiseSource.buffer = buffer;
+
+    // Resonant bandpass filter tuned to authentic broadsheet newsprint acoustics
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.Q.value = type === 'unfold' ? 1.8 : 2.4;
+
+    const now = ctx.currentTime;
+    if (type === 'unfold') {
+      filter.frequency.setValueAtTime(450, now);
+      filter.frequency.exponentialRampToValueAtTime(1600, now + 0.12);
+      filter.frequency.exponentialRampToValueAtTime(650, now + duration);
+    } else if (type === 'flip') {
+      filter.frequency.setValueAtTime(750, now);
+      filter.frequency.exponentialRampToValueAtTime(2200, now + 0.09);
+      filter.frequency.exponentialRampToValueAtTime(600, now + duration);
+    } else {
+      filter.frequency.setValueAtTime(550, now);
+      filter.frequency.exponentialRampToValueAtTime(1100, now + 0.1);
+      filter.frequency.exponentialRampToValueAtTime(400, now + duration);
+    }
+
+    const gainNode = ctx.createGain();
+    gainNode.gain.setValueAtTime(0.001, now);
+    if (type === 'unfold') {
+      gainNode.gain.exponentialRampToValueAtTime(0.26, now + 0.05);
+      gainNode.gain.exponentialRampToValueAtTime(0.18, now + 0.15);
+      gainNode.gain.exponentialRampToValueAtTime(0.24, now + 0.24);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+    } else if (type === 'flip') {
+      gainNode.gain.exponentialRampToValueAtTime(0.24, now + 0.03);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+    } else {
+      gainNode.gain.exponentialRampToValueAtTime(0.19, now + 0.05);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+    }
+
+    noiseSource.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    noiseSource.start(now);
+    noiseSource.stop(now + duration);
+  } catch (err) {
+    console.debug('Paper rustle effect skipped:', err);
+  }
+}
+
 function initTheme() {
   const savedTheme = localStorage.getItem('smriti_shuddhi_theme') || 'light';
   setTheme(savedTheme, false);
@@ -191,6 +288,10 @@ function setTheme(theme, isUserClick = true) {
   state.currentTheme = theme;
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('smriti_shuddhi_theme', theme);
+
+  if (isUserClick) {
+    playPaperRustleSound('rustle');
+  }
 
   const btnLight = document.getElementById('btnThemeLight');
   const btnPaper = document.getElementById('btnThemePaper');
@@ -220,6 +321,7 @@ function setTheme(theme, isUserClick = true) {
 
 function toggleProfileDrawer(e) {
   if (e) e.stopPropagation();
+  playPaperRustleSound('flip');
   const drawer = document.getElementById('profileSettingsDrawer');
   if (drawer) {
     const isShown = drawer.style.display !== 'none';
@@ -475,7 +577,6 @@ function updateUserUI() {
   });
 
   // Update author input in submission form
-  const authorInput = document.getElementById('authorInput');
   if (authorInput && state.currentUser.name) {
     authorInput.value = state.currentUser.name;
   }
@@ -625,6 +726,7 @@ function closeModalOnBackdrop(e, modalId) {
 // ==========================================================================
 function switchTab(tabId) {
   state.currentTab = tabId;
+  playPaperRustleSound('flip');
   const tabs = ['wire', 'ingest', 'submissions', 'admin', 'audit'];
   
   tabs.forEach(t => {
@@ -1910,6 +2012,7 @@ async function loadUnlearningLedger() {
 // ==========================================================================
 async function openArticleModal(newsId) {
   try {
+    playPaperRustleSound('unfold');
     const res = await fetch(`/api/v1/news/${newsId}`);
     const data = await res.json();
     const article = data.article;
@@ -2067,6 +2170,8 @@ function openFeaturedLeadArticle() {
 }
 
 function closeArticleModal() {
+  playPaperRustleSound('close');
+  stopAudioNarration();
   document.getElementById('articleModal').style.display = 'none';
 }
 
@@ -2114,6 +2219,7 @@ async function rejectArticle(newsId) {
 
 async function openEditModal(newsId) {
   try {
+    playPaperRustleSound('flip');
     let article = (state.adminBlockedMap && state.adminBlockedMap[newsId]) ? state.adminBlockedMap[newsId] : null;
     if (!article && state.allNews) {
       article = state.allNews.find(n => n.news_id === newsId || n.sample_id === newsId);
@@ -2199,6 +2305,7 @@ function openEditModalFromReader() {
 }
 
 function closeEditModal() {
+  playPaperRustleSound('close');
   const modal = document.getElementById('editArticleModal');
   if (modal) modal.style.display = 'none';
 }
@@ -2710,9 +2817,96 @@ async function probeModelMemory() {
   }
 }
 
+// ==========================================================================
+// ROBUST MULTILINGUAL SPEECH SYNTHESIS ENGINE
+// Guarantees audible speech for English, Hindi, and Telugu with automatic
+// Indic voice matching & graceful universal voice fallback
+// ==========================================================================
 let isSpeaking = false;
 let currentAudioSpeed = 1.0;
 let currentUtterance = null;
+let cachedSpeechVoices = [];
+
+function loadSpeechVoices() {
+  if ('speechSynthesis' in window) {
+    cachedSpeechVoices = window.speechSynthesis.getVoices() || [];
+  }
+}
+
+if ('speechSynthesis' in window) {
+  loadSpeechVoices();
+  window.speechSynthesis.onvoiceschanged = () => {
+    loadSpeechVoices();
+  };
+}
+
+function resolveOptimalVoice(targetCode, textSample = '') {
+  loadSpeechVoices();
+  const voices = cachedSpeechVoices;
+  const isTelugu = targetCode === 'te' || /[\u0C00-\u0C7F]/.test(textSample);
+  const isHindi = targetCode === 'hi' || /[\u0900-\u097F]/.test(textSample);
+
+  if (!voices || voices.length === 0) {
+    return {
+      voice: null,
+      lang: isTelugu ? 'te-IN' : (isHindi ? 'hi-IN' : 'en-IN'),
+      displayName: isTelugu ? 'Telugu Engine' : (isHindi ? 'Hindi Engine' : 'Indian English')
+    };
+  }
+
+  if (isTelugu) {
+    // 1. Exact native Telugu voice
+    let teVoice = voices.find(v => v.lang && (v.lang.toLowerCase() === 'te-in' || v.lang.toLowerCase() === 'te'));
+    if (!teVoice) {
+      teVoice = voices.find(v => v.name && (v.name.includes('Telugu') || v.name.includes('Mohan') || v.name.includes('Chitra') || v.name.includes('Shruti')));
+    }
+    if (teVoice) {
+      return { voice: teVoice, lang: teVoice.lang, displayName: `Telugu (${teVoice.name})` };
+    }
+
+    // 2. Fallback: Hindi voice (can pronounce Indic syllables phonetically)
+    let hiVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('hi')) ||
+                  voices.find(v => v.name && (v.name.includes('Hindi') || v.name.includes('Swara') || v.name.includes('Kalpana') || v.name.includes('Madhur') || v.name.includes('Google हिन्दी')));
+    if (hiVoice) {
+      return { voice: hiVoice, lang: hiVoice.lang, displayName: `Indic Speech Engine (${hiVoice.name})` };
+    }
+
+    // 3. Fallback: Indian English voice
+    let enInVoice = voices.find(v => v.lang && v.lang.toLowerCase() === 'en-in') ||
+                    voices.find(v => v.name && (v.name.includes('India') || v.name.includes('Ravi') || v.name.includes('Heera') || v.name.includes('Neerja')));
+    if (enInVoice) {
+      return { voice: enInVoice, lang: enInVoice.lang, displayName: `Indic English Engine (${enInVoice.name})` };
+    }
+  }
+
+  if (isHindi) {
+    // 1. Native Hindi voice
+    let hiVoice = voices.find(v => v.lang && (v.lang.toLowerCase() === 'hi-in' || v.lang.toLowerCase() === 'hi')) ||
+                  voices.find(v => v.name && (v.name.includes('Hindi') || v.name.includes('Swara') || v.name.includes('Kalpana') || v.name.includes('Madhur') || v.name.includes('Google हिन्दी')));
+    if (hiVoice) {
+      return { voice: hiVoice, lang: hiVoice.lang, displayName: `Hindi (${hiVoice.name})` };
+    }
+
+    // 2. Fallback: Indian English voice
+    let enInVoice = voices.find(v => v.lang && v.lang.toLowerCase() === 'en-in') ||
+                    voices.find(v => v.name && (v.name.includes('India') || v.name.includes('Ravi') || v.name.includes('Heera')));
+    if (enInVoice) {
+      return { voice: enInVoice, lang: enInVoice.lang, displayName: `Indic English (${enInVoice.name})` };
+    }
+  }
+
+  // English or Default
+  let defaultVoice = voices.find(v => v.lang && v.lang.toLowerCase() === 'en-in') ||
+                     voices.find(v => v.name && (v.name.includes('India') || v.name.includes('Ravi') || v.name.includes('Heera'))) ||
+                     voices.find(v => v.lang && v.lang.toLowerCase().startsWith('en')) ||
+                     voices[0];
+
+  return {
+    voice: defaultVoice,
+    lang: defaultVoice ? defaultVoice.lang : 'en-US',
+    displayName: defaultVoice ? defaultVoice.name : 'System Broadcaster'
+  };
+}
 
 function setAudioPlaybackSpeed(rate, btnEl) {
   currentAudioSpeed = parseFloat(rate);
@@ -2730,7 +2924,9 @@ function setAudioPlaybackSpeed(rate, btnEl) {
 
 function stopAudioNarration() {
   if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
+    try {
+      window.speechSynthesis.cancel();
+    } catch (e) {}
   }
   isSpeaking = false;
   currentUtterance = null;
@@ -2750,7 +2946,7 @@ function stopAudioNarration() {
 
 function speakArticle(overrideText = null) {
   if (!('speechSynthesis' in window)) {
-    alert('Text-to-speech audio reader is not supported by your browser.');
+    showToast('Text-to-speech audio reader is not supported by your browser.', 'warning');
     return;
   }
 
@@ -2766,7 +2962,9 @@ function speakArticle(overrideText = null) {
     return;
   }
 
-  window.speechSynthesis.cancel();
+  try {
+    window.speechSynthesis.cancel();
+  } catch (e) {}
 
   const title = document.getElementById('modalTitle') ? document.getElementById('modalTitle').innerText : '';
   const body = document.getElementById('modalBody') ? document.getElementById('modalBody').innerText : '';
@@ -2774,43 +2972,26 @@ function speakArticle(overrideText = null) {
 
   if (!textToRead.trim()) return;
 
+  const isTelugu = /[\u0C00-\u0C7F]/.test(textToRead);
+  const isHindi = /[\u0900-\u097F]/.test(textToRead);
+  const targetCode = isTelugu ? 'te' : (isHindi ? 'hi' : 'en');
+
+  const voiceMeta = resolveOptimalVoice(targetCode, textToRead);
+
   const utterance = new SpeechSynthesisUtterance(textToRead);
   currentUtterance = utterance;
   utterance.rate = currentAudioSpeed;
   utterance.pitch = 1.0;
 
-  // Multilingual script detection: Telugu vs Devanagari (Hindi) vs Latin (English)
-  const isTelugu = /[\u0C00-\u0C7F]/.test(textToRead);
-  const isHindi = /[\u0900-\u097F]/.test(textToRead);
-  utterance.lang = isTelugu ? 'te-IN' : (isHindi ? 'hi-IN' : 'en-IN');
-
-  if (langIndicator) {
-    if (isTelugu) {
-      langIndicator.innerText = '🎙️ Voice Engine: తెలుగు (te-IN)';
-    } else if (isHindi) {
-      langIndicator.innerText = '🎙️ Voice Engine: हिन्दी (hi-IN)';
-    } else {
-      langIndicator.innerText = '🎙️ Voice Engine: Indian English (en-IN)';
-    }
+  if (voiceMeta.voice) {
+    utterance.voice = voiceMeta.voice;
+    utterance.lang = voiceMeta.lang;
+  } else {
+    utterance.lang = isTelugu ? 'te-IN' : (isHindi ? 'hi-IN' : 'en-IN');
   }
 
-  const voices = window.speechSynthesis.getVoices();
-  if (voices && voices.length > 0) {
-    if (isTelugu) {
-      const teVoice = voices.find(v => v.lang && (v.lang.startsWith('te') || v.lang === 'te-IN')) ||
-                      voices.find(v => v.name && (v.name.includes('Telugu') || v.name.includes('Mohan') || v.name.includes('Chitra'))) ||
-                      voices.find(v => v.lang && v.lang.includes('IN'));
-      if (teVoice) utterance.voice = teVoice;
-    } else if (isHindi) {
-      const hiVoice = voices.find(v => v.lang && (v.lang.startsWith('hi') || v.lang.includes('IN'))) ||
-                      voices.find(v => v.name && (v.name.includes('Hindi') || v.name.includes('Kalpana') || v.name.includes('Hemant')));
-      if (hiVoice) utterance.voice = hiVoice;
-    } else {
-      const enInVoice = voices.find(v => v.lang === 'en-IN') ||
-                        voices.find(v => v.name && (v.name.includes('India') || v.name.includes('Ravi') || v.name.includes('Heera'))) ||
-                        voices.find(v => v.lang && v.lang.startsWith('en'));
-      if (enInVoice) utterance.voice = enInVoice;
-    }
+  if (langIndicator) {
+    langIndicator.innerText = `🎙️ Voice Engine: ${voiceMeta.displayName}`;
   }
 
   utterance.onstart = () => {
@@ -2818,21 +2999,48 @@ function speakArticle(overrideText = null) {
     if (eqBars) eqBars.classList.add('active');
     if (liveDot) liveDot.classList.add('speaking');
     if (playBtn) playBtn.classList.add('speaking');
-    if (audioBtnText) audioBtnText.innerText = state.currentLang === 'te' ? 'ఆపు' : (state.currentLang === 'hi' ? 'रोकें' : 'Pause / Stop');
-    if (statusText) statusText.innerText = isTelugu ? 'తెలుగులో కథనం చదువుతోంది...' : (isHindi ? 'हिंदी में वाचन जारी है...' : 'Narrating Dispatch in English...');
+    if (audioBtnText) audioBtnText.innerText = isTelugu ? 'ఆపు' : (isHindi ? 'रोकें' : 'Stop Narration');
+    if (statusText) statusText.innerText = isTelugu ? 'తెలుగు కథనం వింటున్నారు...' : (isHindi ? 'हिंदी में वाचन जारी है...' : 'Narrating Broadsheet Dispatch...');
   };
 
   utterance.onend = () => {
     stopAudioNarration();
   };
 
-  utterance.onerror = () => {
+  utterance.onerror = (e) => {
+    console.warn('Speech synthesis error event:', e);
+    // If voice error occurred due to language-unavailable on Windows, retry immediately with universal voice
+    if (e.error === 'language-unavailable' || e.error === 'voice-unavailable' || e.error === 'synthesis-failed') {
+      console.log('Falling back to universal speech synthesis...');
+      try {
+        const fallbackUtterance = new SpeechSynthesisUtterance(textToRead);
+        fallbackUtterance.rate = currentAudioSpeed;
+        fallbackUtterance.pitch = 1.0;
+        fallbackUtterance.onstart = () => {
+          isSpeaking = true;
+          if (eqBars) eqBars.classList.add('active');
+          if (liveDot) liveDot.classList.add('speaking');
+          if (playBtn) playBtn.classList.add('speaking');
+        };
+        fallbackUtterance.onend = () => stopAudioNarration();
+        fallbackUtterance.onerror = () => stopAudioNarration();
+        window.speechSynthesis.speak(fallbackUtterance);
+        return;
+      } catch (err) {
+        console.error('Fallback synthesis failed:', err);
+      }
+    }
     stopAudioNarration();
   };
 
+  // Chromium pause bug workaround:
+  if (window.speechSynthesis.paused) {
+    window.speechSynthesis.resume();
+  }
+
   window.speechSynthesis.speak(utterance);
   isSpeaking = true;
-  showToast(isTelugu ? '🔊 తెలుగులో ఆడియో కథనం ప్రారంభమైంది.' : (isHindi ? '🔊 हिंदी में ऑडियो वाचन प्रारंभ हुआ।' : '🔊 Audio dispatch playback started.'), 'info');
+  showToast(`🔊 Playing dispatch via ${voiceMeta.displayName}`, 'info');
 }
 
 function listenToDispatchCard(newsId, event) {
@@ -2988,7 +3196,10 @@ function startAnchorBroadcast(article) {
     showToast('Your browser does not support Speech Synthesis audio.', 'warning');
     return;
   }
-  window.speechSynthesis.cancel();
+  try {
+    window.speechSynthesis.cancel();
+  } catch (e) {}
+
   anchorAudioState.currentNewsId = article.news_id;
   anchorAudioState.article = article;
   anchorAudioState.isPaused = false;
@@ -3017,18 +3228,44 @@ function startAnchorBroadcast(article) {
 
   const isTelugu = /[\u0C00-\u0C7F]/.test(fullText);
   const isHindi = /[\u0900-\u097F]/.test(fullText);
-  utterance.lang = isTelugu ? 'te-IN' : (isHindi ? 'hi-IN' : 'en-IN');
+  const targetCode = isTelugu ? 'te' : (isHindi ? 'hi' : 'en');
+
+  const voiceMeta = resolveOptimalVoice(targetCode, fullText);
+  if (voiceMeta.voice) {
+    utterance.voice = voiceMeta.voice;
+    utterance.lang = voiceMeta.lang;
+  } else {
+    utterance.lang = isTelugu ? 'te-IN' : (isHindi ? 'hi-IN' : 'en-IN');
+  }
 
   utterance.onend = () => {
     stopAnchorAudio();
     showToast('Broadsheet audio broadcast complete.', 'info');
   };
-  utterance.onerror = () => {
+
+  utterance.onerror = (e) => {
+    console.warn('Anchor audio error:', e);
+    if (e.error === 'language-unavailable' || e.error === 'voice-unavailable' || e.error === 'synthesis-failed') {
+      try {
+        const retry = new SpeechSynthesisUtterance(fullText);
+        retry.rate = utterance.rate;
+        retry.pitch = 1.0;
+        retry.onend = () => stopAnchorAudio();
+        retry.onerror = () => stopAnchorAudio();
+        window.speechSynthesis.speak(retry);
+        return;
+      } catch (err) {}
+    }
     stopAnchorAudio();
   };
 
+  // Chromium pause bug workaround:
+  if (window.speechSynthesis.paused) {
+    window.speechSynthesis.resume();
+  }
+
   window.speechSynthesis.speak(utterance);
-  showToast(`🎙️ Broadcaster On Air: "${article.title.slice(0, 30)}..."`, 'info');
+  showToast(`🎙️ Broadcaster On Air (${voiceMeta.displayName}): "${article.title.slice(0, 30)}..."`, 'info');
 }
 
 function toggleAnchorAudio() {
