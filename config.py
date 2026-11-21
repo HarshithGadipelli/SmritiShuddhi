@@ -5,7 +5,11 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / '.env')
 
-# Database & Core Services
+# Database & Core Services (Supabase PostgreSQL / pgvector + Fallback)
+DATABASE_URL = os.getenv('DATABASE_URL', os.getenv('SUPABASE_DB_URL', ''))
+SUPABASE_URL = os.getenv('SUPABASE_URL', '')
+SUPABASE_KEY = os.getenv('SUPABASE_KEY', '')
+SUPABASE_STORAGE_BUCKET = os.getenv('SUPABASE_STORAGE_BUCKET', 'smriti-shuddhi-storage')
 MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017')
 MONGO_DB = os.getenv('MONGO_DB', 'fake_news_unlearning')
 SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-change-me')

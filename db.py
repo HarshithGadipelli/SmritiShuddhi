@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from config import MONGO_URI, MONGO_DB, DATA_DIR
+from config import MONGO_URI, MONGO_DB, DATA_DIR, DATABASE_URL
 
 logger = logging.getLogger("Database")
 
@@ -185,11 +185,26 @@ def _probe_mongo(timeout: float = 0.2) -> bool:
     except Exception:
         return False
 
-# Initialization with automatic connection probe
+# Database Engine Initialization (Priority: 1. Supabase PostgreSQL -> 2. MongoDB -> 3. LocalFallbackDB)
+using_supabase = False
 using_mongo = False
-if _probe_mongo():
+DESCENDING = -1
+
+# 1. Probe & Connect to Supabase PostgreSQL (Tier 1 Architecture)
+if DATABASE_URL and ("postgres://" in DATABASE_URL or "postgresql://" in DATABASE_URL):
     try:
-        from pymongo import MongoClient, DESCENDING
+        from app.db.supabase_adapter import SupabaseDB
+        db = SupabaseDB(DATABASE_URL)
+        using_supabase = True
+        logger.info("Connected to live Supabase PostgreSQL cluster with pgvector!")
+    except Exception as e:
+        logger.warning("Could not connect to Supabase: %s. Falling back to local store.", e)
+        using_supabase = False
+
+# 2. Check for local MongoDB cluster if Supabase is not configured
+if not using_supabase and _probe_mongo():
+    try:
+        from pymongo import MongoClient
         client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=800, connectTimeoutMS=800)
         client.admin.command('ping')
         db = client[MONGO_DB]
@@ -198,10 +213,10 @@ if _probe_mongo():
     except Exception as e:
         using_mongo = False
 
-if not using_mongo:
-    logger.info("MongoDB cluster unreachable; initializing persistent LocalFallbackDB at %s", LOCAL_DB_FILE)
+# 3. Persistent Local File-based Database fallback
+if not using_supabase and not using_mongo:
+    logger.info("External databases unconfigured or offline; initializing persistent LocalFallbackDB at %s", LOCAL_DB_FILE)
     db = LocalFallbackDB(LOCAL_DB_FILE)
-    DESCENDING = -1
 
 news_col = db['news']
 training_col = db['training_samples']
