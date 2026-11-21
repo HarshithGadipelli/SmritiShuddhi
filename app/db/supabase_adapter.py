@@ -33,8 +33,10 @@ KNOWN_COLUMNS = {
     "news": {
         "news_id", "sample_id", "title", "text", "category", "source", "region",
         "language", "author", "image_url", "reading_time", "status", "real_probability",
-        "fake_probability", "s_style", "s_fact", "s_quant", "s_prop", "temporal_consistency",
-        "xai", "created_at", "is_user_submission", "tag", "tag_display"
+        "fake_probability", "s_style", "s_fact", "s_quant", "s_prop", "s_propagation",
+        "temporal_consistency", "xai", "created_at", "updated_at", "is_user_submission",
+        "tag", "tag_display", "risk_band", "action_recommended", "unlearned_strategy",
+        "unlearned_at", "residual_influence_pct", "retain_accuracy_pct", "parameters_modified_pct"
     },
     "official_truth_vectors": {
         "id", "evidence_id", "news_id", "title", "text", "source", "source_type",
@@ -47,7 +49,8 @@ KNOWN_COLUMNS = {
     },
     "removal_requests": {
         "request_id", "news_id", "sample_id", "title", "reason", "details",
-        "requested_by", "requester_name", "requester_email", "status", "created_at", "unlearned_at"
+        "requested_by", "requester_name", "requester_email", "status", "created_at",
+        "unlearned_at", "unlearned_strategy", "rejected_at"
     },
     "training_samples": {
         "sample_id", "news_id", "shard_id", "slice_id", "title", "text",
@@ -221,12 +224,16 @@ class SupabaseCollection:
             doc_copy["news_id"] = f"NEWS_{uuid.uuid4().hex[:8].upper()}"
         elif self.table_name == "unlearning_ledger" and "job_id" not in doc_copy:
             doc_copy["job_id"] = f"JOB_{uuid.uuid4().hex[:8].upper()}"
-        elif self.table_name == "audit_logs" and "log_id" not in doc_copy:
-            doc_copy["log_id"] = f"LOG_{uuid.uuid4().hex[:8].upper()}"
         elif self.table_name == "users" and "user_id" not in doc_copy:
             doc_copy["user_id"] = f"USR_{uuid.uuid4().hex[:8].upper()}"
         elif self.table_name == "removal_requests" and "request_id" not in doc_copy:
             doc_copy["request_id"] = f"REQ_REM_{uuid.uuid4().hex[:8].upper()}"
+
+        # If table uses serial/auto-increment integer primary key, omit string ids
+        if self.table_name in ("audit_logs", "official_truth_vectors"):
+            for serial_pk in ("log_id", "id"):
+                if serial_pk in doc_copy and not isinstance(doc_copy[serial_pk], int):
+                    doc_copy.pop(serial_pk, None)
 
         processed = {}
         for k, v in doc_copy.items():

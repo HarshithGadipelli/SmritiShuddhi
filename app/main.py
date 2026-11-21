@@ -27,7 +27,7 @@ from app.retrieval.knowledge_base import (
 )
 from app.unlearning.engine import unlearning_engine
 from app.unlearning.algorithms import multi_model_suite
-from db import init_db, news_col, training_col, requests_col, unlearning_col, audit_col, users_col, unlearning_ledger_col, using_mongo, now
+from db import init_db, news_col, training_col, requests_col, unlearning_col, audit_col, users_col, unlearning_ledger_col, using_supabase, using_mongo, now
 from app.utils.document_parser import parse_base64_document
 from app.retrieval.news_feed import (
     fetch_realtime_news,
@@ -159,151 +159,127 @@ ws_manager = ConnectionManager()
 
 def seed_initial_demo_news():
     """Seeds verified, pending, and flagged articles if missing, including rich live curated wire items."""
-    # Ensure curated multilingual stories always exist
+    published_count = news_col.count_documents({"status": "PUBLISHED"})
+    if published_count >= 10:
+        logger.info("Database news wire already populated (%d articles). Skipping initial seed.", published_count)
+        return
+
+    logger.info("Seeding initial news wire articles into database...")
+    demo_items = [
+        {
+            "news_id": "NEWS_REAL_001",
+            "sample_id": "SYN_REAL_001",
+            "title": "ISRO Releases Scientific Data Archive from Chandrayaan Mission on ISSDC",
+            "text": "Indian Space Research Organisation (ISRO) has officially opened the scientific payload repository on the Indian Space Science Data Centre for researchers globally.",
+            "source": "ISRO Press Office",
+            "author": "Dr. S. Nair",
+            "category": "Science & Space",
+            "image_url": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
+            "reading_time": "3 min read",
+            "status": "PUBLISHED",
+            "fake_probability": 0.08,
+            "real_probability": 0.92,
+            "risk_band": "LOW_RISK_FACTUAL",
+            "action_recommended": "ALLOW_AUTOMATIC_BROADCAST",
+            "created_at": now()
+        },
+        {
+            "news_id": "NEWS_REAL_002",
+            "sample_id": "SYN_REAL_002",
+            "title": "India Meteorological Department Issues Heatwave Alert for Northern States",
+            "text": "IMD red alert advisory issued for Delhi, Rajasthan, and Haryana with temperatures touching 45C. Public advised to stay hydrated.",
+            "source": "IMD Weather Bureau",
+            "author": "Bureau Reporter",
+            "category": "Weather & Safety",
+            "image_url": "https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=800&q=80",
+            "reading_time": "2 min read",
+            "status": "PUBLISHED",
+            "fake_probability": 0.05,
+            "real_probability": 0.95,
+            "risk_band": "LOW_RISK_FACTUAL",
+            "action_recommended": "ALLOW_AUTOMATIC_BROADCAST",
+            "created_at": now()
+        },
+        {
+            "news_id": "NEWS_MOD_003",
+            "sample_id": "SYN_MOD_003",
+            "title": "State Road Transport Authority Reviews Potential 10% Fare Revision Next Quarter",
+            "text": "Regional transport unions submit memorandum proposing tariff updates to offset diesel expenses. Ministry committee review planned.",
+            "source": "State Tribune",
+            "author": "A. Verma",
+            "category": "Banking & Economy",
+            "image_url": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80",
+            "reading_time": "3 min read",
+            "status": "PENDING_ADMIN_REVIEW",
+            "fake_probability": 0.48,
+            "real_probability": 0.52,
+            "risk_band": "MODERATE_RISK",
+            "action_recommended": "MONITOR_USER_FEEDBACK",
+            "created_at": now()
+        },
+        {
+            "news_id": "NEWS_FAKE_004",
+            "sample_id": "SYN_R_00445",
+            "title": "VIRAL ALERT: RBI Invaliding All 500 Rupee Currency Notes Tonight",
+            "text": "Urgent WhatsApp warning: Reserve Bank of India is withdrawing all 500 currency notes from circulation midnight. Secret exposed share immediately before ban!",
+            "source": "Social Media Forward",
+            "author": "Anonymous Viral Post",
+            "category": "Banking & Economy",
+            "image_url": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
+            "reading_time": "2 min read",
+            "status": "BLOCKED_HIGH_RISK_FAKE",
+            "fake_probability": 0.94,
+            "real_probability": 0.06,
+            "risk_band": "HIGH_RISK_FAKE",
+            "action_recommended": "FLAG_FOR_ADMIN_REVIEW_OR_REVOCATION",
+            "created_at": now()
+        },
+        {
+            "news_id": "NEWS_FAKE_005",
+            "sample_id": "SYN_R_00782",
+            "title": "Free 5000 Rs Laptop Scheme Under Prime Minister Scheme Approved",
+            "text": "Breaking dhamaka news: Government is providing free laptops and 5000 rupees to all students under PM Free Laptop Yojana. Register now via link!",
+            "source": "WhatsApp Group Broadcast",
+            "author": "Viral Forwarder",
+            "category": "Governance & Policy",
+            "image_url": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=800&q=80",
+            "reading_time": "2 min read",
+            "status": "BLOCKED_HIGH_RISK_FAKE",
+            "fake_probability": 0.96,
+            "real_probability": 0.04,
+            "risk_band": "HIGH_RISK_FAKE",
+            "action_recommended": "FLAG_FOR_ADMIN_REVIEW_OR_REVOCATION",
+            "created_at": now()
+        }
+    ]
+
     curated = get_curated_live_stories()
     for idx, cs in enumerate(curated):
-        news_id = f"NEWS_CURATED_{idx+1}"
-        news_col.update_one(
-            {"news_id": news_id},
-            {"$set": {
-                "news_id": news_id,
-                "sample_id": f"SYN_CUR_{idx+1}",
-                "title": cs["title"],
-                "text": cs["text"],
-                "source": cs["source"],
-                "author": cs["author"],
-                "category": cs["category"],
-                "language": cs.get("language", "English"),
-                "region": cs.get("region", "India National"),
-                "image_url": cs["image_url"],
-                "reading_time": cs.get("reading_time", "3 min read"),
-                "status": "PUBLISHED",
-                "fake_probability": 0.04,
-                "real_probability": 0.96,
-                "risk_band": "LOW_RISK_FACTUAL",
-                "action_recommended": "ALLOW_AUTOMATIC_BROADCAST",
-                "created_at": now()
-            }},
-            upsert=True
-        )
+        demo_items.append({
+            "news_id": f"NEWS_CURATED_{idx+1}",
+            "sample_id": f"SYN_CUR_{idx+1}",
+            "title": cs["title"],
+            "text": cs["text"],
+            "source": cs["source"],
+            "author": cs["author"],
+            "category": cs["category"],
+            "language": cs.get("language", "English"),
+            "region": cs.get("region", "India National"),
+            "image_url": cs["image_url"],
+            "reading_time": cs.get("reading_time", "3 min read"),
+            "status": "PUBLISHED",
+            "fake_probability": 0.04,
+            "real_probability": 0.96,
+            "risk_band": "LOW_RISK_FACTUAL",
+            "action_recommended": "ALLOW_AUTOMATIC_BROADCAST",
+            "created_at": now()
+        })
 
-    if news_col.count_documents({"status": "PUBLISHED"}) < 3:
-        logger.info("Seeding initial news wire articles into database...")
-        demo_items = [
-            {
-                "news_id": "NEWS_REAL_001",
-                "sample_id": "SYN_REAL_001",
-                "title": "ISRO Releases Scientific Data Archive from Chandrayaan Mission on ISSDC",
-                "text": "Indian Space Research Organisation (ISRO) has officially opened the scientific payload repository on the Indian Space Science Data Centre for researchers globally.",
-                "source": "ISRO Press Office",
-                "author": "Dr. S. Nair",
-                "category": "Science & Space",
-                "image_url": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
-                "reading_time": "3 min read",
-                "status": "PUBLISHED",
-                "fake_probability": 0.08,
-                "real_probability": 0.92,
-                "risk_band": "LOW_RISK_FACTUAL",
-                "action_recommended": "ALLOW_AUTOMATIC_BROADCAST",
-                "created_at": now()
-            },
-            {
-                "news_id": "NEWS_REAL_002",
-                "sample_id": "SYN_REAL_002",
-                "title": "India Meteorological Department Issues Heatwave Alert for Northern States",
-                "text": "IMD red alert advisory issued for Delhi, Rajasthan, and Haryana with temperatures touching 45C. Public advised to stay hydrated.",
-                "source": "IMD Weather Bureau",
-                "author": "Bureau Reporter",
-                "category": "Weather & Safety",
-                "image_url": "https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=800&q=80",
-                "reading_time": "2 min read",
-                "status": "PUBLISHED",
-                "fake_probability": 0.05,
-                "real_probability": 0.95,
-                "risk_band": "LOW_RISK_FACTUAL",
-                "action_recommended": "ALLOW_AUTOMATIC_BROADCAST",
-                "created_at": now()
-            },
-            {
-                "news_id": "NEWS_MOD_003",
-                "sample_id": "SYN_MOD_003",
-                "title": "State Road Transport Authority Reviews Potential 10% Fare Revision Next Quarter",
-                "text": "Regional transport unions submit memorandum proposing tariff updates to offset diesel expenses. Ministry committee review planned.",
-                "source": "State Tribune",
-                "author": "A. Verma",
-                "category": "Banking & Economy",
-                "image_url": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80",
-                "reading_time": "3 min read",
-                "status": "PENDING_ADMIN_REVIEW",
-                "fake_probability": 0.48,
-                "real_probability": 0.52,
-                "risk_band": "MODERATE_RISK",
-                "action_recommended": "MONITOR_USER_FEEDBACK",
-                "created_at": now()
-            },
-            {
-                "news_id": "NEWS_FAKE_004",
-                "sample_id": "SYN_R_00445",
-                "title": "VIRAL ALERT: RBI Invaliding All 500 Rupee Currency Notes Tonight",
-                "text": "Urgent WhatsApp warning: Reserve Bank of India is withdrawing all 500 currency notes from circulation midnight. Secret exposed share immediately before ban!",
-                "source": "Social Media Forward",
-                "author": "Anonymous Viral Post",
-                "category": "Banking & Economy",
-                "image_url": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
-                "reading_time": "2 min read",
-                "status": "BLOCKED_HIGH_RISK_FAKE",
-                "fake_probability": 0.94,
-                "real_probability": 0.06,
-                "risk_band": "HIGH_RISK_FAKE",
-                "action_recommended": "FLAG_FOR_ADMIN_REVIEW_OR_REVOCATION",
-                "created_at": now()
-            },
-            {
-                "news_id": "NEWS_FAKE_005",
-                "sample_id": "SYN_R_00782",
-                "title": "Free 5000 Rs Laptop Scheme Under Prime Minister Scheme Approved",
-                "text": "Breaking dhamaka news: Government is providing free laptops and 5000 rupees to all students under PM Free Laptop Yojana. Register now via link!",
-                "source": "WhatsApp Group Broadcast",
-                "author": "Viral Forwarder",
-                "category": "Governance & Policy",
-                "image_url": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=800&q=80",
-                "reading_time": "2 min read",
-                "status": "BLOCKED_HIGH_RISK_FAKE",
-                "fake_probability": 0.96,
-                "real_probability": 0.04,
-                "risk_band": "HIGH_RISK_FAKE",
-                "action_recommended": "FLAG_FOR_ADMIN_REVIEW_OR_REVOCATION",
-                "created_at": now()
-            }
-        ]
-        # Ingest curated live stories as well
-        curated = get_curated_live_stories()
-        for idx, cs in enumerate(curated):
-            demo_items.append({
-                "news_id": f"NEWS_CURATED_{idx+1}",
-                "sample_id": f"SYN_CUR_{idx+1}",
-                "title": cs["title"],
-                "text": cs["text"],
-                "source": cs["source"],
-                "author": cs["author"],
-                "category": cs["category"],
-                "language": cs.get("language", "English"),
-                "region": cs.get("region", "India National"),
-                "image_url": cs["image_url"],
-                "reading_time": cs.get("reading_time", "3 min read"),
-                "status": "PUBLISHED",
-                "fake_probability": 0.04,
-                "real_probability": 0.96,
-                "risk_band": "LOW_RISK_FACTUAL",
-                "action_recommended": "ALLOW_AUTOMATIC_BROADCAST",
-                "created_at": now()
-            })
-
-        for item in demo_items:
-            existing = news_col.find_one({"news_id": item["news_id"]})
-            if not existing:
-                news_col.insert_one(item)
-        logger.info("Successfully seeded %d initial news items with rich photography.", len(demo_items))
+    for item in demo_items:
+        existing = news_col.find_one({"news_id": item["news_id"]})
+        if not existing:
+            news_col.insert_one(item)
+    logger.info("Successfully seeded %d initial news items with rich photography.", len(demo_items))
 
 
 # -----------------------------------------------------------------------------
@@ -701,7 +677,7 @@ def get_news_sync_status():
 @app.get("/api/v1/news/{news_id}")
 def get_article_detail(news_id: str):
     """Returns single article details with complete XAI fact-checking certificate."""
-    doc = news_col.find_one({"news_id": news_id})
+    doc = news_col.find_one({"news_id": news_id}) or news_col.find_one({"sample_id": news_id})
     if not doc:
         raise HTTPException(status_code=404, detail="Article not found")
     if "_id" in doc:
@@ -1354,7 +1330,12 @@ def query_admin_copilot(payload: CopilotQueryRequest, background_tasks: Backgrou
         }
 
     elif action == "inspect_db" or "db" in q or "database" in q or "cache" in q or "redis" in q:
-        db_type = "MongoDB Cluster (Port 27017)" if using_mongo else "LocalFallbackDB (data/local_store.json)"
+        if using_supabase:
+            db_type = "Supabase PostgreSQL + pgvector Cloud Cluster (Port 5432)"
+        elif using_mongo:
+            db_type = "MongoDB Cluster (Port 27017)"
+        else:
+            db_type = "LocalFallbackDB (data/local_store.json)"
         resp_text = (f"🔍 **Live Telemetry & Database Diagnostics**:\n\n"
                      f"• **Database Engine**: `{db_type}`\n"
                      f"• **Total News Documents**: `{news_col.count_documents({})}`\n"
@@ -1438,7 +1419,9 @@ def get_db_explorer():
         "timestamp": now(),
         "telemetry": telemetry,
         "database": {
-            "backend": "MongoDB Cluster" if using_mongo else "LocalFallbackDB (Persisted JSON)",
+            "backend": "Supabase PostgreSQL + pgvector Cluster" if using_supabase else ("MongoDB Cluster" if using_mongo else "LocalFallbackDB (Persisted JSON)"),
+            "pgvector_active": True if using_supabase else False,
+            "database_url": "postgresql://postgres...aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres" if using_supabase else None,
             "file_store": str(config.DATA_DIR / "local_store.json"),
             "collections": col_counts
         },
