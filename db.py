@@ -273,7 +273,9 @@ def now():
 
 def init_db():
     seed_demo_users()
-    if using_mongo:
+    if using_supabase:
+        logger.info("Supabase PostgreSQL + pgvector database initialized successfully.")
+    elif using_mongo:
         try:
             news_col.create_index([('created_at', DESCENDING)])
             news_col.create_index('news_id', unique=True)

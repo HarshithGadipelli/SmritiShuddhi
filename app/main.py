@@ -316,7 +316,7 @@ async def background_news_sync_loop():
     while True:
         try:
             logger.info("Executing periodic live news background sync...")
-            res = perform_news_sync()
+            res = await asyncio.to_thread(perform_news_sync)
             logger.info("Periodic news sync: %d new articles synced from %s", res.get("synced_count", 0), res.get("sources_used", []))
         except Exception as e:
             logger.warning("Periodic news sync iteration notice: %s", e)

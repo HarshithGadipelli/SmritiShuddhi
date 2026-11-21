@@ -28,6 +28,9 @@ CREATE TABLE IF NOT EXISTS news (
     s_prop FLOAT DEFAULT 0.10,
     temporal_consistency FLOAT DEFAULT 0.95,
     xai JSONB DEFAULT '{}'::jsonb,
+    is_user_submission BOOLEAN DEFAULT FALSE,
+    tag VARCHAR(32),
+    tag_display VARCHAR(64),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -61,12 +64,17 @@ CREATE TABLE IF NOT EXISTS unlearning_ledger (
     job_id VARCHAR(64) PRIMARY KEY,
     sample_id VARCHAR(64) NOT NULL,
     news_id VARCHAR(64),
+    title TEXT,
     strategy VARCHAR(64) NOT NULL,
     residual_influence FLOAT DEFAULT 0.0000,
+    residual_influence_pct FLOAT DEFAULT 0.0,
+    retain_accuracy_pct FLOAT DEFAULT 100.0,
+    results JSONB DEFAULT '[]'::jsonb,
     execution_time_ms FLOAT DEFAULT 0.27,
     proof_hash TEXT,
     status VARCHAR(48) DEFAULT 'PURGED',
-    timestamp TIMESTAMPTZ DEFAULT NOW()
+    timestamp TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_unlearning_ledger_time ON unlearning_ledger(timestamp DESC);
@@ -78,7 +86,10 @@ CREATE TABLE IF NOT EXISTS removal_requests (
     sample_id VARCHAR(64),
     title TEXT NOT NULL,
     reason TEXT NOT NULL,
+    details TEXT,
     requested_by VARCHAR(128) DEFAULT 'Citizen Contributor',
+    requester_name VARCHAR(128),
+    requester_email VARCHAR(128),
     status VARCHAR(48) DEFAULT 'PENDING_REVIEW',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     unlearned_at TIMESTAMPTZ
@@ -126,6 +137,9 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     action VARCHAR(64) NOT NULL,
     details TEXT,
     client_ip VARCHAR(64) DEFAULT '127.0.0.1',
+    sample_id VARCHAR(64),
+    news_id VARCHAR(64),
+    strategy VARCHAR(64),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

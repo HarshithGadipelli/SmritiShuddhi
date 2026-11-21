@@ -6,3 +6,5 @@ artifacts/sisa/*.joblib
 artifacts/models/*.joblib
 artifacts/evaluation/
 logs/*.log
+*.db
+
