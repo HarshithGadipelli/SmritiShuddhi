@@ -144,3 +144,23 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 );
 
 CREATE INDEX IF NOT EXISTS idx_audit_logs_time ON audit_logs(created_at DESC);
+
+-- 9. Quantitative & Time-Series Knowledge Base Table
+-- Stores historical thresholds, baselines, and volatility boundaries for Gold, Crude Oil, Stocks, and Weather
+CREATE TABLE IF NOT EXISTS quantitative_knowledge_base (
+    metric_id VARCHAR(64) PRIMARY KEY,
+    category VARCHAR(64) NOT NULL,
+    metric_name VARCHAR(128) NOT NULL,
+    symbol VARCHAR(32),
+    unit VARCHAR(32) DEFAULT 'INR',
+    baseline_value FLOAT NOT NULL,
+    min_realistic FLOAT,
+    max_realistic FLOAT,
+    daily_swing_limit_pct FLOAT DEFAULT 5.0,
+    extreme_anomaly_pct FLOAT DEFAULT 10.0,
+    rule_summary TEXT,
+    last_updated TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_quant_kb_cat ON quantitative_knowledge_base(category);
+

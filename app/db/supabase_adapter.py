@@ -61,6 +61,11 @@ KNOWN_COLUMNS = {
     },
     "audit_logs": {
         "log_id", "action", "details", "client_ip", "sample_id", "news_id", "strategy", "created_at"
+    },
+    "quantitative_knowledge_base": {
+        "metric_id", "category", "metric_name", "symbol", "unit", "baseline_value",
+        "min_realistic", "max_realistic", "daily_swing_limit_pct", "extreme_anomaly_pct",
+        "rule_summary", "last_updated"
     }
 }
 

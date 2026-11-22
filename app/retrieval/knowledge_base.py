@@ -36,6 +36,10 @@ QUANTITATIVE_BASELINES = {
         "gold_24k_10g_inr": {"baseline": 78500, "min_realistic": 68000, "max_realistic": 92000, "daily_swing_limit_pct": 4.5, "unit": "₹"},
         "rule_summary": "Gold prices remain anchored in the ₹70,000-₹90,000 range per 10 grams. Claims of gold dropping to ₹20,000 or soaring to ₹2,00,000 overnight are mathematically false."
     },
+    "crude_oil_energy": {
+        "brent_crude_usd_bbl": {"baseline": 74.50, "min_realistic": 55.0, "max_realistic": 115.0, "daily_swing_limit_pct": 6.0, "unit": "$/bbl"},
+        "rule_summary": "Brent crude oil trades within $60-$100/barrel. Claims of crude dropping to $15 or spiking to $250 overnight are false."
+    },
     "forex_currency": {
         "usd_inr": {"baseline": 84.20, "min_realistic": 78.0, "max_realistic": 92.0, "daily_swing_limit_pct": 2.5, "unit": "₹"},
         "rule_summary": "USD/INR exchange rate trades within ₹80-₹88 per USD. Claims of 1 USD = ₹20 or ₹200 are false."
@@ -190,7 +194,25 @@ class QuantitativeAnomalyEngine:
             except ValueError:
                 pass
 
-        # 4. Temperature Physical Impossibilities
+        # 4. Crude Oil & Energy Price Collapse/Spike Anomaly
+        crude_match = re.search(r'(?:crude|brent|petroleum)[\s\w]*(?:drop|crash|fall|fell|reach|trade|rate|price|soar|surge|plunge|plunges|collapse|collapses|slump|slumps|tumble|tumbles)[\s\w]*?(?:\$|usd|rs\.?|₹|\bto\b|\bat\b)?\s*([0-9]+(?:\.[0-9]+)?)', combined)
+        if crude_match:
+            try:
+                price = float(crude_match.group(1))
+                if (1.0 <= price <= 25.0) or price >= 200.0:
+                    anomalies.append({
+                        "dimension": "ENERGY_COMMODITY_ANOMALY",
+                        "severity": "CRITICAL",
+                        "claimed": f"Crude oil at ${price:,.1f}/barrel",
+                        "baseline": "Brent crude baseline: ~$74.50/barrel (Normal trading range: $55-$110/barrel).",
+                        "discrepancy": f"Claimed crude price of ${price:,.1f}/barrel is an extreme non-market dislocation anomaly.",
+                        "penalty": 0.80
+                    })
+                    anomaly_score = max(anomaly_score, 0.85)
+            except ValueError:
+                pass
+
+        # 5. Temperature Physical Impossibilities
         temp_match = re.search(r'([0-9]+(?:\.[0-9]+)?)\s*(?:degrees?|°|\s*c\b|\s*celsius)', combined)
         if temp_match:
             try:
