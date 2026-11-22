@@ -236,6 +236,24 @@ class QuantitativeAnomalyEngine:
             except ValueError:
                 pass
 
+        # 6. Forex USD/INR Drastic Dislocation Anomaly
+        forex_match = re.search(r'(?:usd|dollar|rupee)[\s\w]*(?:drop|crash|fall|fell|reach|trade|rate|equal|equals|plunge|plunges|soar|surge)[\s\w]*?(?:rs\.?|inr|₹|\$)?\s*([0-9]+(?:\.[0-9]+)?)', combined)
+        if forex_match:
+            try:
+                rate = float(forex_match.group(1))
+                if (1.0 <= rate <= 45.0) or (rate >= 140.0):
+                    anomalies.append({
+                        "dimension": "FOREX_EXCHANGE_ANOMALY",
+                        "severity": "CRITICAL",
+                        "claimed": f"USD/INR exchange rate at ₹{rate:,.1f}",
+                        "baseline": "USD/INR baseline: ~₹84.20 (Normal trading band: ₹80 - ₹90).",
+                        "discrepancy": f"Claimed rate of ₹{rate:,.1f}/USD is an extreme monetary dislocation anomaly.",
+                        "penalty": 0.85
+                    })
+                    anomaly_score = max(anomaly_score, 0.88)
+            except ValueError:
+                pass
+
         has_anomaly = len(anomalies) > 0
         severity = "NONE"
         if has_anomaly:
@@ -259,18 +277,19 @@ class ContextPropagationAnalyzer:
         "reuters", "reuters india", "times of india", "the times of india", "the hindu",
         "the hindu business line", "pib", "press information bureau", "pib national wire",
         "isro", "isro press office", "rbi", "rbi central bulletin", "imd", "imd weather bureau",
-        "ndtv", "indian express", "live law", "eenadu", "sakshi", "bbc news"
+        "ndtv", "indian express", "hindustan times", "economic times", "business standard",
+        "mint", "live law", "eenadu", "sakshi", "bbc news", "ani", "pti", "dd news", "all india radio"
     ]
 
     UNVERIFIED_SOURCE_MARKERS = [
         "whatsapp", "telegram", "forward", "viral post", "social media", "unknown", "anonymous",
-        "facebook post", "blog", "group forward"
+        "facebook post", "blog", "group forward", "tiktok", "instagram reel"
     ]
 
     VIRAL_PROPAGATION_PATTERNS = [
         r'\b(forward to all|share before deleted|share before midnight|viral alert|breaking dhamaka)\b',
         r'\b(secret exposed|hidden truth|leak exposed|panic|urgent warning|warning to public)\b',
-        r'\b(forwarded as received|must forward|send to 10 friends|share in all groups)\b',
+        r'\b(forwarded as received|must forward|send to 10 friends|share in all groups|share maximum|don\'t ignore)\b',
         r'\b(ban tonight|withdrawing tonight|breaking alert|save your money immediately)\b'
     ]
 
@@ -279,7 +298,7 @@ class ContextPropagationAnalyzer:
         src_lower = (source or "").strip().lower()
         author_lower = (author or "").strip().lower()
 
-        # 1. Source Credibility Scoring
+        # 1. Source Credibility Scoring (Pillar 5)
         is_trusted = any(ts in src_lower for ts in self.TRUSTED_SOURCES)
         is_unverified_source = any(us in src_lower or us in author_lower for us in self.UNVERIFIED_SOURCE_MARKERS)
 
@@ -293,7 +312,7 @@ class ContextPropagationAnalyzer:
             source_risk = 0.40
             source_verdict = "INDEPENDENT_CITIZEN_SUBMISSION"
 
-        # 2. Viral Propagation & Coercive Forwarding Cues
+        # 2. Viral Propagation & Coercive Forwarding Cues (Pillar 4)
         propagation_cues = []
         for pat in self.VIRAL_PROPAGATION_PATTERNS:
             for match in re.finditer(pat, combined, re.IGNORECASE):
@@ -310,11 +329,13 @@ class ContextPropagationAnalyzer:
             virality_pressure_score = 0.10
             propagation_band = "ORGANIC_EDITORIAL_FRAMING"
 
-        # Composite propagation risk score
-        s_propagation = round(0.40 * source_risk + 0.60 * virality_pressure_score, 4)
+        # Composite propagation score for backward compatibility
+        s_propagation_composite = round(0.40 * source_risk + 0.60 * virality_pressure_score, 4)
 
         return {
-            "s_propagation": s_propagation,
+            "s_source": round(source_risk, 4),
+            "s_propagation": round(virality_pressure_score, 4),
+            "s_propagation_composite": s_propagation_composite,
             "source_verdict": source_verdict,
             "source_risk": source_risk,
             "propagation_band": propagation_band,

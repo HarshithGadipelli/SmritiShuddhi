@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 from typing import Dict, Any, List, Optional
 from config import FAKE_THRESHOLD_HIGH, FAKE_THRESHOLD_LOW
 
@@ -28,66 +29,125 @@ class EnsembleFusionLayer:
         propagation_result: Optional[Dict[str, Any]] = None,
         internal_evidence_result: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        s_style = style_result["s_style"]
-        s_fact = retrieval_result["s_fact"]
-        evidence_status = retrieval_result["verdict_status"]
-        timeline_score = graph_result["temporal_consistency_score"]
-        contradictions = graph_result.get("contradictions", [])
+        """5-Pillar Multi-Aspect Decoupled Ensemble Fusion:
+        1. Content-Based: Stylometric Intention, Sensationalism & DeBERTa LoRA (s_content)
+        2. Context-Based: Chronological Linearity & Knowledge Graph Consistency (s_context)
+        3. Knowledge-Based / Fact-Check: Vector debunks + Internal archive + Time-series anomaly (s_knowledge)
+        4. Propagation-Based: Virality pressure & coercive forwarding triggers (s_propagation)
+        5. Source-Based: Publisher credibility & institutional wire verification (s_source)
+        """
+        # Pillar 1: Content-Based Stylometric Score
+        s_content = float(style_result["s_style"])
 
-        # Default sub-scores if not passed
+        # Pillar 2: Context-Based Temporal & Chronological Linearity
+        timeline_score = float(graph_result.get("temporal_consistency_score", 0.90))
+        contradictions = graph_result.get("contradictions", [])
+        timeline_anomalies = graph_result.get("anomalies", [])
+        if contradictions:
+            s_context = 0.92
+        elif timeline_anomalies or timeline_score < 0.50:
+            s_context = 0.70
+        else:
+            s_context = max(0.05, round(1.0 - timeline_score, 4))
+
+        # Pillar 3: Knowledge-Based / Fact-Check Retrieval & Quantitative Baselines
+        raw_s_fact = float(retrieval_result.get("s_fact", 0.50))
+        evidence_status = retrieval_result.get("verdict_status", "NO_EVIDENCE")
         quant_res = quant_result or {"has_anomaly": False, "s_quant_anomaly": 0.0, "anomalies": []}
-        prop_res = propagation_result or {"s_propagation": 0.20, "source_verdict": "STANDARD_BROADCAST", "detected_propagation_cues": []}
         int_evid = internal_evidence_result or {"has_match": False, "s_internal_fact": 0.50}
 
-        s_quant = quant_res.get("s_quant_anomaly", 0.0)
-        s_prop = prop_res.get("s_propagation", 0.20)
+        s_quant = float(quant_res.get("s_quant_anomaly", 0.0))
+        s_internal = float(int_evid.get("s_internal_fact", 0.50))
 
-        # Internal Evidence reconciliation
+        # Reconcile Knowledge Base Evidence
         xai_factors = []
         if int_evid.get("has_match") and int_evid.get("top_match"):
             top_m = int_evid["top_match"]
-            s_fact = min(s_fact, top_m["fact_score"]) if top_m["truth_status"] == "VERIFIED_OFFICIAL" else max(s_fact, top_m["fact_score"])
-            xai_factors.append(f"Internal Knowledge Base proof matched ({top_m['official_source']}): {top_m['summary'][:110]}...")
-
-        if evidence_status == "EVIDENCE_MATCHED":
-            w_fact = 0.50
-            w_style = 0.25
-            w_quant = 0.15
-            w_prop = 0.10
-            xai_factors.append("Official verification evidence matched in Qdrant vector space.")
+            if top_m["truth_status"] == "VERIFIED_OFFICIAL":
+                s_fact_base = min(raw_s_fact, s_internal)
+            else:
+                s_fact_base = max(raw_s_fact, s_internal)
+            xai_factors.append(f"Internal Fact-Check archive matched ({top_m['official_source']}): {top_m['summary'][:110]}...")
         else:
-            w_fact = 0.15
-            w_style = 0.45
-            w_quant = 0.25
-            w_prop = 0.15
-            xai_factors.append("Predictive synthesis guided by stylometric intention, quantitative knowledge base, and propagation markers.")
+            s_fact_base = raw_s_fact
 
-        # Quantitative Anomaly Escalation
+        # Quantitative anomaly escalation
         if quant_res.get("has_anomaly") and quant_res.get("anomalies"):
             top_anomaly = quant_res["anomalies"][0]
             xai_factors.append(f"Quantitative Anomaly [{top_anomaly['dimension']}]: {top_anomaly['discrepancy']}")
-            s_quant = max(s_quant, 0.85)
+            s_quant = max(s_quant, 0.88)
 
-        # Viral Propagation Escalation
+        s_knowledge = round(max(s_fact_base, s_quant), 4)
+
+        # Pillar 4: Propagation-Based Virality Pressure & Coercive Hooks
+        prop_res = propagation_result or {
+            "s_propagation": 0.10, "s_source": 0.40,
+            "source_verdict": "STANDARD_BROADCAST",
+            "propagation_band": "ORGANIC_EDITORIAL_FRAMING",
+            "detected_propagation_cues": []
+        }
+        s_propagation = float(prop_res.get("s_propagation", prop_res.get("virality_pressure_score", 0.10)))
+
+        # Pillar 5: Source-Based Publisher Credibility
+        s_source = float(prop_res.get("s_source", prop_res.get("source_risk", 0.40)))
+        source_verdict = prop_res.get("source_verdict", "INDEPENDENT_CITIZEN_SUBMISSION")
+
         if prop_res.get("propagation_band") == "HIGH_COERCIVE_VIRALITY":
             xai_factors.append("High viral propagation pressure detected (coercive forwarding patterns).")
-        elif prop_res.get("source_verdict") == "VERIFIED_INSTITUTIONAL_WIRE":
+        if source_verdict == "VERIFIED_INSTITUTIONAL_WIRE":
             xai_factors.append("Source verified as institutional wire (Reuters / Times of India / PIB / ISRO).")
+        elif source_verdict == "UNVERIFIED_VIRAL_CHANNEL":
+            xai_factors.append("Source flagged as unverified viral channel / social messaging forward.")
 
-        # Temporal Graph Adjustment
         if contradictions:
-            s_fact = max(s_fact, 0.90)
-            xai_factors.append(f"Temporal graph detected chronological contradiction: {contradictions[0]}")
-        elif timeline_score < 0.50:
-            s_fact = max(s_fact, 0.70)
+            xai_factors.append(f"Chronological knowledge graph detected contradiction: {contradictions[0]}")
+        elif s_context >= 0.60:
             xai_factors.append("Chronological anomaly detected against verified timeline anchors.")
 
-        # Multi-Aspect 5-Pillar Weighted Fusion
-        fake_prob = float(w_style * s_style + w_fact * s_fact + w_quant * s_quant + w_prop * s_prop)
-        fake_prob = round(min(max(fake_prob, 0.01), 0.99), 4)
+        if evidence_status == "EVIDENCE_MATCHED":
+            xai_factors.append("Official verification evidence matched in vector space.")
+
+        # ---------------------------------------------------------------------
+        # DYNAMIC 5-PILLAR WEIGHT DISTRIBUTION
+        # ---------------------------------------------------------------------
+        if evidence_status == "EVIDENCE_MATCHED" or int_evid.get("has_match"):
+            # Evidence-Anchored Verification
+            w_knowledge = 0.35
+            w_content = 0.20
+            w_source = 0.20
+            w_context = 0.15
+            w_propagation = 0.10
+        else:
+            # Predictive Zero-Shot Synthesis
+            w_content = 0.30
+            w_knowledge = 0.25
+            w_source = 0.20
+            w_propagation = 0.15
+            w_context = 0.10
+
+        # Multi-Aspect 5-Pillar Weighted Linear Combination
+        raw_fake_prob = float(
+            w_content * s_content +
+            w_context * s_context +
+            w_knowledge * s_knowledge +
+            w_propagation * s_propagation +
+            w_source * s_source
+        )
+
+        # Critical Safety Overrides & Escalations
+        # If any single pillar exhibits extreme critical violation:
+        if quant_res.get("has_anomaly") or (int_evid.get("has_match") and int_evid.get("top_match", {}).get("truth_status") == "VERIFIED_DEBUNK"):
+            raw_fake_prob = max(raw_fake_prob, 0.88)
+        elif contradictions:
+            raw_fake_prob = max(raw_fake_prob, 0.85)
+        elif source_verdict == "VERIFIED_INSTITUTIONAL_WIRE" and s_content < 0.30 and not quant_res.get("has_anomaly") and not contradictions:
+            # Verified institutional news without sensationalism or contradictions is anchored authentic
+            raw_fake_prob = min(raw_fake_prob, 0.08)
+
+        fake_prob = round(float(np.clip(raw_fake_prob, 0.01, 0.99)), 4)
         real_prob = round(1.0 - fake_prob, 4)
 
-        # Risk band determination
+        # 3-Tier Risk Band Determination
         if fake_prob >= self.threshold_high:
             risk_band = "HIGH_RISK_FAKE"
             prediction = "FAKE"
@@ -101,11 +161,12 @@ class EnsembleFusionLayer:
             prediction = "UNCERTAIN"
             action_recommended = "MONITOR_USER_FEEDBACK"
 
-        # Construct comprehensive Explainable AI (XAI) report
+        # Construct comprehensive Explainable AI (XAI) report across all 5 aspects
         xai_report = {
             "primary_verdict_factors": xai_factors,
             "stylistic_analysis": {
-                "s_style": s_style,
+                "s_style": s_content,
+                "s_content": s_content,
                 "framing_risk": style_result["xai_style_attribution"]["stylistic_framing_risk"],
                 "sensational_cue_count": style_result["xai_style_attribution"]["sensational_cue_count"],
                 "exclamation_density": style_result["xai_style_attribution"]["exclamation_density"],
@@ -115,7 +176,7 @@ class EnsembleFusionLayer:
                 "detected_cues": style_result["xai_style_attribution"].get("detected_cues", [])
             },
             "factual_retrieval_analysis": {
-                "s_fact": s_fact,
+                "s_fact": s_knowledge,
                 "evidence_status": evidence_status,
                 "official_matches": retrieval_result.get("matches", [])
             },
@@ -126,13 +187,15 @@ class EnsembleFusionLayer:
                 "detected_anomalies": quant_res.get("anomalies", [])
             },
             "context_and_propagation": {
-                "s_propagation": s_prop,
-                "source_verdict": prop_res.get("source_verdict", "STANDARD_BROADCAST"),
+                "s_propagation": s_propagation,
+                "s_source": s_source,
+                "source_verdict": source_verdict,
                 "propagation_band": prop_res.get("propagation_band", "ORGANIC_EDITORIAL_FRAMING"),
                 "detected_cues": prop_res.get("detected_propagation_cues", [])
             },
             "chronological_graph_analysis": {
                 "temporal_score": timeline_score,
+                "s_context": s_context,
                 "timeline_verdict": graph_result.get("timeline_verdict"),
                 "detected_contradictions": contradictions,
                 "graph_backend": graph_result.get("graph_backend")
@@ -143,17 +206,63 @@ class EnsembleFusionLayer:
             }
         }
 
+        # Five-Pillar Explicit Breakdown for Explainability and UI
+        five_pillar_breakdown = {
+            "content_based": {
+                "pillar_name": "Content-Based (Stylometry & Emotional Framing)",
+                "risk_score": s_content,
+                "weight": w_content,
+                "status": "ELEVATED" if s_content >= 0.50 else "NORMAL",
+                "cues_found": style_result["xai_style_attribution"]["sensational_cue_count"]
+            },
+            "context_based": {
+                "pillar_name": "Context-Based (Chronological Linearity & Entities)",
+                "risk_score": s_context,
+                "weight": w_context,
+                "status": "CONTRADICTION" if contradictions else ("ANOMALY" if s_context >= 0.50 else "CONSISTENT"),
+                "temporal_score": timeline_score
+            },
+            "knowledge_based": {
+                "pillar_name": "Knowledge & Fact-Check (Vector Debunks & Time-Series)",
+                "risk_score": s_knowledge,
+                "weight": w_knowledge,
+                "status": "ANOMALY_OR_DEBUNK" if s_knowledge >= 0.70 else "VERIFIED_ACCURATE",
+                "has_quant_anomaly": quant_res.get("has_anomaly", False)
+            },
+            "propagation_based": {
+                "pillar_name": "Propagation-Based (Virality Pressure & Coercive Forwarding)",
+                "risk_score": s_propagation,
+                "weight": w_propagation,
+                "status": prop_res.get("propagation_band", "ORGANIC_EDITORIAL_FRAMING"),
+                "cues_found": len(prop_res.get("detected_propagation_cues", []))
+            },
+            "source_based": {
+                "pillar_name": "Source-Based (Publisher Credibility & Verification)",
+                "risk_score": s_source,
+                "weight": w_source,
+                "verdict": source_verdict,
+                "status": "TRUSTED" if s_source <= 0.15 else ("UNVERIFIED" if s_source >= 0.70 else "STANDARD")
+            }
+        }
+
         return {
             "prediction": prediction,
             "fake_probability": fake_prob,
             "real_probability": real_prob,
             "risk_band": risk_band,
             "action_recommended": action_recommended,
-            "s_style": s_style,
-            "s_fact": s_fact,
+            # 5-Pillar Dedicated Scores
+            "s_content": s_content,
+            "s_context": s_context,
+            "s_knowledge": s_knowledge,
+            "s_propagation": s_propagation,
+            "s_source": s_source,
+            # Backward-compatible aliases
+            "s_style": s_content,
+            "s_fact": s_knowledge,
             "s_quant": s_quant,
-            "s_propagation": s_prop,
             "temporal_consistency": timeline_score,
+            "five_pillar_breakdown": five_pillar_breakdown,
             "xai": xai_report
         }
 

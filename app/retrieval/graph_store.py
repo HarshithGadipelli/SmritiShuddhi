@@ -18,6 +18,8 @@ HISTORICAL_ANCHORS = [
     {"entity": "G20 India", "event": "New Delhi Summit", "date": "2023-09-09", "status": "COMPLETED"},
     {"entity": "Aadhaar UIDAI", "event": "Lifetime Validity Clarification", "date": "2024-01-25", "status": "CONFIRMED_LIFETIME"},
     {"entity": "PM Free Laptop Scheme", "event": "Government Free Device Scheme", "date": "2024-03-15", "status": "NEVER_EXISTED_FAKE"},
+    {"entity": "Ministry of Home Affairs", "event": "National Lockdown Rumor", "date": "2024-02-10", "status": "NEVER_EXISTED_FAKE"},
+    {"entity": "Ministry of Railways", "event": "Tatkal Agent-Only Restriction Rumor", "date": "2024-05-01", "status": "NEVER_EXISTED_FAKE"},
 ]
 
 
@@ -126,9 +128,17 @@ class TemporalGraphEngine:
 
             # Contradiction: text claims something is newly happening or active, but official graph states it never existed
             if status == "NEVER_EXISTED_FAKE":
-                if any(w in combined.lower() for w in ["apply now", "register", "free laptop", "5000"]):
+                if "Laptop" in event_name and any(w in combined.lower() for w in ["apply now", "register", "free laptop", "5000", "laptop"]):
                     contradictions.append(
                         f"Fabricated Event Contradiction: Official record shows '{event_name}' was verified as fake on {anchor_date}."
+                    )
+                elif "Lockdown" in event_name and any(w in combined.lower() for w in ["lockdown", "strict lockdown", "nationwide", "closed"]):
+                    contradictions.append(
+                        f"Fabricated Event Contradiction: Official record shows '{event_name}' was verified as fake by MHA on {anchor_date}."
+                    )
+                elif "Tatkal" in event_name and any(w in combined.lower() for w in ["tatkal", "agent only", "booking window"]):
+                    contradictions.append(
+                        f"Fabricated Event Contradiction: Official record shows '{event_name}' was verified as fake by Railways on {anchor_date}."
                     )
 
             # Contradiction: 500 currency note ban

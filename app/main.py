@@ -521,7 +521,12 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "s_fact": verdict["s_fact"],
         "s_quant": verdict.get("s_quant", 0.10),
         "s_propagation": verdict.get("s_propagation", 0.10),
+        "s_content": verdict.get("s_content", verdict.get("s_style")),
+        "s_context": verdict.get("s_context", 0.10),
+        "s_knowledge": verdict.get("s_knowledge", verdict.get("s_fact")),
+        "s_source": verdict.get("s_source", 0.40),
         "temporal_consistency": verdict["temporal_consistency"],
+        "five_pillar_breakdown": verdict.get("five_pillar_breakdown", {}),
         "xai": verdict["xai"],
         "created_at": now()
     }
@@ -559,7 +564,13 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "cache_hit": cache_hit,
         "s_style": verdict["s_style"],
         "s_fact": verdict["s_fact"],
+        "s_content": verdict.get("s_content", verdict.get("s_style")),
+        "s_context": verdict.get("s_context", 0.10),
+        "s_knowledge": verdict.get("s_knowledge", verdict.get("s_fact")),
+        "s_propagation": verdict.get("s_propagation", 0.10),
+        "s_source": verdict.get("s_source", 0.40),
         "temporal_consistency": verdict["temporal_consistency"],
+        "five_pillar_breakdown": verdict.get("five_pillar_breakdown", {}),
         "xai": verdict["xai"]
     }
 
