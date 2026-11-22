@@ -23,7 +23,8 @@ from app.models.fusion import fusion_layer
 from app.retrieval.knowledge_base import (
     quantitative_anomaly_engine,
     propagation_analyzer,
-    internal_evidence_engine
+    internal_evidence_engine,
+    entity_specificity_analyzer
 )
 from app.unlearning.engine import unlearning_engine
 from app.unlearning.algorithms import multi_model_suite
@@ -378,6 +379,9 @@ def execute_hybrid_inference(title: str, text: str, source: str = "", author: st
     # Track F: Stored Internal Evidence Archive
     int_evid_res = internal_evidence_engine.query_evidence(title, text)
 
+    # Track G: Informational Density & Entity Specificity
+    spec_res = entity_specificity_analyzer.analyze_specificity(title, text)
+
     # Multi-Aspect 5-Pillar Fusion
     verdict = fusion_layer.fuse(
         style_result=style_res,
@@ -386,7 +390,8 @@ def execute_hybrid_inference(title: str, text: str, source: str = "", author: st
         regional_info=regional_info,
         quant_result=quant_res,
         propagation_result=prop_res,
-        internal_evidence_result=int_evid_res
+        internal_evidence_result=int_evid_res,
+        specificity_result=spec_res
     )
     return verdict
 

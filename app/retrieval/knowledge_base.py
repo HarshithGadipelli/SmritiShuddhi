@@ -122,6 +122,42 @@ INTERNAL_FACT_EVIDENCE_ARCHIVE = [
         "official_source": "Ministry of Railways & IRCTC",
         "summary": "IRCTC standard booking timings (10:00 AM for AC, 11:00 AM for Non-AC) remain active. No mandatory agent restriction has been implemented.",
         "fact_score": 0.06
+    },
+    {
+        "evidence_id": "EVID_FREE_ENERGY_MIRACLE_INVENTION",
+        "topic": "Free Fuel / Perpetual Motion / Miracle Energy Invention Fraud",
+        "keywords": ["free fuel", "free electricity", "water fuel", "water running car", "perpetual motion", "water to petrol", "miracle invention"],
+        "truth_status": "VERIFIED_DEBUNK",
+        "official_source": "Department of Science and Technology (DST) & PIB Fact Check",
+        "summary": "Claims of water-running cars, free perpetual electricity generators, or secret fuel inventions suppressed by oil cartels are scientifically fraudulent and violate thermodynamic laws.",
+        "fact_score": 0.98
+    },
+    {
+        "evidence_id": "EVID_HEALTH_MIRACLE_CURE",
+        "topic": "Miracle Medical Disease Cure Hoaxes",
+        "keywords": ["cure cancer in 24 hours", "miracle cure", "cure all diseases", "who approved miracle", "lemon baking soda cancer"],
+        "truth_status": "VERIFIED_DEBUNK",
+        "official_source": "Ministry of Ayush, ICMR & WHO Fact Desk",
+        "summary": "No verified clinical medical evidence exists for overnight miracle cancer cures or instant cures circulating on social messaging channels.",
+        "fact_score": 0.96
+    },
+    {
+        "evidence_id": "EVID_RBI_MONEY_DOUBLING_FRAUD",
+        "topic": "Government Money Doubling & Direct Cash Phishing",
+        "keywords": ["double money", "rbi lottery", "pm mudra free", "7 days double", "claim cash prize"],
+        "truth_status": "VERIFIED_DEBUNK",
+        "official_source": "Reserve Bank of India & PIB Fact Check",
+        "summary": "RBI does not run lotteries or offer cash prizes. Any scheme promising doubling money in days or free direct bank transfers is fraudulent phishing.",
+        "fact_score": 0.97
+    },
+    {
+        "evidence_id": "EVID_DOT_SIM_DEACTIVATION_FRAUD",
+        "topic": "Department of Telecom SIM Card Disconnection Hoaxes",
+        "keywords": ["sim block", "deactivate in 24 hours", "dot blocking", "kyc expired sim", "call this number to avoid block"],
+        "truth_status": "VERIFIED_DEBUNK",
+        "official_source": "Department of Telecommunications (DoT)",
+        "summary": "Department of Telecommunications (DoT) does not issue calls or messages threatening immediate 24-hour disconnection for KYC. Such messages are cyber scams.",
+        "fact_score": 0.95
     }
 ]
 
@@ -253,6 +289,32 @@ class QuantitativeAnomalyEngine:
                     anomaly_score = max(anomaly_score, 0.88)
             except ValueError:
                 pass
+
+        # 7. Pseudoscience & Thermodynamic Free Energy Physical Anomaly
+        free_energy_cues = ["free fuel", "free electricity", "water fuel", "water running car", "perpetual motion", "water to petrol", "free energy generator"]
+        if any(f in combined for f in free_energy_cues):
+            anomalies.append({
+                "dimension": "PSEUDOSCIENCE_PHYSICAL_ANOMALY",
+                "severity": "CRITICAL",
+                "claimed": "Free Energy / Perpetual Motion / Miracle Fuel Invention",
+                "baseline": "First and Second Laws of Thermodynamics prohibit perpetual energy creation without fuel consumption.",
+                "discrepancy": "Claim asserts a physically impossible zero-fuel or perpetual energy generation mechanism.",
+                "penalty": 0.85
+            })
+            anomaly_score = max(anomaly_score, 0.88)
+
+        # 8. Miracle Medical Cure & Unverified Pharmacology Anomaly
+        miracle_cures = ["cure cancer in 24 hours", "miracle cure", "cures all diseases", "instant cure", "cure overnight"]
+        if any(m in combined for m in miracle_cures):
+            anomalies.append({
+                "dimension": "MEDICAL_EFFICACY_ANOMALY",
+                "severity": "CRITICAL",
+                "claimed": "Overnight Miracle Disease Cure",
+                "baseline": "Clinical pharmacovigilance requires verified CDSCO/ICMR/WHO randomized clinical trials.",
+                "discrepancy": "Unverified medical claims claiming instantaneous cures violate scientific and regulatory standards.",
+                "penalty": 0.80
+            })
+            anomaly_score = max(anomaly_score, 0.85)
 
         has_anomaly = len(anomalies) > 0
         severity = "NONE"
@@ -387,7 +449,69 @@ class InternalEvidenceEngine:
         }
 
 
+class EntitySpecificityAnalyzer:
+    """Analyzes the informational density, named entity attribution, and contextual verifiability of news claims.
+    Distinguishes abstract generic assertions (e.g. 'an inventor invented an invention yesterday',
+    'a person invented an invention') from verifiable claims anchored with named entities, research labs,
+    or institutional citations.
+    """
+    GENERIC_SUBJECT_PATTERNS = [
+        r'\b(an inventor|a person|someone|somebody|a scientist|an individual|a man|a woman|a guy)\b',
+        r'\b(an invention|a discovery|something|a device|a gadget|a machine)\b'
+    ]
+
+    INSTITUTIONAL_ENTITY_MARKERS = [
+        r'\b(isro|drdo|iit|iisc|aiims|csir|icmr|dst|barc|tifr|nasa|mit|stanford|oxford|cambridge|who|rbi|sebi|pib|bse|nse)\b',
+        r'\b(dr\.|prof\.|professor|minister|ministry|director|spokesperson|chief justice|court|patent)\b'
+    ]
+
+    def analyze_specificity(self, title: str, text: str) -> Dict[str, Any]:
+        combined = f"{title} {text}".strip()
+        combined_lower = combined.lower()
+
+        # 1. Count generic subject placeholders
+        generic_hits = 0
+        for pat in self.GENERIC_SUBJECT_PATTERNS:
+            generic_hits += len(re.findall(pat, combined_lower))
+
+        # 2. Count institutional or accredited named entities
+        named_entity_hits = 0
+        for pat in self.INSTITUTIONAL_ENTITY_MARKERS:
+            named_entity_hits += len(re.findall(pat, combined_lower))
+
+        # 3. Capitalized Proper Nouns (proxy for named entities in English)
+        words = combined.split()
+        capitalized_names = [
+            w for w in words[1:] 
+            if w.istitle() and not w.isupper() and w.lower() not in {"an", "the", "in", "on", "at", "to", "for", "of", "and", "a", "yesterday", "today", "tomorrow"}
+        ]
+
+        # Classification into specificity tiers
+        if named_entity_hits >= 1 or len(capitalized_names) >= 2:
+            tier = "HIGH_SPECIFICITY_VERIFIABLE"
+            xai_note = "Entity Specificity: High named entity attribution (verifiable institutional anchors or named individuals detected)."
+            vagueness_penalty = 0.0
+        elif generic_hits >= 2 or (generic_hits >= 1 and len(capitalized_names) == 0):
+            tier = "ABSTRACT_GENERIC_ASSERTION"
+            xai_note = "Entity Specificity: Abstract uncorroborated claim lacking named entity attribution, research institution, or verifiable patent/journal citation."
+            vagueness_penalty = 0.10
+        else:
+            tier = "STANDARD_EDITORIAL_SPECIFICITY"
+            xai_note = "Entity Specificity: Standard narrative content with typical situational framing."
+            vagueness_penalty = 0.0
+
+        return {
+            "specificity_tier": tier,
+            "generic_subject_hits": generic_hits,
+            "named_entity_hits": named_entity_hits,
+            "capitalized_names_count": len(capitalized_names),
+            "vagueness_penalty": vagueness_penalty,
+            "xai_specificity_note": xai_note
+        }
+
+
 # Global Singletons
 quantitative_anomaly_engine = QuantitativeAnomalyEngine()
 propagation_analyzer = ContextPropagationAnalyzer()
 internal_evidence_engine = InternalEvidenceEngine()
+entity_specificity_analyzer = EntitySpecificityAnalyzer()

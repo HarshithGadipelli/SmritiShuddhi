@@ -27,7 +27,8 @@ class EnsembleFusionLayer:
         regional_info: Dict[str, Any],
         quant_result: Optional[Dict[str, Any]] = None,
         propagation_result: Optional[Dict[str, Any]] = None,
-        internal_evidence_result: Optional[Dict[str, Any]] = None
+        internal_evidence_result: Optional[Dict[str, Any]] = None,
+        specificity_result: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """5-Pillar Multi-Aspect Decoupled Ensemble Fusion:
         1. Content-Based: Stylometric Intention, Sensationalism & DeBERTa LoRA (s_content)
@@ -36,6 +37,11 @@ class EnsembleFusionLayer:
         4. Propagation-Based: Virality pressure & coercive forwarding triggers (s_propagation)
         5. Source-Based: Publisher credibility & institutional wire verification (s_source)
         """
+        spec_res = specificity_result or {
+            "specificity_tier": "STANDARD_EDITORIAL_SPECIFICITY",
+            "vagueness_penalty": 0.0,
+            "xai_specificity_note": ""
+        }
         # Pillar 1: Content-Based Stylometric Score
         s_content = float(style_result["s_style"])
 
@@ -107,6 +113,19 @@ class EnsembleFusionLayer:
         if evidence_status == "EVIDENCE_MATCHED":
             xai_factors.append("Official verification evidence matched in vector space.")
 
+        # Entity Specificity & Attribution Factor
+        if spec_res.get("xai_specificity_note"):
+            xai_factors.append(spec_res["xai_specificity_note"])
+
+        # Supplemental contextual proof factors if minimal hits
+        if not int_evid.get("has_match") and not quant_res.get("has_anomaly") and evidence_status != "EVIDENCE_MATCHED":
+            xai_factors.append("Knowledge Base Baseline: No factual contradictions against official registries; evaluated via zero-shot predictive synthesis.")
+
+        if s_content >= 0.60:
+            xai_factors.append(f"Stylistic Analysis: High emotional manipulation / urgency markers ({style_result['xai_style_attribution']['sensational_cue_count']} cues).")
+        elif s_content <= 0.35:
+            xai_factors.append("Stylistic Analysis: Objective and neutral journalistic tone without sensationalism.")
+
         # ---------------------------------------------------------------------
         # DYNAMIC 5-PILLAR WEIGHT DISTRIBUTION
         # ---------------------------------------------------------------------
@@ -131,7 +150,8 @@ class EnsembleFusionLayer:
             w_context * s_context +
             w_knowledge * s_knowledge +
             w_propagation * s_propagation +
-            w_source * s_source
+            w_source * s_source +
+            spec_res.get("vagueness_penalty", 0.0)
         )
 
         # Critical Safety Overrides & Escalations
