@@ -416,7 +416,11 @@ class InternalEvidenceEngine:
         matched_evidence = []
 
         for record in INTERNAL_FACT_EVIDENCE_ARCHIVE:
-            keyword_hits = sum(1 for kw in record["keywords"] if kw in combined)
+            keyword_hits = 0
+            for kw in record["keywords"]:
+                # Use strict word boundary matching so "star" does not match "started" and "rbi" does not match "orbital"
+                if re.search(r'\b' + re.escape(kw.lower()) + r'\b', combined):
+                    keyword_hits += 1
             if keyword_hits >= 2:
                 matched_evidence.append({
                     "evidence_id": record["evidence_id"],

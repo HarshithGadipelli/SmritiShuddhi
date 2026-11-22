@@ -1203,6 +1203,7 @@ def get_all_unlearning_benchmark():
 
 
 @app.get("/api/v1/admin/unlearning-ledger")
+@app.get("/api/v1/admin/ledger")
 def get_unlearning_ledger():
     """Returns persistent audit ledger of all exact machine unlearning operations."""
     items = list(unlearning_ledger_col.find({}).limit(50))

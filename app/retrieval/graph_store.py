@@ -99,7 +99,7 @@ class TemporalGraphEngine:
         # Matched historical entities
         found_entities = []
         for anchor in HISTORICAL_ANCHORS:
-            if re.search(re.escape(anchor["entity"]), text, re.IGNORECASE) or re.search(re.escape(anchor["event"]), text, re.IGNORECASE):
+            if re.search(r'\b' + re.escape(anchor["entity"]) + r'\b', text, re.IGNORECASE) or re.search(r'\b' + re.escape(anchor["event"]) + r'\b', text, re.IGNORECASE):
                 found_entities.append(anchor)
 
         return {
