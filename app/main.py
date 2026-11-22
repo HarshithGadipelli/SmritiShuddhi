@@ -30,6 +30,7 @@ from app.unlearning.engine import unlearning_engine
 from app.unlearning.algorithms import multi_model_suite
 from db import init_db, news_col, training_col, requests_col, unlearning_col, audit_col, users_col, unlearning_ledger_col, using_supabase, using_mongo, now
 from app.utils.document_parser import parse_base64_document
+from app.utils.storage import store_document_attachment
 from app.retrieval.news_feed import (
     fetch_realtime_news,
     fetch_live_rss_feed,
@@ -582,11 +583,18 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
 
 @app.post("/api/v1/news/extract-document")
 def extract_document(payload: DocumentExtractRequest):
-    """Parses uploaded document files (.txt, .docx, .pdf, .md, .json, .csv) and returns extracted text."""
+    """Parses uploaded document files (.txt, .docx, .pdf, .md, .json, .csv) and returns extracted text,
+    archiving the binary attachment into Supabase Storage bucket with local fallback."""
     try:
+        import base64
+        file_bytes = base64.b64decode(payload.base64_content)
+        storage_meta = store_document_attachment(payload.filename, file_bytes)
         extracted = parse_base64_document(payload.filename, payload.base64_content)
         return {
             "success": True,
+            "storage_url": storage_meta.get("url"),
+            "storage_provider": storage_meta.get("storage_provider"),
+            "bucket": storage_meta.get("bucket"),
             **extracted
         }
     except Exception as e:
@@ -1506,6 +1514,12 @@ def search_evidence(query: str):
     if not query.strip():
         raise HTTPException(status_code=400, detail="Query cannot be empty")
     return vector_store.search_evidence(query, top_k=5)
+
+
+@app.get("/api/v1/graph/data")
+def get_knowledge_graph_data():
+    """Returns visual nodes and edges of the chronological knowledge graph for visual rendering."""
+    return graph_engine.get_graph_data()
 
 
 # -----------------------------------------------------------------------------

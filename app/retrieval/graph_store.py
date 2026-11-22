@@ -39,7 +39,11 @@ class TemporalGraphEngine:
     def _connect_neo4j(self):
         try:
             import socket
-            with socket.create_connection(("localhost", 7687), timeout=0.2):
+            from urllib.parse import urlparse
+            parsed = urlparse(NEO4J_URI)
+            host = parsed.hostname or "localhost"
+            port = parsed.port or 7687
+            with socket.create_connection((host, port), timeout=0.2):
                 pass
             from neo4j import GraphDatabase
             driver = GraphDatabase.driver(
@@ -83,23 +87,65 @@ class TemporalGraphEngine:
                             entity=entity, event=event, date=date_str, status=status
                         )
                 except Exception as e:
-                    logger.warning("Error seeding Neo4j node: %s", e)
+                    logger.info("Neo4j seeding unavailable (%s); using embedded NetworkX graph.", e)
+                    self.using_neo4j = False
+
+    def get_graph_data(self) -> Dict[str, Any]:
+        """Exports graph nodes and edges for visual frontend rendering (Cytoscape / vis.js)."""
+        nodes = []
+        for node, attrs in self.nx_graph.nodes(data=True):
+            node_type = attrs.get("type", "ENTITY")
+            status = attrs.get("status", "")
+            if node_type == "ENTITY":
+                color = "#00e5ff"  # Cyan for entities
+            elif status in ["COMPLETED", "CONFIRMED_VALID", "CONFIRMED_LIFETIME"]:
+                color = "#00e676"  # Green for verified real milestones
+            else:
+                color = "#ff1744"  # Red for debunked/fabricated events
+
+            nodes.append({
+                "id": node,
+                "label": node,
+                "type": node_type,
+                "date": attrs.get("date", ""),
+                "status": status,
+                "color": color
+            })
+
+        edges = []
+        for u, v, attrs in self.nx_graph.edges(data=True):
+            edges.append({
+                "from": u,
+                "to": v,
+                "relation": attrs.get("relation", "ASSOCIATED_WITH"),
+                "date": attrs.get("date", ""),
+                "status": attrs.get("status", "")
+            })
+
+        return {
+            "nodes": nodes,
+            "edges": edges,
+            "node_count": len(nodes),
+            "edge_count": len(edges),
+            "backend": "neo4j_cluster" if self.using_neo4j else "embedded_networkx_graph"
+        }
 
     def extract_temporal_entities(self, text: str) -> Dict[str, Any]:
         """Extracts dates, years, and recognized entities from text."""
+        safe_text = str(text or "")
         # Find explicit 4-digit years (e.g., 2018 to 2035)
-        years = re.findall(r'\b(20[1-3][0-9])\b', text)
+        years = re.findall(r'\b(20[1-3][0-9])\b', safe_text)
         
         # Find explicit date patterns (YYYY-MM-DD or DD/MM/YYYY)
-        dates = re.findall(r'\b(\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{4})\b', text)
+        dates = re.findall(r'\b(\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{4})\b', safe_text)
 
         # Future-oriented phrasing
-        future_markers = re.findall(r'\b(will happen tomorrow|next week|in upcoming months|to be banned soon|predicted for 202[5-9])\b', text, re.IGNORECASE)
+        future_markers = re.findall(r'\b(will happen tomorrow|next week|in upcoming months|to be banned soon|predicted for 202[5-9])\b', safe_text, re.IGNORECASE)
 
         # Matched historical entities
         found_entities = []
         for anchor in HISTORICAL_ANCHORS:
-            if re.search(r'\b' + re.escape(anchor["entity"]) + r'\b', text, re.IGNORECASE) or re.search(r'\b' + re.escape(anchor["event"]) + r'\b', text, re.IGNORECASE):
+            if re.search(r'\b' + re.escape(anchor["entity"]) + r'\b', safe_text, re.IGNORECASE) or re.search(r'\b' + re.escape(anchor["event"]) + r'\b', safe_text, re.IGNORECASE):
                 found_entities.append(anchor)
 
         return {

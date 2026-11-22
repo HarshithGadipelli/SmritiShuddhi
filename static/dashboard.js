@@ -1071,6 +1071,128 @@ function closeApiConfigModal() {
   if (modal) modal.style.display = 'none';
 }
 
+function openKnowledgeGraphModal() {
+  const modal = document.getElementById('knowledgeGraphModal');
+  if (modal) modal.style.display = 'flex';
+  fetchAndRenderKnowledgeGraph();
+}
+
+function closeKnowledgeGraphModal() {
+  const modal = document.getElementById('knowledgeGraphModal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function fetchAndRenderKnowledgeGraph() {
+  const svg = document.getElementById('graphSvg');
+  const notice = document.getElementById('graphLoadingNotice');
+  const inspector = document.getElementById('inspectorDetails');
+  const badge = document.getElementById('graphBackendBadge');
+
+  if (notice) notice.style.display = 'block';
+  if (svg) svg.innerHTML = '';
+
+  try {
+    const res = await fetch('/api/v1/graph/data');
+    const data = await res.json();
+    if (notice) notice.style.display = 'none';
+
+    if (badge && data.backend) {
+      badge.innerText = data.backend === 'neo4j_cluster' ? 'Backend: Neo4j Live Cluster' : 'Backend: Embedded NetworkX Engine';
+      badge.style.borderColor = data.backend === 'neo4j_cluster' ? 'var(--accent-green)' : 'var(--accent-cyan)';
+      badge.style.color = data.backend === 'neo4j_cluster' ? 'var(--accent-green)' : 'var(--accent-cyan)';
+    }
+
+    const nodes = data.nodes || [];
+    const edges = data.edges || [];
+
+    const width = 850;
+    const height = 420;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    const entityNodes = nodes.filter(n => n.type === 'ENTITY');
+    const eventNodes = nodes.filter(n => n.type !== 'ENTITY');
+
+    const nodePositions = {};
+
+    const rEntityX = 180;
+    const rEntityY = 100;
+    entityNodes.forEach((node, i) => {
+      const angle = (2 * Math.PI * i) / (entityNodes.length || 1);
+      nodePositions[node.id] = {
+        x: centerX + rEntityX * Math.cos(angle),
+        y: centerY + rEntityY * Math.sin(angle),
+        ...node
+      };
+    });
+
+    const rEventX = 330;
+    const rEventY = 165;
+    eventNodes.forEach((node, i) => {
+      const angle = (2 * Math.PI * i) / (eventNodes.length || 1);
+      nodePositions[node.id] = {
+        x: centerX + rEventX * Math.cos(angle),
+        y: centerY + rEventY * Math.sin(angle),
+        ...node
+      };
+    });
+
+    let svgHtml = `
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(255,255,255,0.4)" />
+        </marker>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
+    `;
+
+    edges.forEach(edge => {
+      const fromPos = nodePositions[edge.from];
+      const toPos = nodePositions[edge.to];
+      if (fromPos && toPos) {
+        const isDebunk = (edge.status === 'NEVER_EXISTED_FAKE');
+        const strokeColor = isDebunk ? 'rgba(255, 23, 68, 0.55)' : 'rgba(0, 229, 255, 0.4)';
+        svgHtml += `<line x1="${fromPos.x}" y1="${fromPos.y}" x2="${toPos.x}" y2="${toPos.y}" stroke="${strokeColor}" stroke-width="1.8" stroke-dasharray="${isDebunk ? '4,4' : 'none'}" marker-end="url(#arrow)" />`;
+      }
+    });
+
+    Object.values(nodePositions).forEach(node => {
+      const isEntity = (node.type === 'ENTITY');
+      const r = isEntity ? 18 : 13;
+      const fill = node.color || '#00e5ff';
+      const label = node.label.length > 20 ? (node.label.slice(0, 18) + '…') : node.label;
+
+      svgHtml += `
+        <g class="graph-node-group" style="cursor: pointer;" onclick="inspectGraphNode('${escapeHtml(node.id)}', '${escapeHtml(node.type)}', '${escapeHtml(node.date || '')}', '${escapeHtml(node.status || '')}')">
+          <circle cx="${node.x}" cy="${node.y}" r="${r}" fill="${fill}" fill-opacity="0.85" stroke="#ffffff" stroke-width="1.5" filter="url(#glow)" />
+          <text x="${node.x}" y="${node.y + r + 13}" font-size="10" font-family="monospace" fill="#e2e8f0" text-anchor="middle" font-weight="600">${escapeHtml(label)}</text>
+        </g>
+      `;
+    });
+
+    svg.innerHTML = svgHtml;
+    if (inspector) {
+      inspector.innerHTML = `<span>Active Graph: <strong>${nodes.length}</strong> Anchor Nodes • <strong>${edges.length}</strong> Temporal Relations. Click any node to inspect.</span>`;
+    }
+  } catch (err) {
+    if (notice) notice.innerText = 'Failed to load Knowledge Graph data.';
+    console.error('Graph fetch error:', err);
+  }
+}
+
+function inspectGraphNode(nodeId, nodeType, date, status) {
+  const inspector = document.getElementById('inspectorDetails');
+  if (!inspector) return;
+  const isFake = (status === 'NEVER_EXISTED_FAKE');
+  const statusColor = isFake ? 'var(--accent-crimson)' : 'var(--accent-green)';
+  const statusBadge = status ? `<span style="color: ${statusColor}; font-weight: bold; margin-left: 6px;">[${status}]</span>` : '';
+  const dateBadge = date ? ` • Date: <span style="color: var(--accent-cyan);">${date}</span>` : '';
+  inspector.innerHTML = `<strong>${escapeHtml(nodeId)}</strong> (${nodeType})${statusBadge}${dateBadge} — <em>Verified against official sovereign public gazette.</em>`;
+}
+
 async function saveApiConfig(e) {
   if (e) e.preventDefault();
   const newsApiKeyInput = document.getElementById('cfgNewsApiKey');

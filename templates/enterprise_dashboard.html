@@ -229,6 +229,9 @@
       <button class="live-sync-btn api-settings-btn" onclick="openApiConfigModal()" title="Configure external live news APIs (NewsAPI.org / GNews.io)" style="background: rgba(255,255,255,0.08); border: 1px solid var(--border-subtle); margin-left: 6px;">
         <span>⚙️</span> <span>API Settings</span>
       </button>
+      <button class="live-sync-btn graph-visual-btn" onclick="openKnowledgeGraphModal()" title="Explore Chronological Entity Knowledge Graph visually" style="background: rgba(2, 132, 199, 0.12); border: 1px solid var(--accent-cyan); margin-left: 6px; color: var(--accent-cyan);">
+        <span>🕸️</span> <span>Knowledge Graph</span>
+      </button>
     </div>
 
     <!-- =====================================================================
@@ -1554,6 +1557,42 @@
           Sign In to Wire
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       CHRONOLOGICAL KNOWLEDGE GRAPH VISUALIZER MODAL
+       ===================================================================== -->
+  <div class="modal-backdrop" id="knowledgeGraphModal" style="display: none;" onclick="closeModalOnBackdrop(event, 'knowledgeGraphModal')">
+    <div class="auth-modal-card" style="max-width: 900px; width: 95%;">
+      <button class="modal-close-btn" onclick="closeKnowledgeGraphModal()">×</button>
+      <div class="auth-header">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h2>🕸️ Chronological Entity Knowledge Graph</h2>
+            <p class="auth-sub">Interactive visual network of historical anchors, sovereign entities, verified events, and debunked hoaxes.</p>
+          </div>
+          <div style="font-size: 0.75rem; background: rgba(2, 132, 199, 0.12); border: 1px solid var(--accent-cyan); padding: 4px 10px; border-radius: 4px; color: var(--accent-cyan);" id="graphBackendBadge">
+            Backend: Embedded NetworkX Engine
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-bottom: 12px; font-size: 0.78rem; flex-wrap: wrap;">
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #00e5ff;"></span> Sovereign Entities</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #00e676;"></span> Verified Historical Milestones</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ff1744;"></span> Fabricated Hoax Records</span>
+      </div>
+
+      <div id="graphCanvasContainer" style="background: rgba(10, 15, 25, 0.95); border: 1px solid var(--border-subtle); border-radius: 8px; height: 420px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <svg id="graphSvg" width="100%" height="100%" viewBox="0 0 850 420" style="display: block;"></svg>
+        <div id="graphLoadingNotice" style="position: absolute; color: var(--text-dim); font-size: 0.9rem;">Loading Knowledge Graph...</div>
+      </div>
+
+      <div id="graphNodeInspector" style="margin-top: 14px; padding: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; font-size: 0.82rem; min-height: 48px; display: flex; align-items: center; justify-content: space-between;">
+        <div id="inspectorDetails"><em>Click any node in the graph above to inspect its chronological anchor details and verification status.</em></div>
+        <button class="btn btn-secondary btn-xs" onclick="fetchAndRenderKnowledgeGraph()">🔄 Redraw Graph</button>
+      </div>
     </div>
   </div>
 
