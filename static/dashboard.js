@@ -987,7 +987,18 @@ function renderNewsWire() {
       gridContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-dim);">No articles in this section yet. Try submitting one!</div>`;
       return;
     }
-    gridContainer.innerHTML = gridItems.map(item => `
+    gridContainer.innerHTML = gridItems.map(item => {
+      let stampBadge = `<span class="card-stamp-badge badge-verified">✓ ${Math.round((item.real_probability || 0.95) * 100)}% AUTHENTIC</span>`;
+      if (item.tag === 'BREAKING_VERIFIED') {
+        stampBadge = `<span class="card-stamp-badge" style="background:#0284c7; color:#fff;">⚡ BREAKING VERIFIED</span>`;
+      } else if (item.tag === 'HALF_TRUTH') {
+        stampBadge = `<span class="card-stamp-badge" style="background:#d97706; color:#fff;">⚠️ HALF-TRUTH</span>`;
+      } else if (item.tag === 'DEVELOPING_STORY') {
+        stampBadge = `<span class="card-stamp-badge" style="background:#ca8a04; color:#fff;">⚡ DEVELOPING</span>`;
+      } else if (item.tag === 'FAKE' || (item.fake_probability && item.fake_probability >= 0.70)) {
+        stampBadge = `<span class="card-stamp-badge" style="background:#dc2626; color:#fff;">✕ BLOCKED FAKE</span>`;
+      }
+      return `
       <article class="newspaper-dispatch-card" onclick="openArticleModal('${item.news_id}')">
         <div class="dispatch-header-line">
           <span class="dispatch-kicker">${escapeHtml((item.category || 'GENERAL WIRE').toUpperCase())}</span>
@@ -995,7 +1006,7 @@ function renderNewsWire() {
         </div>
         <div class="card-thumb-wrapper">
           <img src="${item.image_url || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80'}" alt="${escapeHtml(item.title)}" class="card-thumb">
-          <span class="card-stamp-badge badge-verified">✓ ${Math.round((item.real_probability || 0.95) * 100)}% AUTHENTIC</span>
+          ${stampBadge}
         </div>
         <div class="card-body">
           <div class="newspaper-dateline-row">
@@ -1021,7 +1032,7 @@ function renderNewsWire() {
           </div>
         </div>
       </article>
-    `).join('');
+    `;}).join('');
     initScrollPaperTurns();
   }
 }
@@ -2250,6 +2261,73 @@ async function openArticleModal(newsId) {
         });
         breakdownHtml += `</ul>`;
       }
+
+      // Sub-Claim Atomic Decomposition
+      const subclaim = article.subclaim_analysis || xai.subclaim_analysis;
+      if (subclaim && subclaim.total_clauses_analyzed > 0) {
+        breakdownHtml += `<div style="margin-top:10px; border-top:1px dashed var(--border-subtle); padding-top:8px;">
+          <div style="font-weight:700; color:${subclaim.is_half_truth ? '#f59e0b' : 'var(--text-headline)'}; display:flex; justify-content:space-between; align-items:center;">
+            <span>🔬 Atomic Sub-Claim Decomposition:</span>
+            <span style="font-size:0.75rem; background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px;">Truth Ratio: ${(subclaim.partial_truth_ratio * 100).toFixed(0)}%</span>
+          </div>
+          <p style="margin:4px 0 6px 0; font-size:0.78rem; opacity:0.9;">${escapeHtml(subclaim.summary || '')}</p>`;
+        if (subclaim.verified_clauses && subclaim.verified_clauses.length > 0) {
+          breakdownHtml += `<div style="color:#10b981; font-weight:600; font-size:0.76rem; margin-top:4px;">✓ Verified Clauses:</div><ul style="margin:2px 0 6px 18px; padding:0; font-size:0.76rem;">`;
+          subclaim.verified_clauses.forEach(c => {
+            breakdownHtml += `<li>"${escapeHtml(c.clause)}" <span style="opacity:0.7;">— ${escapeHtml(c.source || 'Official Registry')}</span></li>`;
+          });
+          breakdownHtml += `</ul>`;
+        }
+        const distorted = (subclaim.contradicted_clauses || []).concat(subclaim.unverified_clauses || []);
+        if (distorted.length > 0) {
+          breakdownHtml += `<div style="color:#ef4444; font-weight:600; font-size:0.76rem; margin-top:4px;">⚠️ Distorted / Unsubstantiated Clauses:</div><ul style="margin:2px 0 6px 18px; padding:0; font-size:0.76rem;">`;
+          distorted.forEach(c => {
+            breakdownHtml += `<li>"${escapeHtml(c.clause)}" <span style="opacity:0.7;">— ${escapeHtml(c.reason || c.source || 'Alarmist Framing')}</span></li>`;
+          });
+          breakdownHtml += `</ul>`;
+        }
+        breakdownHtml += `</div>`;
+      }
+
+      // Evidentiary Justification & Forensics Bar
+      const just = article.justification_metrics || xai.justification_metrics;
+      const calib = article.epistemic_calibration || xai.epistemic_calibration;
+      const multi = article.multimodal_forensics || xai.multimodal_forensics;
+      if (just || calib || multi) {
+        breakdownHtml += `<div style="margin-top:10px; border-top:1px dashed var(--border-subtle); padding-top:8px;">
+          <div style="font-weight:700; color:var(--text-headline); margin-bottom:6px;">📊 Evidentiary Proof Metrics & Calibration:</div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:6px; font-size:0.75rem;">
+            ${just ? `<div style="background:rgba(255,255,255,0.04); padding:6px; border-radius:4px;">
+              <span style="opacity:0.7;">HSDI Stance:</span> <strong>${(just.hsdi || 0).toFixed(2)}</strong>
+            </div>
+            <div style="background:rgba(255,255,255,0.04); padding:6px; border-radius:4px;">
+              <span style="opacity:0.7;">Entropy H(X):</span> <strong>${(just.shannon_entropy_bits || 0).toFixed(2)}b</strong>
+            </div>
+            <div style="background:rgba(255,255,255,0.04); padding:6px; border-radius:4px;">
+              <span style="opacity:0.7;">Lexical TTR:</span> <strong>${(just.type_token_ratio || 0).toFixed(2)}</strong>
+            </div>
+            <div style="background:rgba(255,255,255,0.04); padding:6px; border-radius:4px;">
+              <span style="opacity:0.7;">Panic EPPI:</span> <strong>${(just.eppi || 0).toFixed(2)}</strong>
+            </div>` : ''}
+            ${calib ? `<div style="background:rgba(255,255,255,0.04); padding:6px; border-radius:4px;">
+              <span style="opacity:0.7;">ECE Error:</span> <strong style="color:#10b981;">${(calib.expected_calibration_error || 0.04).toFixed(3)}</strong>
+            </div>
+            <div style="background:rgba(255,255,255,0.04); padding:6px; border-radius:4px;">
+              <span style="opacity:0.7;">Brier Score:</span> <strong>${(calib.brier_calibration_score || 0.01).toFixed(3)}</strong>
+            </div>` : ''}
+            ${multi ? `<div style="background:rgba(255,255,255,0.04); padding:6px; border-radius:4px;">
+              <span style="opacity:0.7;">Image Match:</span> <strong style="color:#38bdf8;">${((multi.image_headline_congruence_score || 0.9) * 100).toFixed(0)}%</strong>
+            </div>` : ''}
+          </div>
+        </div>`;
+      }
+
+      // Schema.org ClaimReview JSON-LD Link
+      breakdownHtml += `<div style="margin-top:12px; display:flex; justify-content:flex-end;">
+        <a href="/api/v1/news/${encodeURIComponent(article.news_id)}/claim-review" target="_blank" class="btn btn-secondary btn-xs" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-size:0.75rem;">
+          <span>🌐</span> View Schema.org ClaimReview JSON-LD
+        </a>
+      </div>`;
       if (breakdownHtml) {
         xaiBox.innerHTML = breakdownHtml;
         xaiBox.style.display = 'block';
