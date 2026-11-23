@@ -30,7 +30,9 @@ class EnsembleFusionLayer:
         internal_evidence_result: Optional[Dict[str, Any]] = None,
         specificity_result: Optional[Dict[str, Any]] = None,
         justification_result: Optional[Dict[str, Any]] = None,
-        breaking_result: Optional[Dict[str, Any]] = None
+        breaking_result: Optional[Dict[str, Any]] = None,
+        subclaim_result: Optional[Dict[str, Any]] = None,
+        zero_knowledge_result: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """5-Pillar Multi-Aspect Decoupled Ensemble Fusion:
         1. Content-Based: Stylometric Intention, Sensationalism & DeBERTa LoRA (s_content)
@@ -39,6 +41,8 @@ class EnsembleFusionLayer:
         4. Propagation-Based: Virality pressure & coercive forwarding triggers (s_propagation)
         5. Source-Based: Publisher credibility & institutional wire verification (s_source)
         + Transparent Evidentiary Justification Metrics & Zero-Day Breaking News Protocol
+        + Atomic Fact Sub-Claim Decomposition (Partial Truth & Half-Truth Handling)
+        + Zero-Knowledge Epistemic Triad Disambiguation
         """
         spec_res = specificity_result or {
             "specificity_tier": "STANDARD_EDITORIAL_SPECIFICITY",
@@ -54,6 +58,16 @@ class EnsembleFusionLayer:
             "is_breaking": False, "breaking_protocol_verdict": "STANDARD_ARCHIVAL_ANALYSIS",
             "cross_source_corroboration_index": 0.0, "distinct_publishers_count": 0,
             "actionable_guidance": "Standard analysis", "developing_tag": None
+        }
+        sub_res = subclaim_result or {
+            "is_half_truth": False, "partial_truth_verdict": "UNVERIFIED_SYNTHESIS",
+            "partial_truth_ratio": 0.0, "summary": "", "verified_clauses": [],
+            "contradicted_clauses": [], "unverified_clauses": []
+        }
+        zk_res = zero_knowledge_result or {
+            "disposition": "ALLOW_DEVELOPING_CITIZEN_REPORT",
+            "epistemic_verdict": "DEVELOPING_PLAUSIBLE",
+            "epistemic_explanation": "Standard analysis"
         }
         # Pillar 1: Content-Based Stylometric Score
         s_content = float(style_result["s_style"])
@@ -144,6 +158,14 @@ class EnsembleFusionLayer:
             elif b_verdict == "BREAKING_DEVELOPING_UNCONFIRMED":
                 xai_factors.append("Developing Story Protocol: Fast-moving story undergoing ongoing real-time multi-wire tracking.")
 
+        # Partial Truth & Half-Truth Sub-Claim Analysis
+        if sub_res.get("is_half_truth"):
+            xai_factors.append(sub_res.get("summary", "Partial truth detected across decomposed clauses."))
+
+        # Zero-Knowledge Epistemic Triad Evaluation
+        if zk_res.get("epistemic_explanation"):
+            xai_factors.append(f"Zero-Knowledge Assessment: {zk_res.get('epistemic_explanation')}")
+
         # Supplemental contextual proof factors if minimal hits
         if not int_evid.get("has_match") and not quant_res.get("has_anomaly") and evidence_status != "EVIDENCE_MATCHED":
             xai_factors.append("Knowledge Base Baseline: No factual contradictions against official registries; evaluated via zero-shot predictive synthesis.")
@@ -189,6 +211,12 @@ class EnsembleFusionLayer:
         # If any single pillar exhibits extreme critical violation:
         if quant_res.get("has_anomaly") or (int_evid.get("has_match") and int_evid.get("top_match", {}).get("truth_status") == "VERIFIED_DEBUNK"):
             raw_fake_prob = max(raw_fake_prob, 0.88)
+        elif zk_res.get("disposition") == "BLOCK_ZERO_DAY_PANIC_HOAX":
+            raw_fake_prob = max(raw_fake_prob, 0.88)
+        elif zk_res.get("disposition") == "REJECT_PHYSICAL_IMPOSSIBILITY":
+            raw_fake_prob = max(raw_fake_prob, 0.90)
+        elif zk_res.get("disposition") == "ALLOW_BENIGN_ABSTRACT_STATEMENT":
+            raw_fake_prob = min(raw_fake_prob, 0.42)
         elif brk_res.get("is_breaking") and brk_res.get("breaking_protocol_verdict") == "CRITICAL_BREAKING_UNSUBSTANTIATED":
             raw_fake_prob = max(raw_fake_prob, 0.86)
         elif contradictions:
@@ -202,8 +230,12 @@ class EnsembleFusionLayer:
         fake_prob = round(float(np.clip(raw_fake_prob, 0.01, 0.99)), 4)
         real_prob = round(1.0 - fake_prob, 4)
 
-        # 3-Tier Risk Band Determination
-        if fake_prob >= self.threshold_high:
+        # 3-Tier Risk Band Determination with Partial Truth Support
+        if sub_res.get("is_half_truth") and fake_prob < 0.75:
+            risk_band = "MODERATE_RISK_HALF_TRUTH"
+            prediction = "PARTIALLY_TRUE_MISLEADING"
+            action_recommended = "FLAG_PARTIAL_TRUTH_WITH_CORRECTIVE_CONTEXT"
+        elif fake_prob >= self.threshold_high:
             risk_band = "HIGH_RISK_FAKE"
             prediction = "FAKE"
             action_recommended = "FLAG_FOR_ADMIN_REVIEW_OR_REVOCATION"
@@ -260,7 +292,9 @@ class EnsembleFusionLayer:
                 "hinglish_markers": regional_info.get("hinglish_cues_found", [])
             },
             "justification_metrics": just_res,
-            "breaking_news_protocol": brk_res
+            "breaking_news_protocol": brk_res,
+            "subclaim_analysis": sub_res,
+            "zero_knowledge_analysis": zk_res
         }
 
         # Five-Pillar Explicit Breakdown for Explainability and UI
@@ -322,6 +356,8 @@ class EnsembleFusionLayer:
             "five_pillar_breakdown": five_pillar_breakdown,
             "justification_metrics": just_res,
             "breaking_protocol": brk_res,
+            "subclaim_analysis": sub_res,
+            "zero_knowledge_analysis": zk_res,
             "xai": xai_report
         }
 

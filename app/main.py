@@ -26,7 +26,9 @@ from app.retrieval.knowledge_base import (
     internal_evidence_engine,
     entity_specificity_analyzer,
     justification_metrics_engine,
-    breaking_corroboration_engine
+    breaking_corroboration_engine,
+    subclaim_decomposition_engine,
+    zero_knowledge_disambiguator
 )
 from app.unlearning.engine import unlearning_engine
 from app.unlearning.algorithms import multi_model_suite
@@ -396,6 +398,22 @@ def execute_hybrid_inference(title: str, text: str, source: str = "", author: st
         claim_criticality=just_res.get("claim_criticality_index", 0.25)
     )
 
+    # Track J: Atomic Fact Sub-Claim Decomposition (Partial Truth & Half-Truth Handling)
+    subclaim_res = subclaim_decomposition_engine.decompose_and_verify(
+        title=title,
+        text=text,
+        evidence_engine=internal_evidence_engine,
+        anomaly_engine=quantitative_anomaly_engine
+    )
+
+    # Track K: Zero-Knowledge Epistemic Triad Disambiguation
+    zk_res = zero_knowledge_disambiguator.evaluate_zero_knowledge(
+        quant_result=quant_res,
+        specificity_result=spec_res,
+        justification_result=just_res,
+        propagation_result=prop_res
+    )
+
     # Multi-Aspect 5-Pillar Fusion
     verdict = fusion_layer.fuse(
         style_result=style_res,
@@ -407,7 +425,9 @@ def execute_hybrid_inference(title: str, text: str, source: str = "", author: st
         internal_evidence_result=int_evid_res,
         specificity_result=spec_res,
         justification_result=just_res,
-        breaking_result=breaking_res
+        breaking_result=breaking_res,
+        subclaim_result=subclaim_res,
+        zero_knowledge_result=zk_res
     )
     return verdict
 
@@ -527,6 +547,13 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
             status = "PENDING_ADMIN_REVIEW"
             user_message = "Fast-moving developing story detected. Placed in live monitoring queue for automated wire corroboration."
 
+    # Partial Truth & Half-Truth Dynamic Tagging
+    if verdict.get("prediction") == "PARTIALLY_TRUE_MISLEADING" or risk_band == "MODERATE_RISK_HALF_TRUTH":
+        tag = "HALF_TRUTH"
+        tag_display = "⚠️ HALF-TRUTH (PARTIALLY ACCURATE / MISLEADING CONTEXT)"
+        status = "PENDING_ADMIN_REVIEW"
+        user_message = "Your submission contains a mix of verified facts and uncorroborated assertions. Tagged as Half-Truth with contextual breakdown."
+
     content_full = f"{payload.title} {payload.text}"
     if re.search(r'[\u0C00-\u0C7F]', content_full):
         detected_lang = "Telugu (తెలుగు)"
@@ -570,6 +597,8 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "five_pillar_breakdown": verdict.get("five_pillar_breakdown", {}),
         "justification_metrics": verdict.get("justification_metrics", {}),
         "breaking_protocol": verdict.get("breaking_protocol", {}),
+        "subclaim_analysis": verdict.get("subclaim_analysis", {}),
+        "zero_knowledge_analysis": verdict.get("zero_knowledge_analysis", {}),
         "xai": verdict["xai"],
         "created_at": now()
     }
@@ -616,6 +645,8 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "five_pillar_breakdown": verdict.get("five_pillar_breakdown", {}),
         "justification_metrics": verdict.get("justification_metrics", {}),
         "breaking_protocol": verdict.get("breaking_protocol", {}),
+        "subclaim_analysis": verdict.get("subclaim_analysis", {}),
+        "zero_knowledge_analysis": verdict.get("zero_knowledge_analysis", {}),
         "xai": verdict["xai"]
     }
 

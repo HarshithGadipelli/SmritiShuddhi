@@ -291,7 +291,11 @@ class QuantitativeAnomalyEngine:
                 pass
 
         # 7. Pseudoscience & Thermodynamic Free Energy Physical Anomaly
-        free_energy_cues = ["free fuel", "free electricity", "water fuel", "water running car", "perpetual motion", "water to petrol", "free energy generator"]
+        free_energy_cues = [
+            "free fuel", "free electricity", "water fuel", "water running car", "perpetual motion",
+            "water to petrol", "free energy generator", "runs on water", "running on water",
+            "without fuel", "water powered car", "water car", "infinite energy"
+        ]
         if any(f in combined for f in free_energy_cues):
             anomalies.append({
                 "dimension": "PSEUDOSCIENCE_PHYSICAL_ANOMALY",
@@ -724,6 +728,172 @@ class BreakingNewsCorroborationEngine:
         }
 
 
+class SubClaimDecompositionEngine:
+    """Atomic Fact & Sub-Claim Decomposition Engine:
+    Deconstructs compound news statements into individual proposition clauses.
+    Identifies 'Partial Truths / Half-Truths' where an authentic premise is cherry-picked
+    to smuggle a fabricated, alarmist, or distorted conclusion.
+    e.g. 'ISRO successfully launched satellite (TRUE), but radiation leak threatens southern states (FABRICATED)'.
+    """
+    CONTRASTIVE_CONJUNCTIONS = ["but", "however", "although", "despite", "yet", "claiming that", "alleging that"]
+
+    def decompose_and_verify(
+        self,
+        title: str,
+        text: str,
+        evidence_engine: Any,
+        anomaly_engine: Any
+    ) -> Dict[str, Any]:
+        combined = f"{title}. {text}".strip()
+        raw_clauses = re.split(r'[,;\.\n]+|\b(?:and|but|however|while|although)\b', combined, flags=re.IGNORECASE)
+        clauses = [c.strip() for c in raw_clauses if len(c.strip().split()) >= 3]
+
+        if not clauses:
+            clauses = [combined]
+
+        verified_clauses = []
+        contradicted_or_anomalous_clauses = []
+        unverified_clauses = []
+
+        for clause in clauses[:8]:
+            clause_lower = clause.lower()
+
+            # 1. Check for physical/quantitative anomaly in this clause
+            q_res = anomaly_engine.analyze_quantities("", clause)
+            if q_res.get("has_anomaly"):
+                contradicted_or_anomalous_clauses.append({
+                    "clause": clause,
+                    "status": "CONTRADICTS_PHYSICAL_OR_FINANCIAL_BASELINE",
+                    "reason": q_res["anomalies"][0]["discrepancy"]
+                })
+                continue
+
+            # 2. Check internal evidence archive for this clause
+            evid = evidence_engine.query_evidence("", clause)
+            if evid.get("has_match") and evid.get("top_match"):
+                top = evid["top_match"]
+                if top["truth_status"] == "VERIFIED_OFFICIAL":
+                    verified_clauses.append({
+                        "clause": clause,
+                        "status": "VERIFIED_FACTUAL",
+                        "source": top["official_source"]
+                    })
+                else:
+                    contradicted_or_anomalous_clauses.append({
+                        "clause": clause,
+                        "status": "VERIFIED_DEBUNKED",
+                        "source": top["official_source"]
+                    })
+                continue
+
+            # 3. Check for obvious sensationalism / alarmism markers
+            has_panic = bool(re.search(r'\b(panic|midnight|curfew|banned|freeze|emergency|destroy|secret exposed|alert)\b', clause_lower))
+            if has_panic:
+                unverified_clauses.append({
+                    "clause": clause,
+                    "status": "UNVERIFIED_HIGH_SENSATIONALISM",
+                    "reason": "Unsubstantiated alarmist framing"
+                })
+            else:
+                unverified_clauses.append({
+                    "clause": clause,
+                    "status": "PLAUSIBLE_UNVERIFIED",
+                    "reason": "Neutral assertion awaiting corroboration"
+                })
+
+        total_analyzed = len(verified_clauses) + len(contradicted_or_anomalous_clauses) + len(unverified_clauses)
+        v_count = len(verified_clauses)
+        c_count = len(contradicted_or_anomalous_clauses)
+        u_count = len(unverified_clauses)
+
+        # Detect Half-Truth: genuine verified premise mixed with debunked or exaggerated conclusion
+        is_half_truth = (v_count >= 1 and (c_count >= 1 or any(u["status"] == "UNVERIFIED_HIGH_SENSATIONALISM" for u in unverified_clauses)))
+
+        if is_half_truth:
+            partial_truth_verdict = "HALF_TRUTH_DISTORTION"
+            summary = f"Partial Truth Detected: Article mixes verified facts ({v_count} verified clause(s)) with false or exaggerated assertions ({c_count + sum(1 for u in unverified_clauses if u['status'] == 'UNVERIFIED_HIGH_SENSATIONALISM')} distorted clause(s))."
+        elif c_count >= 1:
+            partial_truth_verdict = "COMPLETELY_FABRICATED"
+            summary = "Direct factual contradictions or debunks detected across core assertions."
+        elif v_count >= 1 and c_count == 0:
+            partial_truth_verdict = "VERIFIED_CONSISTENT"
+            summary = "Clauses are consistent with verified official records."
+        else:
+            partial_truth_verdict = "UNVERIFIED_SYNTHESIS"
+            summary = "Clauses contain zero registered debunks or verifications; evaluated via predictive zero-shot modeling."
+
+        partial_truth_ratio = round(v_count / max(total_analyzed, 1), 3)
+
+        return {
+            "total_clauses_analyzed": total_analyzed,
+            "verified_clauses_count": v_count,
+            "contradicted_clauses_count": c_count,
+            "unverified_clauses_count": u_count,
+            "is_half_truth": is_half_truth,
+            "partial_truth_verdict": partial_truth_verdict,
+            "partial_truth_ratio": partial_truth_ratio,
+            "summary": summary,
+            "verified_clauses": verified_clauses[:3],
+            "contradicted_clauses": contradicted_or_anomalous_clauses[:3],
+            "unverified_clauses": unverified_clauses[:3]
+        }
+
+
+class ZeroKnowledgeDisambiguator:
+    """Handles the Zero-Knowledge / Zero-Day dilemma:
+    When an event is NOT present in any database, knowledge base, fact-check registry, or news wire.
+    Evaluates the claim across 3 Orthogonal Epistemic Axes:
+    1. Physical & Institutional Possibility (Does it violate fundamental baselines?)
+    2. Epistemic Criticality vs. Evidentiary Burden (Extraordinary claims require extraordinary evidence)
+    3. Linguistic Intention & Propagation Dynamics (Objective reporting vs. coercive virality)
+    """
+    def evaluate_zero_knowledge(
+        self,
+        quant_result: Dict[str, Any],
+        specificity_result: Dict[str, Any],
+        justification_result: Dict[str, Any],
+        propagation_result: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        has_physical_violation = quant_result.get("has_anomaly", False)
+        spec_tier = specificity_result.get("specificity_tier", "STANDARD_EDITORIAL_SPECIFICITY")
+        is_abstract = (spec_tier == "ABSTRACT_GENERIC_ASSERTION")
+        cci = justification_result.get("claim_criticality_index", 0.0)
+        eppi = justification_result.get("eppi", 0.0)
+        prop_band = propagation_result.get("propagation_band", "ORGANIC_EDITORIAL_FRAMING")
+        is_coercive = (prop_band == "HIGH_COERCIVE_VIRALITY")
+
+        if has_physical_violation:
+            disposition = "REJECT_PHYSICAL_IMPOSSIBILITY"
+            epistemic_verdict = "FAKE"
+            explanation = "Claim asserts physically, financially, or thermodynamically impossible phenomena."
+        elif is_abstract and cci >= 0.50:
+            disposition = "QUARANTINE_ABSTRACT_CRITICAL_CLAIM"
+            epistemic_verdict = "UNCERTAIN_HIGH_RISK"
+            explanation = "High-criticality claim made with abstract generic subjects lacking institutional entity attribution."
+        elif is_abstract and not is_coercive and eppi < 0.20:
+            disposition = "ALLOW_BENIGN_ABSTRACT_STATEMENT"
+            epistemic_verdict = "UNCERTAIN_BENIGN"
+            explanation = "Abstract ungrounded statement (e.g. 'an inventor invented an invention') without manipulative or dangerous panic markers."
+        elif cci >= 0.70 and is_coercive:
+            disposition = "BLOCK_ZERO_DAY_PANIC_HOAX"
+            epistemic_verdict = "FAKE"
+            explanation = "Zero-day claim asserts massive national emergency with zero accredited wire traces while using coercive forwarding hooks."
+        else:
+            disposition = "ALLOW_DEVELOPING_CITIZEN_REPORT"
+            epistemic_verdict = "DEVELOPING_PLAUSIBLE"
+            explanation = "Plausible observational or developing report without physical contradictions or coercive manipulation."
+
+        return {
+            "disposition": disposition,
+            "epistemic_verdict": epistemic_verdict,
+            "has_physical_violation": has_physical_violation,
+            "is_abstract_generic": is_abstract,
+            "claim_criticality": cci,
+            "is_coercive_virality": is_coercive,
+            "epistemic_explanation": explanation
+        }
+
+
 # Global Singletons
 quantitative_anomaly_engine = QuantitativeAnomalyEngine()
 propagation_analyzer = ContextPropagationAnalyzer()
@@ -731,3 +901,5 @@ internal_evidence_engine = InternalEvidenceEngine()
 entity_specificity_analyzer = EntitySpecificityAnalyzer()
 justification_metrics_engine = AdvancedJustificationMetricsEngine()
 breaking_corroboration_engine = BreakingNewsCorroborationEngine()
+subclaim_decomposition_engine = SubClaimDecompositionEngine()
+zero_knowledge_disambiguator = ZeroKnowledgeDisambiguator()
