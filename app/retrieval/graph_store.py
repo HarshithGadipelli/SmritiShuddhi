@@ -37,28 +37,48 @@ class TemporalGraphEngine:
         self._seed_temporal_graph()
 
     def _connect_neo4j(self):
+        """Attempts connection to Neo4j graph cluster with fast non-blocking probe
+        and graceful fallback to embedded NetworkX multi-graph.
+        """
+        self.driver = None
+        self.using_neo4j = False
+
+        if not NEO4J_URI:
+            logger.info("NEO4J_URI not configured; using embedded NetworkX chronological graph engine.")
+            return
+
         try:
             import socket
             from urllib.parse import urlparse
             parsed = urlparse(NEO4J_URI)
             host = parsed.hostname or "localhost"
             port = parsed.port or 7687
+
+            # Quick 0.2s probe so startup never hangs if Neo4j container is offline
             with socket.create_connection((host, port), timeout=0.2):
                 pass
-            from neo4j import GraphDatabase
+
+            from neo4j import GraphDatabase, basic_auth
+            auth = basic_auth(NEO4J_USER, NEO4J_PASSWORD) if NEO4J_USER else None
             driver = GraphDatabase.driver(
                 NEO4J_URI,
-                auth=(NEO4J_USER, NEO4J_PASSWORD),
-                connection_timeout=0.5
+                auth=auth,
+                connection_timeout=1.0,
+                max_connection_lifetime=30
             )
             driver.verify_connectivity()
             self.driver = driver
             self.using_neo4j = True
             logger.info("Connected to Neo4j graph cluster at %s", NEO4J_URI)
-        except Exception:
+        except Exception as e:
+            if self.driver:
+                try:
+                    self.driver.close()
+                except Exception:
+                    pass
             self.driver = None
             self.using_neo4j = False
-            logger.info("Neo4j server not reachable; initializing embedded chronological knowledge graph engine.")
+            logger.info("Neo4j cluster not active (%s); using embedded NetworkX chronological engine.", e)
 
     def _seed_temporal_graph(self):
         """Populates the directed temporal graph with known timeline anchors."""
@@ -73,10 +93,11 @@ class TemporalGraphEngine:
             self.nx_graph.add_node(event, type="EVENT", date=date_str, status=status)
             self.nx_graph.add_edge(entity, event, relation="ASSOCIATED_WITH", date=date_str, status=status)
 
-            # Neo4j cypher insertion if available
-            if self.using_neo4j and self.driver:
-                try:
-                    with self.driver.session() as session:
+        # Batch seed to Neo4j in single session if cluster is active
+        if self.using_neo4j and self.driver:
+            try:
+                with self.driver.session() as session:
+                    for item in HISTORICAL_ANCHORS:
                         session.run(
                             """
                             MERGE (e:Entity {name: $entity})
@@ -84,11 +105,47 @@ class TemporalGraphEngine:
                             ON CREATE SET v.date = $date, v.status = $status
                             MERGE (e)-[r:ASSOCIATED_WITH {date: $date, status: $status}]->(v)
                             """,
-                            entity=entity, event=event, date=date_str, status=status
+                            entity=item["entity"], event=item["event"], date=item["date"], status=item["status"]
                         )
-                except Exception as e:
-                    logger.info("Neo4j seeding unavailable (%s); using embedded NetworkX graph.", e)
-                    self.using_neo4j = False
+                logger.info("Seeded %d historical anchors into live Neo4j cluster.", len(HISTORICAL_ANCHORS))
+            except Exception as e:
+                logger.info("Neo4j seeding notice: %s. Continuing with embedded NetworkX graph.", e)
+                try:
+                    self.driver.close()
+                except Exception:
+                    pass
+                self.driver = None
+                self.using_neo4j = False
+
+    def add_temporal_anchor(self, entity: str, event: str, date_str: str, status: str):
+        """Dynamically registers a verified historical or debunked milestone into the knowledge graph."""
+        self.nx_graph.add_node(entity, type="ENTITY")
+        self.nx_graph.add_node(event, type="EVENT", date=date_str, status=status)
+        self.nx_graph.add_edge(entity, event, relation="ASSOCIATED_WITH", date=date_str, status=status)
+
+        if self.using_neo4j and self.driver:
+            try:
+                with self.driver.session() as session:
+                    session.run(
+                        """
+                        MERGE (e:Entity {name: $entity})
+                        MERGE (v:Event {name: $event})
+                        ON CREATE SET v.date = $date, v.status = $status
+                        MERGE (e)-[r:ASSOCIATED_WITH {date: $date, status: $status}]->(v)
+                        """,
+                        entity=entity, event=event, date=date_str, status=status
+                    )
+            except Exception as e:
+                logger.warning("Dynamic Neo4j anchor sync error: %s", e)
+
+    def close(self):
+        """Closes live Neo4j connection pool cleanly on shutdown."""
+        if self.driver:
+            try:
+                self.driver.close()
+            except Exception:
+                pass
+            self.driver = None
 
     def get_graph_data(self) -> Dict[str, Any]:
         """Exports graph nodes and edges for visual frontend rendering (Cytoscape / vis.js)."""

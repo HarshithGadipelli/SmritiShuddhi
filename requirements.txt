@@ -16,5 +16,6 @@ aiofiles>=24.1.0
 redis>=5.0.0
 qdrant-client>=1.11.0
 networkx>=3.3
+neo4j>=5.0.0
 torch>=2.2.0
 
