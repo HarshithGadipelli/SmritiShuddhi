@@ -28,7 +28,9 @@ from app.retrieval.knowledge_base import (
     justification_metrics_engine,
     breaking_corroboration_engine,
     subclaim_decomposition_engine,
-    zero_knowledge_disambiguator
+    zero_knowledge_disambiguator,
+    multimodal_forensics_engine,
+    epistemic_calibration_engine
 )
 from app.unlearning.engine import unlearning_engine
 from app.unlearning.algorithms import multi_model_suite
@@ -354,7 +356,14 @@ if static_path.exists():
 # DUAL-TRACK HYBRID INFERENCE LOGIC
 # -----------------------------------------------------------------------------
 
-def execute_hybrid_inference(title: str, text: str, source: str = "", author: str = "") -> Dict[str, Any]:
+def execute_hybrid_inference(
+    title: str,
+    text: str,
+    source: str = "",
+    author: str = "",
+    image_url: Optional[str] = None,
+    category: Optional[str] = "General"
+) -> Dict[str, Any]:
     """Concurrent Multi-Aspect Hybrid Inference:
     Track A: Stylistic Intention Parsing (DeBERTa-v3 frozen base + LoRA adapters)
     Track B: Real-Time Fact Cross-Referencing (BGE-M3 + Qdrant KNN vector search)
@@ -362,7 +371,13 @@ def execute_hybrid_inference(title: str, text: str, source: str = "", author: st
     Track D: Quantitative Time-Series Knowledge Base (Stocks, Gold, Weather, Currency anomalies)
     Track E: Context & Viral Propagation Dynamics (Source Credibility + Coercive Sharing cues)
     Track F: Stored Internal Evidence Archive (Official Past Verification Proof)
-    Fusion: 5-pillar Multi-Aspect Weighted Ensemble + Explainable AI (XAI) rationale
+    Track G: Entity Specificity & Vagueness Penalty
+    Track H: Evidentiary Justification Metrics (HSDI, Shannon Entropy, TTR, EPPI)
+    Track I: Zero-Day Breaking News Corroboration Protocol (CSCI across live news wire)
+    Track J: Atomic Fact Sub-Claim Decomposition (Partial Truth & Half-Truth Handling)
+    Track K: Zero-Knowledge Epistemic Triad Disambiguation
+    Track L: Multimodal Asset & Metadata Provenance Forensics
+    Fusion: 5-pillar Multi-Aspect Weighted Ensemble + Statistical Epistemic Calibration
     """
     # Track A: Stylistic & Linguistic Intention
     style_res = lora_sisa_engine.predict_style(title, text)
@@ -414,7 +429,17 @@ def execute_hybrid_inference(title: str, text: str, source: str = "", author: st
         propagation_result=prop_res
     )
 
-    # Multi-Aspect 5-Pillar Fusion
+    # Track L: Multimodal Asset & Metadata Provenance Forensics
+    multi_res = multimodal_forensics_engine.analyze_multimodal(
+        title=title,
+        text=text,
+        image_url=image_url,
+        source=source,
+        author=author,
+        category=category
+    )
+
+    # Multi-Aspect 5-Pillar Fusion with Multimodal and Epistemic Calibration
     verdict = fusion_layer.fuse(
         style_result=style_res,
         retrieval_result=retrieval_res,
@@ -427,7 +452,8 @@ def execute_hybrid_inference(title: str, text: str, source: str = "", author: st
         justification_result=just_res,
         breaking_result=breaking_res,
         subclaim_result=subclaim_res,
-        zero_knowledge_result=zk_res
+        zero_knowledge_result=zk_res,
+        multimodal_result=multi_res
     )
     return verdict
 
@@ -497,11 +523,17 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
             verdict = cached_verdict
             cache_hit = True
         else:
-            verdict = execute_hybrid_inference(payload.title, payload.text, source=payload.source, author=payload.author)
+            verdict = execute_hybrid_inference(
+                payload.title, payload.text, source=payload.source,
+                author=payload.author, image_url=payload.image_url, category=payload.category
+            )
             cache_hit = False
             cache_controller.cache_verdict(signature, verdict, ttl=86400)
     else:
-        verdict = execute_hybrid_inference(payload.title, payload.text, source=payload.source, author=payload.author)
+        verdict = execute_hybrid_inference(
+            payload.title, payload.text, source=payload.source,
+            author=payload.author, image_url=payload.image_url, category=payload.category
+        )
         cache_hit = False
         cache_controller.cache_verdict(signature, verdict, ttl=86400)
 
@@ -599,6 +631,16 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "breaking_protocol": verdict.get("breaking_protocol", {}),
         "subclaim_analysis": verdict.get("subclaim_analysis", {}),
         "zero_knowledge_analysis": verdict.get("zero_knowledge_analysis", {}),
+        "multimodal_forensics": verdict.get("multimodal_forensics", {}),
+        "epistemic_calibration": verdict.get("epistemic_calibration", {}),
+        "schema_org_ld": multimodal_forensics_engine.generate_schema_org_claim_review(
+            news_id=news_id,
+            title=payload.title,
+            source=payload.source,
+            prediction=tag,
+            fake_probability=verdict["fake_probability"],
+            verdict_summary=user_message
+        ),
         "xai": verdict["xai"],
         "created_at": now()
     }
@@ -647,8 +689,29 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "breaking_protocol": verdict.get("breaking_protocol", {}),
         "subclaim_analysis": verdict.get("subclaim_analysis", {}),
         "zero_knowledge_analysis": verdict.get("zero_knowledge_analysis", {}),
+        "multimodal_forensics": verdict.get("multimodal_forensics", {}),
+        "epistemic_calibration": verdict.get("epistemic_calibration", {}),
+        "schema_org_ld": doc["schema_org_ld"],
         "xai": verdict["xai"]
     }
+
+
+@app.get("/api/v1/news/{news_id}/claim-review")
+def get_claim_review_schema(news_id: str):
+    """Returns official Schema.org ClaimReview JSON-LD markup for open-web standards and Google Fact Check Tools."""
+    doc = news_col.find_one({"$or": [{"news_id": news_id}, {"sample_id": news_id}]})
+    if not doc:
+        raise HTTPException(status_code=404, detail="News article not found")
+    if doc.get("schema_org_ld"):
+        return doc["schema_org_ld"]
+    return multimodal_forensics_engine.generate_schema_org_claim_review(
+        news_id=doc.get("news_id", news_id),
+        title=doc.get("title", ""),
+        source=doc.get("source", ""),
+        prediction=doc.get("tag", "REAL"),
+        fake_probability=doc.get("fake_probability", 0.0),
+        verdict_summary=doc.get("tag_display", "")
+    )
 
 
 @app.post("/api/v1/news/extract-document")
