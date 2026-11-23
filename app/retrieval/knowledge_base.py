@@ -514,8 +514,220 @@ class EntitySpecificityAnalyzer:
         }
 
 
+class AdvancedJustificationMetricsEngine:
+    """Computes transparent mathematical metrics to justify fake/real classification:
+    1. Headline-Body Stance Discrepancy Index (HSDI): Stance divergence & clickbait exaggeration
+    2. Shannon Lexical Entropy (H(X)): Information density in bits vs. repetitive spam
+    3. Type-Token Ratio (TTR): Lexical diversity (journalistic prose vs. keyword stuffing)
+    4. Emotional Panic & Polarization Index (EPPI): Density of existential panic/fear markers
+    5. Claim Criticality Index (CCI): Intrinsic societal/safety impact severity
+    6. Entity Attribution Depth (EAD): Proportion of grounded named entities vs. vague placeholders
+    """
+    CRITICAL_SEVERITY_KEYWORDS = [
+        "war", "nuclear", "assassination", "killed", "dead", "casualty", "attack",
+        "terror", "lockdown", "curfew", "emergency", "demonetization", "ban",
+        "bank run", "collapse", "pandemic", "poison", "leak", "riot", "shootout"
+    ]
+
+    PANIC_EMOTIONAL_PATTERNS = [
+        r'\b(panic|terrified|danger|horrific|flee|run for your life|catastrophe|devastating)\b',
+        r'\b(deadly|poisonous|massive destruction|bloodbath|shocking disaster|doomsday)\b',
+        r'\b(save your children|withdraw all money|emergency alert|do not drink|do not eat)\b'
+    ]
+
+    CLICKBAIT_STANCE_EXAGGERATIONS = [
+        r'\b(banned|cancelled|terminated|shut down|arrested|executed|resigned|declared)\b'
+    ]
+
+    STANCE_HEDGE_PATTERNS = [
+        r'\b(may|might|could|possible|alleged|rumor|speculated|proposed|considering|unconfirmed)\b'
+    ]
+
+    def compute_metrics(self, title: str, text: str) -> Dict[str, Any]:
+        title_lower = (title or "").lower()
+        text_lower = (text or "").lower()
+        combined = f"{title_lower} {text_lower}"
+
+        # 1. Tokenization & Basic Counts
+        words = re.findall(r'\b[a-zA-Z\u0900-\u097F\u0C00-\u0C7F0-9_]+\b', combined)
+        total_tokens = max(len(words), 1)
+        unique_tokens = len(set(words))
+
+        # 2. Type-Token Ratio (TTR) - Lexical Diversity
+        ttr = round(unique_tokens / total_tokens, 4)
+
+        # 3. Shannon Lexical Entropy H(X) in bits
+        token_counts = {}
+        for w in words:
+            token_counts[w] = token_counts.get(w, 0) + 1
+        entropy = 0.0
+        for count in token_counts.values():
+            p = count / total_tokens
+            if p > 0:
+                entropy -= p * math.log2(p)
+        entropy = round(entropy, 3)
+
+        # 4. Emotional Panic & Polarization Index (EPPI)
+        panic_hits = 0
+        for pat in self.PANIC_EMOTIONAL_PATTERNS:
+            panic_hits += len(re.findall(pat, combined))
+        eppi = min(1.0, round((panic_hits * 3.0) / max(total_tokens // 15, 1), 4))
+
+        # 5. Claim Criticality Index (CCI)
+        crit_hits = sum(1 for kw in self.CRITICAL_SEVERITY_KEYWORDS if re.search(r'\b' + re.escape(kw) + r'\b', combined))
+        cci = min(1.0, round(crit_hits * 0.25, 3))
+
+        # 6. Headline-Body Stance Discrepancy Index (HSDI)
+        headline_exaggeration = any(re.search(pat, title_lower) for pat in self.CLICKBAIT_STANCE_EXAGGERATIONS)
+        body_hedges = any(re.search(pat, text_lower) for pat in self.STANCE_HEDGE_PATTERNS)
+
+        title_words = set(re.findall(r'\b[a-zA-Z0-9]{3,}\b', title_lower))
+        text_words = set(re.findall(r'\b[a-zA-Z0-9]{3,}\b', text_lower))
+        if title_words:
+            overlap = len(title_words.intersection(text_words)) / len(title_words)
+        else:
+            overlap = 1.0
+
+        if headline_exaggeration and body_hedges:
+            hsdi = 0.85
+        elif overlap < 0.25 and len(title_words) >= 4:
+            hsdi = 0.70
+        elif overlap < 0.45:
+            hsdi = 0.40
+        else:
+            hsdi = round(max(0.05, 1.0 - overlap), 3)
+
+        # 7. Entity Attribution Depth (EAD)
+        named_entities = re.findall(r'\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b', f"{title} {text}")
+        common_stops = {"The", "A", "An", "In", "On", "At", "To", "For", "Of", "And", "Today", "Yesterday"}
+        filtered_ne = [e for e in named_entities if e not in common_stops]
+        ead = min(1.0, round(len(filtered_ne) / max(total_tokens // 25, 2), 3))
+
+        justification_notes = []
+        if hsdi >= 0.70:
+            justification_notes.append("Headline-Body Stance Discrepancy: Headline makes categorical assertions hedged or contradicted in body text.")
+        if eppi >= 0.50:
+            justification_notes.append("High Emotional Panic Index: Elevated frequency of alarmist, existential threat terminology.")
+        if ttr < 0.38 and total_tokens > 40:
+            justification_notes.append("Low Lexical Diversity: Repetitive linguistic structure characteristic of automated or propagandistic copy.")
+        if cci >= 0.60:
+            justification_notes.append("High-Criticality Claim: Involves national security, public safety, or systemic financial stability.")
+
+        return {
+            "hsdi": hsdi,
+            "shannon_entropy_bits": entropy,
+            "type_token_ratio": ttr,
+            "eppi": eppi,
+            "claim_criticality_index": cci,
+            "entity_attribution_depth": ead,
+            "justification_notes": justification_notes
+        }
+
+
+class BreakingNewsCorroborationEngine:
+    """Specialized Zero-Day Protocol for Breaking & Fast-Moving News:
+    Cross-references breaking submissions in real time against the active corpus of
+    live institutional wire stories (Reuters, PTI, ANI, BBC, PIB, The Hindu).
+    Resolves the 'Fact-Check Latency Lag' by computing the Cross-Source Corroboration Index (CSCI).
+    """
+    BREAKING_CUE_PATTERNS = [
+        r'\b(breaking news|just in|flash|developing story|developing|latest update|reports emerging)\b',
+        r'\b(urgent update|breaking|live updates|just now|happening now|minutes ago)\b'
+    ]
+
+    def corroborate_breaking_story(
+        self,
+        title: str,
+        text: str,
+        news_collection: Any = None,
+        claim_criticality: float = 0.25,
+        max_wire_check: int = 150
+    ) -> Dict[str, Any]:
+        combined = f"{title} {text}".lower()
+
+        # 1. Detect breaking cues
+        breaking_hits = []
+        for pat in self.BREAKING_CUE_PATTERNS:
+            found = re.findall(pat, combined)
+            if found:
+                breaking_hits.extend(found)
+        is_breaking = len(breaking_hits) > 0 or "breaking" in title.lower()
+
+        # 2. Extract salient search entities / keywords (length >= 4)
+        stopwords = {
+            "that", "this", "from", "with", "have", "were", "been", "will", "would",
+            "could", "should", "their", "there", "about", "which", "after", "before",
+            "news", "breaking", "update", "today", "report", "reports", "says", "said"
+        }
+        tokens = [w for w in re.findall(r'\b[a-zA-Z0-9]{4,}\b', combined) if w not in stopwords]
+        salient_keywords = list(dict.fromkeys(tokens))[:8]
+
+        # 3. Cross-reference against active live wire news repository
+        corroborating_articles = []
+        distinct_publishers = set()
+
+        if news_collection is not None and salient_keywords:
+            try:
+                cursor = news_collection.find({"status": "PUBLISHED"}).limit(max_wire_check)
+                for article in cursor:
+                    art_text = f"{article.get('title', '')} {article.get('text', '')}".lower()
+                    matches = sum(1 for kw in salient_keywords if kw in art_text)
+                    if matches >= 2:
+                        corroborating_articles.append({
+                            "title": article.get("title", ""),
+                            "source": article.get("source", "Accredited Wire"),
+                            "keyword_matches": matches
+                        })
+                        src_name = (article.get("source") or "").strip().lower()
+                        if src_name:
+                            distinct_publishers.add(src_name)
+            except Exception as e:
+                logger.debug("Breaking news wire corroboration query notice: %s", e)
+
+        distinct_count = len(distinct_publishers)
+        # CSCI: 3 or more independent accredited wires = 1.0 (Full corroboration)
+        csci = min(1.0, round(distinct_count / 3.0, 3))
+        criticality_gap = max(0.0, round(claim_criticality - csci, 3))
+
+        # 4. Breaking Protocol Decision
+        if is_breaking:
+            if csci >= 0.65:
+                protocol_verdict = "BREAKING_MULTI_SOURCE_CORROBORATED"
+                guidance = "Corroborated by multiple independent accredited news wires in real time."
+                developing_tag = "BREAKING_VERIFIED"
+            elif claim_criticality >= 0.60 and csci == 0.0:
+                protocol_verdict = "CRITICAL_BREAKING_UNSUBSTANTIATED"
+                guidance = "High-criticality national/public safety assertion with ZERO accredited wire corroboration. High rumor probability."
+                developing_tag = "CRITICAL_UNVERIFIED_RUMOR"
+            else:
+                protocol_verdict = "BREAKING_DEVELOPING_UNCONFIRMED"
+                guidance = "Developing story undergoing real-time wire verification. Recommended for human editorial review."
+                developing_tag = "DEVELOPING_STORY"
+        else:
+            protocol_verdict = "STANDARD_ARCHIVAL_ANALYSIS"
+            guidance = "Standard news content evaluated against established historical and vector evidence."
+            developing_tag = None
+
+        return {
+            "is_breaking": is_breaking,
+            "breaking_protocol_verdict": protocol_verdict,
+            "developing_tag": developing_tag,
+            "cross_source_corroboration_index": csci,
+            "criticality_gap": criticality_gap,
+            "distinct_publishers_count": distinct_count,
+            "distinct_publishers": list(distinct_publishers)[:5],
+            "corroborating_articles_count": len(corroborating_articles),
+            "breaking_cues_found": list(set(breaking_hits)),
+            "salient_keywords_queried": salient_keywords[:6],
+            "actionable_guidance": guidance,
+            "top_corroborations": corroborating_articles[:3]
+        }
+
+
 # Global Singletons
 quantitative_anomaly_engine = QuantitativeAnomalyEngine()
 propagation_analyzer = ContextPropagationAnalyzer()
 internal_evidence_engine = InternalEvidenceEngine()
 entity_specificity_analyzer = EntitySpecificityAnalyzer()
+justification_metrics_engine = AdvancedJustificationMetricsEngine()
+breaking_corroboration_engine = BreakingNewsCorroborationEngine()

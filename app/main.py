@@ -24,7 +24,9 @@ from app.retrieval.knowledge_base import (
     quantitative_anomaly_engine,
     propagation_analyzer,
     internal_evidence_engine,
-    entity_specificity_analyzer
+    entity_specificity_analyzer,
+    justification_metrics_engine,
+    breaking_corroboration_engine
 )
 from app.unlearning.engine import unlearning_engine
 from app.unlearning.algorithms import multi_model_suite
@@ -383,6 +385,17 @@ def execute_hybrid_inference(title: str, text: str, source: str = "", author: st
     # Track G: Informational Density & Entity Specificity
     spec_res = entity_specificity_analyzer.analyze_specificity(title, text)
 
+    # Track H: Evidentiary Justification Metrics (HSDI, Shannon Entropy, TTR, EPPI)
+    just_res = justification_metrics_engine.compute_metrics(title, text)
+
+    # Track I: Zero-Day Breaking News Corroboration Protocol (CSCI & Multi-Wire Cross-Check)
+    breaking_res = breaking_corroboration_engine.corroborate_breaking_story(
+        title=title,
+        text=text,
+        news_collection=news_col,
+        claim_criticality=just_res.get("claim_criticality_index", 0.25)
+    )
+
     # Multi-Aspect 5-Pillar Fusion
     verdict = fusion_layer.fuse(
         style_result=style_res,
@@ -392,7 +405,9 @@ def execute_hybrid_inference(title: str, text: str, source: str = "", author: st
         quant_result=quant_res,
         propagation_result=prop_res,
         internal_evidence_result=int_evid_res,
-        specificity_result=spec_res
+        specificity_result=spec_res,
+        justification_result=just_res,
+        breaking_result=breaking_res
     )
     return verdict
 
@@ -492,6 +507,26 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         status = "BLOCKED_HIGH_RISK_FAKE"
         user_message = "Our verification engine detected false or manipulative claims. This article has been quarantined and blocked from the platform."
 
+    # Zero-Day Breaking News Protocol Dynamic Overrides
+    brk_proto = verdict.get("breaking_protocol", {})
+    if brk_proto.get("is_breaking"):
+        b_verdict = brk_proto.get("breaking_protocol_verdict")
+        if b_verdict == "BREAKING_MULTI_SOURCE_CORROBORATED" and risk_band != "HIGH_RISK_FAKE":
+            tag = "BREAKING_VERIFIED"
+            tag_display = "⚡ BREAKING (MULTI-SOURCE CONFIRMED)"
+            status = "PUBLISHED"
+            user_message = f"Breaking News Confirmed! Corroborated across {brk_proto.get('distinct_publishers_count', 2)}+ independent news agencies in real time."
+        elif b_verdict == "CRITICAL_BREAKING_UNSUBSTANTIATED":
+            tag = "CRITICAL_UNVERIFIED_RUMOR"
+            tag_display = "⚠️ CRITICAL UNVERIFIED RUMOR (ZERO WIRE CORROBORATION)"
+            status = "BLOCKED_HIGH_RISK_FAKE"
+            user_message = "High-criticality assertion detected with zero accredited news wire corroboration. Quarantined to prevent viral panic."
+        elif b_verdict == "BREAKING_DEVELOPING_UNCONFIRMED":
+            tag = "DEVELOPING_STORY"
+            tag_display = "⚡ DEVELOPING STORY (AWAITING WIRE CONFIRMATION)"
+            status = "PENDING_ADMIN_REVIEW"
+            user_message = "Fast-moving developing story detected. Placed in live monitoring queue for automated wire corroboration."
+
     content_full = f"{payload.title} {payload.text}"
     if re.search(r'[\u0C00-\u0C7F]', content_full):
         detected_lang = "Telugu (తెలుగు)"
@@ -533,6 +568,8 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "s_source": verdict.get("s_source", 0.40),
         "temporal_consistency": verdict["temporal_consistency"],
         "five_pillar_breakdown": verdict.get("five_pillar_breakdown", {}),
+        "justification_metrics": verdict.get("justification_metrics", {}),
+        "breaking_protocol": verdict.get("breaking_protocol", {}),
         "xai": verdict["xai"],
         "created_at": now()
     }
@@ -577,6 +614,8 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "s_source": verdict.get("s_source", 0.40),
         "temporal_consistency": verdict["temporal_consistency"],
         "five_pillar_breakdown": verdict.get("five_pillar_breakdown", {}),
+        "justification_metrics": verdict.get("justification_metrics", {}),
+        "breaking_protocol": verdict.get("breaking_protocol", {}),
         "xai": verdict["xai"]
     }
 

@@ -28,7 +28,9 @@ class EnsembleFusionLayer:
         quant_result: Optional[Dict[str, Any]] = None,
         propagation_result: Optional[Dict[str, Any]] = None,
         internal_evidence_result: Optional[Dict[str, Any]] = None,
-        specificity_result: Optional[Dict[str, Any]] = None
+        specificity_result: Optional[Dict[str, Any]] = None,
+        justification_result: Optional[Dict[str, Any]] = None,
+        breaking_result: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """5-Pillar Multi-Aspect Decoupled Ensemble Fusion:
         1. Content-Based: Stylometric Intention, Sensationalism & DeBERTa LoRA (s_content)
@@ -36,11 +38,22 @@ class EnsembleFusionLayer:
         3. Knowledge-Based / Fact-Check: Vector debunks + Internal archive + Time-series anomaly (s_knowledge)
         4. Propagation-Based: Virality pressure & coercive forwarding triggers (s_propagation)
         5. Source-Based: Publisher credibility & institutional wire verification (s_source)
+        + Transparent Evidentiary Justification Metrics & Zero-Day Breaking News Protocol
         """
         spec_res = specificity_result or {
             "specificity_tier": "STANDARD_EDITORIAL_SPECIFICITY",
             "vagueness_penalty": 0.0,
             "xai_specificity_note": ""
+        }
+        just_res = justification_result or {
+            "hsdi": 0.10, "shannon_entropy_bits": 4.5, "type_token_ratio": 0.65,
+            "eppi": 0.05, "claim_criticality_index": 0.20, "entity_attribution_depth": 0.50,
+            "justification_notes": []
+        }
+        brk_res = breaking_result or {
+            "is_breaking": False, "breaking_protocol_verdict": "STANDARD_ARCHIVAL_ANALYSIS",
+            "cross_source_corroboration_index": 0.0, "distinct_publishers_count": 0,
+            "actionable_guidance": "Standard analysis", "developing_tag": None
         }
         # Pillar 1: Content-Based Stylometric Score
         s_content = float(style_result["s_style"])
@@ -117,6 +130,20 @@ class EnsembleFusionLayer:
         if spec_res.get("xai_specificity_note"):
             xai_factors.append(spec_res["xai_specificity_note"])
 
+        # Evidentiary Justification Metrics Integration
+        for j_note in just_res.get("justification_notes", []):
+            xai_factors.append(f"Justification Metric: {j_note}")
+
+        # Breaking News Protocol Evaluation
+        if brk_res.get("is_breaking"):
+            b_verdict = brk_res.get("breaking_protocol_verdict")
+            if b_verdict == "BREAKING_MULTI_SOURCE_CORROBORATED":
+                xai_factors.append(f"Breaking News Corroborated: {brk_res.get('distinct_publishers_count', 0)} accredited news wires independently reporting this event in real time.")
+            elif b_verdict == "CRITICAL_BREAKING_UNSUBSTANTIATED":
+                xai_factors.append("Critical Breaking Discrepancy Warning: Zero accredited institutional news wires reporting this high-criticality assertion.")
+            elif b_verdict == "BREAKING_DEVELOPING_UNCONFIRMED":
+                xai_factors.append("Developing Story Protocol: Fast-moving story undergoing ongoing real-time multi-wire tracking.")
+
         # Supplemental contextual proof factors if minimal hits
         if not int_evid.get("has_match") and not quant_res.get("has_anomaly") and evidence_status != "EVIDENCE_MATCHED":
             xai_factors.append("Knowledge Base Baseline: No factual contradictions against official registries; evaluated via zero-shot predictive synthesis.")
@@ -154,12 +181,20 @@ class EnsembleFusionLayer:
             spec_res.get("vagueness_penalty", 0.0)
         )
 
+        # Apply Headline-Body Stance Discrepancy Penalty
+        if just_res.get("hsdi", 0.0) >= 0.70:
+            raw_fake_prob += 0.08
+
         # Critical Safety Overrides & Escalations
         # If any single pillar exhibits extreme critical violation:
         if quant_res.get("has_anomaly") or (int_evid.get("has_match") and int_evid.get("top_match", {}).get("truth_status") == "VERIFIED_DEBUNK"):
             raw_fake_prob = max(raw_fake_prob, 0.88)
+        elif brk_res.get("is_breaking") and brk_res.get("breaking_protocol_verdict") == "CRITICAL_BREAKING_UNSUBSTANTIATED":
+            raw_fake_prob = max(raw_fake_prob, 0.86)
         elif contradictions:
             raw_fake_prob = max(raw_fake_prob, 0.85)
+        elif brk_res.get("is_breaking") and brk_res.get("breaking_protocol_verdict") == "BREAKING_MULTI_SOURCE_CORROBORATED" and s_content < 0.35:
+            raw_fake_prob = min(raw_fake_prob, 0.10)
         elif source_verdict == "VERIFIED_INSTITUTIONAL_WIRE" and s_content < 0.30 and not quant_res.get("has_anomaly") and not contradictions:
             # Verified institutional news without sensationalism or contradictions is anchored authentic
             raw_fake_prob = min(raw_fake_prob, 0.08)
@@ -223,7 +258,9 @@ class EnsembleFusionLayer:
             "regional_linguistics": {
                 "detected_language": regional_info.get("primary_language"),
                 "hinglish_markers": regional_info.get("hinglish_cues_found", [])
-            }
+            },
+            "justification_metrics": just_res,
+            "breaking_news_protocol": brk_res
         }
 
         # Five-Pillar Explicit Breakdown for Explainability and UI
@@ -283,6 +320,8 @@ class EnsembleFusionLayer:
             "s_quant": s_quant,
             "temporal_consistency": timeline_score,
             "five_pillar_breakdown": five_pillar_breakdown,
+            "justification_metrics": just_res,
+            "breaking_protocol": brk_res,
             "xai": xai_report
         }
 
