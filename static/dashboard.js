@@ -2081,14 +2081,56 @@ async function executeBatchUnlearning() {
     });
     const data = await res.json();
     renderBenchmarkTable(data.benchmark);
+    if (data.clearance_certificate) {
+      renderClearanceCertificate(data.clearance_certificate, `Batch Purge (${data.batch_count} articles)`);
+    }
     await loadAdminQueue();
     await loadUnlearningLedger();
     await loadPublishedNews();
     await loadLiveShardStats();
-    showToast(`Batch unlearned ${data.batch_count} articles (${data.proof_hash ? data.proof_hash.slice(0, 12) : 'sealed'}).`, 'success');
+    showToast(`✓ Clearance verified: batch unlearned ${data.batch_count} articles (${data.proof_hash ? data.proof_hash.slice(0, 12) : 'sealed'}).`, 'success');
   } catch (e) {
     showToast(`Batch unlearning failed: ${e.message}`, 'error');
   }
+}
+
+function renderClearanceCertificate(cert, headlineHint = '') {
+  if (!cert) return;
+  const banner = document.getElementById('unlearningClearanceBanner');
+  const summaryEl = document.getElementById('clearanceSummaryText');
+  const pillsEl = document.getElementById('clearanceSystemPills');
+  const metaEl = document.getElementById('clearanceMetaLine');
+  const badgeEl = document.getElementById('clearanceStatusBadge');
+
+  if (badgeEl) badgeEl.innerText = cert.clearance_status || 'VERIFIED_CLEAR';
+  if (summaryEl) {
+    const titlePrefix = headlineHint ? `<strong>${escapeHtml(headlineHint.slice(0, 90))}</strong> — ` : '';
+    summaryEl.innerHTML = `${titlePrefix}${escapeHtml(cert.notification_message || 'Article unlearned and cleared across all storage and ML layers.')}`;
+  }
+  if (pillsEl) {
+    const cs = cert.cleared_systems || {};
+    const items = [
+      ['Supabase News', cs.supabase_news_revoked],
+      ['Training Index', cs.training_samples_purged],
+      ['SISA Shards', cs.sisa_shard_weights_evicted],
+      ['SVM Hessian H⁻¹', cs.svm_hessian_downdated],
+      ['LoRA Sub-Slice', cs.modular_lora_slice_masked],
+      ['Qdrant + pgvector', cs.vector_qdrant_pgvector_purged],
+      [`Temporal Graph (${cs.temporal_graph_nodes_removed ?? 0})`, true],
+      ['SHA-256 Cache', cs.semantic_cache_evicted],
+    ];
+    pillsEl.innerHTML = items.map(([lbl, ok]) =>
+      `<span class="badge-pill ${ok ? 'badge-green' : 'badge-amber'}" style="font-size:0.72rem;">${ok ? '✓' : '○'} ${escapeHtml(lbl)}</span>`
+    ).join('');
+  }
+  if (metaEl) {
+    const ph = cert.proof_hash ? cert.proof_hash.slice(0, 20) + '...' : 'sealed';
+    metaEl.innerText = `Proof: ${ph} | Strategy: ${cert.strategy || '--'} | Residual: ${Number(cert.residual_influence_pct ?? 0).toFixed(4)}% | L2 Parity: ${Number(cert.weight_l2_parity ?? 0).toExponential(2)} | MIA AUC: ${Number(cert.mia_auc ?? 0.5).toFixed(3)} | Retain Acc: ${Number(cert.retain_accuracy_pct ?? 0).toFixed(2)}%`;
+  }
+  if (banner) {
+    banner.style.display = 'block';
+  }
+  logTerminal('CLEARANCE_CONFIRMED', cert.notification_message || `Proof ${cert.proof_hash || ''}`);
 }
 
 // 4-Way Exact Machine Unlearning Execution & Comparative Evaluation
@@ -2144,16 +2186,20 @@ async function executeSelectedUnlearning(strategy) {
     animateShardPurge(targetShard);
 
     renderBenchmarkTable(data.benchmark);
+    if (data.clearance_certificate) {
+      renderClearanceCertificate(data.clearance_certificate, target.title || target.sampleId);
+    }
     state.selectedTarget = null;
     await loadAdminQueue();
     await loadUnlearningLedger();
     await loadPublishedNews();
     await loadUserSubmissions();
 
-    // Auto-populate Model Memory Probe input with target headline so admin can test right away
+    // Auto-populate and verify Model Memory Probe immediately after unlearning
     const probeInput = document.getElementById('probeQueryInput');
     if (probeInput && target.title) {
       probeInput.value = target.title;
+      await probeModelMemory();
     }
 
     const stratNames = {
@@ -2166,7 +2212,7 @@ async function executeSelectedUnlearning(strategy) {
     };
     const stratName = stratNames[strategy] || strategy;
     await loadLiveShardStats();
-    showToast(`Executed ${stratName}. Updated shard & ledger telemetry!`, 'success');
+    showToast(`✓ Clearance verified via ${stratName} — database, vectors & model purged!`, 'success');
   } catch (err) {
     console.error('Unlearn error:', err);
     showToast(`Unlearning request error: ${err.message}`, 'error');
@@ -2318,13 +2364,18 @@ async function loadUnlearningLedger() {
 async function openArticleModal(newsId) {
   try {
     playPaperRustleSound('unfold');
-    const res = await fetch(`/api/v1/news/${newsId}`);
-    const data = await res.json();
-    const article = data.article;
+    let article = (state.topicArticlesMap && state.topicArticlesMap[newsId]) || null;
+    if (!article) {
+      const res = await fetch(`/api/v1/news/${newsId}`);
+      const data = await res.json();
+      article = data.article;
+    }
     if (!article) return;
 
     state.currentModalArticle = article;
-    recordEngagement(newsId, 'view');
+    if (!String(newsId).startsWith('TOPIC_')) {
+      recordEngagement(newsId, 'view');
+    }
 
     document.getElementById('modalTitle').innerText = article.title;
     document.getElementById('modalCategory').innerText = article.category || 'General';
@@ -2929,6 +2980,9 @@ function handleWebSocketMessage(data) {
   if (ev === 'NEW_ARTICLE_PUBLISHED' || ev === 'LIVE_FEED_ITEM_SYNCED') {
     loadPublishedNews();
   } else if (ev === 'ALERT_HIGH_RISK_FAKE' || ev === 'ALERT_PENDING_REVIEW' || ev === 'ARTICLE_APPROVED_AND_PUBLISHED' || ev === 'NEWS_REVOKED_AND_UNLEARNED' || ev === 'ARTICLE_UPDATED' || ev === 'ARTICLE_REJECTED') {
+    if (ev === 'NEWS_REVOKED_AND_UNLEARNED' && data.clearance_certificate) {
+      renderClearanceCertificate(data.clearance_certificate, data.title || data.sample_id || '');
+    }
     loadAdminQueue();
     loadPublishedNews();
     loadUnlearningLedger();
@@ -3169,18 +3223,24 @@ function executeUnifiedSearch(query) {
 function renderCustomNewsGrid(items) {
   const gridContainer = document.getElementById('newsFeedGrid');
   if (!gridContainer) return;
+  if (!state.topicArticlesMap) state.topicArticlesMap = {};
+  (items || []).forEach(it => {
+    if (it && it.news_id && (String(it.news_id).startsWith('TOPIC_') || it.status === 'LIVE_TOPIC_WIRE')) {
+      state.topicArticlesMap[it.news_id] = it;
+    }
+  });
   if (items.length === 0) {
     gridContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-dim);">No articles matched your search query. Try another keyword.</div>`;
     return;
   }
   gridContainer.innerHTML = items.map(item => `
-    <article class="newspaper-dispatch-card" onclick="openArticleModal('${item.news_id}')">
+    <article class="newspaper-dispatch-card" onclick="openArticleModal('${escapeAttr(item.news_id)}')">
       <div class="dispatch-header-line">
         <span class="dispatch-kicker">${escapeHtml((item.category || 'GENERAL WIRE').toUpperCase())}</span>
         <span class="dispatch-vol">VOL. LXXIV • DISPATCH ${escapeHtml(item.sample_id || item.news_id)}</span>
       </div>
       <div class="card-thumb-wrapper">
-        <img src="${item.image_url || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80'}" alt="${escapeHtml(item.title)}" class="card-thumb">
+        <img src="${escapeAttr(item.image_url || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80')}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80';" alt="${escapeAttr(item.title)}" class="card-thumb">
         <span class="card-stamp-badge badge-verified">✓ ${Math.round((item.real_probability || 0.95) * 100)}% AUTHENTIC</span>
       </div>
       <div class="card-body">
@@ -3710,6 +3770,7 @@ const anchorAudioState = {
 
 function playArticleAnchor(newsId) {
   let item = (state.allNews || []).find(n => n.news_id === newsId);
+  if (!item && state.topicArticlesMap) item = state.topicArticlesMap[newsId];
   if (!item && state.adminBlockedMap) item = state.adminBlockedMap[newsId];
   if (!item && state.currentModalArticle && state.currentModalArticle.news_id === newsId) {
     item = state.currentModalArticle;

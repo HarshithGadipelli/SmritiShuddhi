@@ -293,6 +293,36 @@ class TemporalGraphEngine:
             "graph_backend": "neo4j_cluster" if self.using_neo4j else "embedded_networkx_graph"
         }
 
+    def purge_article(self, identifier: str, title: str = "") -> int:
+        """Removes any matching dynamic event nodes/edges for an unlearned article from the temporal graph."""
+        removed = 0
+        ident_l = (identifier or "").strip().lower()
+        title_l = (title or "").strip().lower()[:64]
+        try:
+            nodes_to_drop = []
+            for node, attrs in list(self.nx_graph.nodes(data=True)):
+                if attrs.get("type") == "ANCHOR_ENTITY":
+                    continue
+                node_l = str(node).lower()
+                if (ident_l and ident_l in node_l) or (title_l and len(title_l) >= 10 and title_l in node_l):
+                    nodes_to_drop.append(node)
+            for node in nodes_to_drop:
+                self.nx_graph.remove_node(node)
+                removed += 1
+            if self.using_neo4j and self.driver is not None and title:
+                try:
+                    with self.driver.session() as session:
+                        session.run(
+                            "MATCH (n) WHERE n.sample_id = $sid OR n.news_id = $sid OR n.name = $title DETACH DELETE n",
+                            sid=str(identifier),
+                            title=str(title),
+                        )
+                except Exception as neo_err:
+                    logger.debug("Neo4j purge notice: %s", neo_err)
+        except Exception as e:
+            logger.debug("Graph purge notice: %s", e)
+        return removed
+
 
 # Global temporal graph engine
 graph_engine = TemporalGraphEngine()

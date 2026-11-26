@@ -647,9 +647,13 @@ def fetch_live_guardian(api_key: str, max_items: int = 12) -> List[Dict[str, Any
     return parsed
 
 
+_THENEWSAPI_COOLDOWN_UNTIL = 0.0
+
+
 def fetch_live_thenewsapi(api_token: str, max_items: int = 10) -> List[Dict[str, Any]]:
     """Fetches real-time curated stories from TheNewsAPI.com."""
-    if not api_token:
+    global _THENEWSAPI_COOLDOWN_UNTIL
+    if not api_token or time.time() < _THENEWSAPI_COOLDOWN_UNTIL:
         return []
     url = (
         "https://api.thenewsapi.com/v1/news/top"
@@ -682,7 +686,12 @@ def fetch_live_thenewsapi(api_token: str, max_items: int = 10) -> List[Dict[str,
                 "published_at": art.get("published_at") or datetime.now(timezone.utc).isoformat(),
             })
     except Exception as e:
-        logger.debug("TheNewsAPI fetch notice: %s", e)
+        code = getattr(e, "code", None)
+        if code in (401, 402, 403, 429):
+            _THENEWSAPI_COOLDOWN_UNTIL = time.time() + 1800.0
+            logger.warning("TheNewsAPI paused for 30m (HTTP %s quota/auth limit).", code)
+        else:
+            logger.debug("TheNewsAPI fetch notice: %s", e)
     return parsed
 
 

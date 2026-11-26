@@ -12,7 +12,7 @@ export default defineConfig({
     assets: {
       htmlHandling: "auto-trailing-slash",
       notFoundHandling: "none",
-      runWorkerFirst: ["/api/*", "/ws", "/favicon.ico"],
+      runWorkerFirst: ["/api/*", "/ws", "/favicon.ico", "/static/uploads/*"],
     },
     workersDev: true,
     env: {

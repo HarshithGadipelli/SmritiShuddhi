@@ -17,8 +17,11 @@ import os
 import ssl
 import json
 import uuid
+import time
+import queue
 import logging
 import threading
+from contextlib import contextmanager
 from datetime import datetime, date, timezone
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -195,32 +198,33 @@ class SupabaseCollection:
 
     def _execute(self, sql: str, params: dict = None, fetch_one: bool = False, fetch_all: bool = False):
         params = params or {}
-        for attempt in range(2):
+        for attempt in range(3):
             try:
-                conn = self.db.get_connection()
-                raw_rows = conn.run(sql, **params)
-                if not raw_rows:
-                    return None if fetch_one else []
-                col_names = [col["name"] for col in conn.columns] if conn.columns else []
-                rows = []
-                for row in raw_rows:
-                    d = dict(zip(col_names, row))
-                    for k, v in d.items():
-                        if isinstance(v, (datetime, date)):
-                            d[k] = v.isoformat()
-                    if "xai" in d and isinstance(d["xai"], str):
-                        try:
-                            d["xai"] = json.loads(d["xai"])
-                        except Exception:
-                            pass
-                    rows.append(d)
-                if fetch_one:
-                    return rows[0] if rows else None
-                return rows
+                with self.db.connection() as conn:
+                    raw_rows = conn.run(sql, **params)
+                    if not raw_rows:
+                        return None if fetch_one else []
+                    col_names = [col["name"] for col in conn.columns] if conn.columns else []
+                    rows = []
+                    for row in raw_rows:
+                        d = dict(zip(col_names, row))
+                        for k, v in d.items():
+                            if isinstance(v, (datetime, date)):
+                                d[k] = v.isoformat()
+                        if "xai" in d and isinstance(d["xai"], str):
+                            try:
+                                d["xai"] = json.loads(d["xai"])
+                            except Exception:
+                                pass
+                        rows.append(d)
+                    if fetch_one:
+                        return rows[0] if rows else None
+                    return rows
             except Exception as e:
                 logger.warning("Supabase SQL notice on %s (attempt %d): %s", self.table_name, attempt + 1, e)
-                self.db.invalidate_current_connection()
-                if attempt == 1:
+                if attempt < 2:
+                    time.sleep(0.2 * (attempt + 1))
+                else:
                     return None if fetch_one else []
 
     def insert_one(self, doc: Dict[str, Any]):
@@ -300,7 +304,7 @@ class SupabaseCollection:
         set_vals = update.get("$set", update)
 
         if not existing and upsert:
-            merged = dict(query)
+            merged = {k: v for k, v in query.items() if not str(k).startswith("$")}
             merged.update(set_vals)
             return self.insert_one(merged)
 
@@ -331,7 +335,8 @@ class SupabaseCollection:
         return True
 
     def update_many(self, query: Dict[str, Any], update: Dict[str, Any], *args, **kwargs):
-        return self.update_one(query, update, *args, **kwargs)
+        upsert = kwargs.pop("upsert", False)
+        return self.update_one(query, update, upsert=upsert, *args, **kwargs)
 
     def delete_one(self, query: Dict[str, Any]):
         params = {}
@@ -351,9 +356,12 @@ class SupabaseCollection:
 
 
 class SupabaseDB:
-    """Manages pure-Python PostgreSQL connections (thread-safe) and schema migration."""
+    """Manages pure-Python PostgreSQL bounded connection pool and schema migration."""
     def __init__(self, uri: str):
         self.uri = uri
+        self._pool_size = max(1, min(8, int(os.getenv("SUPABASE_POOL_SIZE", "3"))))
+        self._pool: queue.LifoQueue = queue.LifoQueue(maxsize=self._pool_size)
+        self._pool_sem = threading.BoundedSemaphore(self._pool_size)
         self._local = threading.local()
         # Verify initial connectivity and apply schema
         startup_conn = self._create_raw_connection()
@@ -379,18 +387,78 @@ class SupabaseDB:
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
 
-        return pg8000.native.Connection(
-            user=unquote(p.username or "postgres"),
-            password=unquote(p.password or ""),
-            host=p.hostname,
-            port=p.port or 5432,
-            database=p.path.lstrip("/") or "postgres",
-            ssl_context=ctx,
-            timeout=12
-        )
+        last_err = None
+        for attempt in range(3):
+            try:
+                return pg8000.native.Connection(
+                    user=unquote(p.username or "postgres"),
+                    password=unquote(p.password or ""),
+                    host=p.hostname,
+                    port=p.port or 5432,
+                    database=p.path.lstrip("/") or "postgres",
+                    ssl_context=ctx,
+                    timeout=12
+                )
+            except Exception as e:
+                last_err = e
+                msg = str(e)
+                if "EMAXCONNSESSION" in msg or "max clients" in msg.lower() or "timeout" in msg.lower():
+                    time.sleep(0.25 * (2 ** attempt))
+                else:
+                    raise
+        raise last_err
+
+    @contextmanager
+    def connection(self):
+        """Checks out a pooled PostgreSQL session (capped cleanly below Supabase pool_size=15)."""
+        acquired = self._pool_sem.acquire(timeout=15.0)
+        if not acquired:
+            raise TimeoutError("Timed out waiting for bounded Supabase connection slot.")
+        conn = None
+        created_at = time.time()
+        try:
+            while True:
+                try:
+                    candidate, ts = self._pool.get_nowait()
+                except queue.Empty:
+                    break
+                if (time.time() - ts) > 180.0:
+                    try:
+                        candidate.close()
+                    except Exception:
+                        pass
+                    continue
+                conn = candidate
+                created_at = ts
+                break
+
+            if conn is None:
+                conn = self._create_raw_connection()
+                created_at = time.time()
+
+            yield conn
+        except Exception:
+            if conn is not None:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
+                conn = None
+            raise
+        else:
+            if conn is not None:
+                try:
+                    self._pool.put_nowait((conn, created_at))
+                except queue.Full:
+                    try:
+                        conn.close()
+                    except Exception:
+                        pass
+        finally:
+            self._pool_sem.release()
 
     def get_connection(self):
-        """Returns thread-local connection, reconnecting automatically if disconnected."""
+        """Legacy thread-local compatibility accessor (internal callers use `with self.connection()`)."""
         conn = getattr(self._local, "conn", None)
         if conn is not None:
             try:
@@ -404,7 +472,7 @@ class SupabaseDB:
         return conn
 
     def invalidate_current_connection(self):
-        """Safely closes and removes the thread-local connection."""
+        """Safely closes and removes any legacy thread-local connection."""
         conn = getattr(self._local, "conn", None)
         if conn is not None:
             try:
@@ -458,7 +526,6 @@ class SupabaseDB:
     ) -> bool:
         """Upserts a 384-dim pgvector ground-truth or debunk record into official_truth_vectors."""
         try:
-            conn = self.get_connection()
             vec_literal = "[" + ",".join(f"{float(v):.6f}" for v in embedding[:384]) + "]"
             sql = """
                 INSERT INTO official_truth_vectors
@@ -474,28 +541,27 @@ class SupabaseDB:
                     category = EXCLUDED.category,
                     embedding = EXCLUDED.embedding;
             """
-            conn.run(
-                sql,
-                evidence_id=str(evidence_id)[:64],
-                news_id=(str(news_id)[:64] if news_id else None),
-                title=str(title)[:500],
-                text=str(text)[:2500],
-                source=str(source)[:120],
-                source_type=str(source_type)[:60],
-                truth_label=int(truth_label),
-                category=str(category)[:60],
-                vec=vec_literal,
-            )
+            with self.connection() as conn:
+                conn.run(
+                    sql,
+                    evidence_id=str(evidence_id)[:64],
+                    news_id=(str(news_id)[:64] if news_id else None),
+                    title=str(title)[:500],
+                    text=str(text)[:2500],
+                    source=str(source)[:120],
+                    source_type=str(source_type)[:60],
+                    truth_label=int(truth_label),
+                    category=str(category)[:60],
+                    vec=vec_literal,
+                )
             return True
         except Exception as e:
             logger.warning("pgvector upsert notice for %s: %s", evidence_id, e)
-            self.invalidate_current_connection()
             return False
 
     def search_truth_vectors(self, query_embedding: list, top_k: int = 5) -> List[Dict[str, Any]]:
         """Executes live pgvector HNSW cosine distance (<=>) query against official_truth_vectors."""
         try:
-            conn = self.get_connection()
             vec_literal = "[" + ",".join(f"{float(v):.6f}" for v in query_embedding[:384]) + "]"
             sql = """
                 SELECT evidence_id, news_id, title, text, source, source_type, truth_label, category,
@@ -505,8 +571,9 @@ class SupabaseDB:
                 ORDER BY embedding <=> CAST(:vec AS vector)
                 LIMIT :lim;
             """
-            rows = conn.run(sql, vec=vec_literal, lim=int(top_k))
-            cols = [c["name"] for c in conn.columns] if conn.columns else []
+            with self.connection() as conn:
+                rows = conn.run(sql, vec=vec_literal, lim=int(top_k))
+                cols = [c["name"] for c in conn.columns] if conn.columns else []
             out = []
             for r in rows:
                 d = dict(zip(cols, r))
@@ -515,28 +582,26 @@ class SupabaseDB:
             return out
         except Exception as e:
             logger.warning("pgvector search notice: %s", e)
-            self.invalidate_current_connection()
             return []
 
     def delete_truth_vector(self, identifier: str) -> int:
         """Removes a purged/forgotten item from official_truth_vectors by evidence_id, news_id, or title substring."""
         try:
-            conn = self.get_connection()
             sql = """
                 DELETE FROM official_truth_vectors
                 WHERE evidence_id = :ident OR news_id = :ident OR title = :ident;
             """
-            conn.run(sql, ident=str(identifier))
+            with self.connection() as conn:
+                conn.run(sql, ident=str(identifier))
             return 1
         except Exception as e:
             logger.warning("pgvector delete notice: %s", e)
-            self.invalidate_current_connection()
             return 0
 
     def get_truth_vector_count(self) -> int:
         try:
-            conn = self.get_connection()
-            rows = conn.run("SELECT COUNT(*) FROM official_truth_vectors;")
+            with self.connection() as conn:
+                rows = conn.run("SELECT COUNT(*) FROM official_truth_vectors;")
             return int(rows[0][0]) if rows else 0
         except Exception:
             return 0
@@ -544,37 +609,37 @@ class SupabaseDB:
     def sync_training_samples_index(self, df_rows: list) -> int:
         """Populates training_samples metadata table in Supabase via single batched JSONB insert."""
         try:
-            conn = self.get_connection()
-            res = conn.run("SELECT COUNT(*) FROM training_samples;")
-            existing = int(res[0][0]) if res else 0
-            if existing >= 100 or not df_rows:
-                return existing
-            batch = []
-            for row in df_rows[:300]:
-                sid = str(row.get("sample_id") or "").replace("\x00", "")[:64]
-                if not sid:
-                    continue
-                nid = str(row.get("news_id") or "").replace("\x00", "")[:64] or None
-                batch.append({
-                    "sample_id": sid,
-                    "news_id": nid,
-                    "shard_id": int(row.get("shard_id", 0)),
-                    "slice_id": int(row.get("slice_id", 0)),
-                    "title": str(row.get("title") or "").replace("\x00", "")[:400],
-                    "text": str(row.get("text") or "").replace("\x00", "")[:1200],
-                    "label": int(row.get("label", 0)),
-                    "status": str(row.get("status") or "ACTIVE")[:48],
-                })
-            if not batch:
-                return existing
-            sql = """
-                INSERT INTO training_samples (sample_id, news_id, shard_id, slice_id, title, text, label, status)
-                SELECT sample_id, news_id, shard_id, slice_id, title, text, label, status
-                FROM jsonb_to_recordset(CAST(:rows_json AS jsonb))
-                  AS x(sample_id text, news_id text, shard_id int, slice_id int, title text, text text, label int, status text)
-                ON CONFLICT (sample_id) DO NOTHING;
-            """
-            conn.run(sql, rows_json=json.dumps(batch))
+            with self.connection() as conn:
+                res = conn.run("SELECT COUNT(*) FROM training_samples;")
+                existing = int(res[0][0]) if res else 0
+                if existing >= 100 or not df_rows:
+                    return existing
+                batch = []
+                for row in df_rows[:300]:
+                    sid = str(row.get("sample_id") or "").replace("\x00", "")[:64]
+                    if not sid:
+                        continue
+                    nid = str(row.get("news_id") or "").replace("\x00", "")[:64] or None
+                    batch.append({
+                        "sample_id": sid,
+                        "news_id": nid,
+                        "shard_id": int(row.get("shard_id", 0)),
+                        "slice_id": int(row.get("slice_id", 0)),
+                        "title": str(row.get("title") or "").replace("\x00", "")[:400],
+                        "text": str(row.get("text") or "").replace("\x00", "")[:1200],
+                        "label": int(row.get("label", 0)),
+                        "status": str(row.get("status") or "ACTIVE")[:48],
+                    })
+                if not batch:
+                    return existing
+                sql = """
+                    INSERT INTO training_samples (sample_id, news_id, shard_id, slice_id, title, text, label, status)
+                    SELECT sample_id, news_id, shard_id, slice_id, title, text, label, status
+                    FROM jsonb_to_recordset(CAST(:rows_json AS jsonb))
+                      AS x(sample_id text, news_id text, shard_id int, slice_id int, title text, text text, label int, status text)
+                    ON CONFLICT (sample_id) DO NOTHING;
+                """
+                conn.run(sql, rows_json=json.dumps(batch))
             return len(batch)
         except Exception as e:
             logger.warning("Training samples index sync notice: %s", e)
@@ -585,14 +650,14 @@ class SupabaseDB:
         if not sample_ids:
             return 0
         try:
-            conn = self.get_connection()
             clean_ids = [str(s) for s in sample_ids if s]
             if not clean_ids:
                 return 0
-            conn.run(
-                "DELETE FROM training_samples WHERE sample_id = ANY(SELECT jsonb_array_elements_text(CAST(:sids AS jsonb)));",
-                sids=json.dumps(clean_ids),
-            )
+            with self.connection() as conn:
+                conn.run(
+                    "DELETE FROM training_samples WHERE sample_id = ANY(SELECT jsonb_array_elements_text(CAST(:sids AS jsonb)));",
+                    sids=json.dumps(clean_ids),
+                )
             return len(clean_ids)
         except Exception as e:
             logger.debug("Training sample unlearn update notice: %s", e)

@@ -24,7 +24,7 @@ function applySecurityHeaders(response: Response, pathname: string): Response {
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   if (pathname === "/" || pathname.endsWith(".html")) {
-    headers.set("Cache-Control", "no-cache");
+    headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
   } else if (pathname.startsWith("/static/")) {
     headers.set("Cache-Control", "public, max-age=3600");
   }
@@ -40,8 +40,8 @@ export default {
     const requestUrl = new URL(request.url);
     const { pathname } = requestUrl;
 
-    // Proxy API requests and WebSocket upgrades to Google Cloud Run backend.
-    if (pathname.startsWith("/api/") || pathname === "/ws") {
+    // Proxy API requests, WebSocket upgrades, and fallback uploads to Google Cloud Run backend.
+    if (pathname.startsWith("/api/") || pathname === "/ws" || pathname.startsWith("/static/uploads/")) {
       const upstreamUrl = resolveBackendUrl(requestUrl, env);
       const upstreamHeaders = buildUpstreamHeaders(request, requestUrl);
 

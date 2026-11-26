@@ -867,7 +867,7 @@ class MultiModelUnlearningSuite:
 
         if committed_engines is not None:
             self.baseline_engine, self.sisa_engine, self.svm_engine, self.lora_engine = committed_engines
-            if executed_strategy in ("algorithm_3_lora", "algorithm_4_hybrid"):
+            if executed_strategy in ("algorithm_3_lora", "algorithm_4_hybrid", "all_benchmark"):
                 self.lora_engine.save_mask()
 
         baseline_time = max(results[0]["execution_time_ms"], 0.01)

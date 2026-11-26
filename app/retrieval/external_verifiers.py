@@ -1,6 +1,7 @@
 import json
 import math
 import re
+import ssl
 import time
 import logging
 import urllib.parse
@@ -14,6 +15,15 @@ import config
 from app.retrieval.encoder import regional_encoder
 
 logger = logging.getLogger("ExternalVerifiers")
+
+
+def _get_ssl_context() -> ssl.SSLContext:
+    """Returns verified SSL context using certifi CA bundle when available."""
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        return ssl.create_default_context()
 
 # Simple in-memory TTL cache to avoid repeated network round-trips for identical claims
 _TTL_CACHE: Dict[str, Tuple[float, Any]] = {}
@@ -276,7 +286,7 @@ class StructuredNERAndSPOEngine:
                 q = urllib.parse.quote(term)
                 url = f"https://www.wikidata.org/w/api.php?action=wbsearchentities&search={q}&language=en&format=json&limit=1"
                 req = urllib.request.Request(url, headers={"User-Agent": "SmritiShuddhi-NER/2.0"})
-                with urllib.request.urlopen(req, timeout=2.2) as resp:
+                with urllib.request.urlopen(req, timeout=4.0, context=_get_ssl_context()) as resp:
                     data = json.loads(resp.read().decode("utf-8"))
                 hits = data.get("search") or []
                 if hits:
@@ -336,7 +346,7 @@ class LiveFactCheckClient:
                     f"?query={urllib.parse.quote(search_q)}&languageCode=en&pageSize=4&key={urllib.parse.quote(api_key)}"
                 )
                 req = urllib.request.Request(url, headers={"User-Agent": "SmritiShuddhi-FactCheck/2.0"})
-                with urllib.request.urlopen(req, timeout=3.5) as resp:
+                with urllib.request.urlopen(req, timeout=6.0, context=_get_ssl_context()) as resp:
                     data = json.loads(resp.read().decode("utf-8"))
                 api_used = True
                 for claim in data.get("claims", [])[:4]:
@@ -352,7 +362,7 @@ class LiveFactCheckClient:
                             "layer": "Google Fact Check Tools API",
                         })
             except Exception as e:
-                logger.debug("Google Fact Check API notice: %s", e)
+                logger.warning("Google Fact Check API notice: %s", e)
 
         # Layer B: $0 Google News Fact-Check / PIB fallback if API returned zero items
         if not matches:
@@ -360,7 +370,7 @@ class LiveFactCheckClient:
                 rss_q = urllib.parse.quote_plus(f"{search_q} (\"fact check\" OR \"PIB Fact Check\" OR \"Alt News\")")
                 url = f"https://news.google.com/rss/search?q={rss_q}&hl=en-IN&gl=IN&ceid=IN:en"
                 req = urllib.request.Request(url, headers={"User-Agent": "SmritiShuddhi-FactCheck/2.0"})
-                with urllib.request.urlopen(req, timeout=3.0) as resp:
+                with urllib.request.urlopen(req, timeout=5.0, context=_get_ssl_context()) as resp:
                     root = ET.fromstring(resp.read())
                 for item in root.findall("./channel/item")[:3]:
                     it_title = (item.findtext("title") or "").strip()
@@ -380,7 +390,7 @@ class LiveFactCheckClient:
                             "layer": "Google News Fact-Check RSS ($0 Fallback)",
                         })
             except Exception as e:
-                logger.debug("Fact-check RSS fallback notice: %s", e)
+                logger.warning("Fact-check RSS fallback notice: %s", e)
 
         factcheck_risk = None
         if matches:
@@ -436,7 +446,7 @@ class LiveOpenMeteoVerifier:
                 f"?latitude={lat}&longitude={lon}&current=temperature_2m,precipitation,wind_speed_10m,weather_code&timezone=Asia/Kolkata"
             )
             req = urllib.request.Request(url, headers={"User-Agent": "SmritiShuddhi-Weather/2.0"})
-            with urllib.request.urlopen(req, timeout=2.5) as resp:
+            with urllib.request.urlopen(req, timeout=5.0, context=_get_ssl_context()) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
             cur = data.get("current") or {}
             res = {
@@ -449,7 +459,8 @@ class LiveOpenMeteoVerifier:
             }
             _cache_set(cache_k, res)
             return res
-        except Exception:
+        except Exception as e:
+            logger.warning("Open-Meteo weather fetch notice for %s: %s", display, e)
             return None
 
     def verify_weather_claim(self, combined_text: str) -> Dict[str, Any]:
@@ -628,24 +639,26 @@ class GeminiFactSynthesisClient:
         )
         raw_models = [
             "gemini-3-flash-preview",
-            getattr(config, "GEMINI_MODEL", "gemini-flash-latest") or "gemini-flash-latest",
-            "gemini-3.8-flash",
+            getattr(config, "GEMINI_MODEL", "gemini-3-flash-preview") or "gemini-3-flash-preview",
+            "gemini-flash-latest",
             "gemini-flash-lite-latest",
         ]
-        models = list(dict.fromkeys(m for m in raw_models if m))
+        models = list(dict.fromkeys(m for m in raw_models if m and m != "gemini-3.8-flash"))
+        ssl_ctx = _get_ssl_context()
         for mdl in models:
             try:
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/{mdl}:generateContent?key={urllib.parse.quote(api_key)}"
                 payload = json.dumps({"contents": [{"parts": [{"text": prompt}]}]}).encode("utf-8")
                 req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")
-                with urllib.request.urlopen(req, timeout=8.0) as resp:
+                with urllib.request.urlopen(req, timeout=8.0, context=ssl_ctx) as resp:
                     data = json.loads(resp.read().decode("utf-8"))
                 cands = data.get("candidates") or []
                 if cands:
                     parts = (cands[0].get("content") or {}).get("parts") or []
                     if parts and parts[0].get("text"):
                         return parts[0]["text"].strip()
-            except Exception:
+            except Exception as e:
+                logger.warning("Gemini model '%s' notice: %s", mdl, e)
                 continue
         return None
 
