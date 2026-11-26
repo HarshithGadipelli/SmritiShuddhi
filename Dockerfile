@@ -24,13 +24,16 @@ RUN pip install --upgrade pip && \
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r /app/requirements.txt
 
+# Pre-download HuggingFace weights in an isolated cacheable layer BEFORE copying app code
+COPY app/utils/preload_models.py /app/app/utils/preload_models.py
+RUN mkdir -p /app/logs /app/artifacts/evaluation /app/data/qdrant_storage /app/static/uploads /app/sisa_adapters /app/models_cache && \
+    python -c "import runpy; runpy.run_path('/app/app/utils/preload_models.py')['ensure_models_cached']()"
+
 # Copy project files (honoring .dockerignore; works cleanly both with local caches & clean Git clones)
 COPY . /app
 
-RUN mkdir -p /app/logs /app/artifacts/evaluation /app/data/qdrant_storage /app/static/uploads /app/sisa_adapters /app/models_cache
-
-# Pre-cache bge-small-en-v1.5, deberta-v3-xsmall & initial SISA shards if not already baked in context
-RUN python -m app.utils.preload_models
+# Build initial SISA shards using already-cached offline models if shards are not present
+RUN python -c "import runpy; runpy.run_path('/app/app/utils/preload_models.py')['ensure_initial_sisa_shards']()"
 
 # Lock offline mode at runtime & grant non-root UID 1000 permissions (required by Hugging Face Spaces)
 ENV HF_HUB_OFFLINE=1 \

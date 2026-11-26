@@ -1,27 +1,39 @@
 # =====================================================================
-# SMRITI SHUDDHI - GOOGLE CLOUD BUILD -> CLOUD RUN PIPELINE
-# Usage:
-#   gcloud builds submit --config cloudbuild.yaml
-# Set runtime secrets in Cloud Run (Secret Manager or env vars):
-#   DATABASE_URL, SUPABASE_URL, SUPABASE_KEY, GUARDIAN_API_KEY,
-#   THE_NEWS_API_TOKEN, GOOGLE_FACTCHECK_API_KEY, GEMINI_API_KEY, SECRET_KEY
+# SMRITI SHUDDHI - FAST CACHED GOOGLE CLOUD BUILD -> CLOUD RUN PIPELINE
+# Supports both GitHub-triggered automatic builds and manual `gcloud builds submit`.
 # =====================================================================
 steps:
+  # 1. Pull previous :latest image (non-fatal on first build) to reuse pip/PyTorch/HF layers
   - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - 'docker pull ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi:latest || true'
+
+  # 2. Build using BuildKit inline layer cache so code-only Git pushes rebuild in ~1 minute
+  - name: 'gcr.io/cloud-builders/docker'
+    env:
+      - 'DOCKER_BUILDKIT=1'
     args:
       - 'build'
+      - '--build-arg'
+      - 'BUILDKIT_INLINE_CACHE=1'
+      - '--cache-from'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi:latest'
       - '-t'
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi:${BUILD_ID}'
       - '-t'
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi:latest'
       - '.'
 
+  # 3. Push both immutable BUILD_ID tag and updated :latest cache tag
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
       - '--all-tags'
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi'
 
+  # 4. Roll out new revision cleanly while preserving Cloud Run runtime secrets/env vars
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:

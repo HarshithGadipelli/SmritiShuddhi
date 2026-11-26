@@ -298,13 +298,29 @@ Open **`http://127.0.0.1:8000`** in your browser (`http://127.0.0.1:8000/docs` f
 
 ## 7. Cloud Deployment & GitHub Auto-Deploy Guide
 
-### A. Automated GitHub CI/CD (Recommended — Update Directly via `git push`)
-[`.github/workflows/deploy.yml`](file:///c:/Users/Harshith%20Gadipelli/Documents/Projectlu/SmritiShuddhi/.github/workflows/deploy.yml) runs automated verification on every push/PR, and automatically deploys both Cloud Run and Cloudflare Workers on pushes to `main`/`master` once these GitHub Repository Secrets/Variables are configured (**GitHub → Settings → Secrets and variables → Actions**):
-- **Variable**: `GCP_PROJECT_ID` (your Google Cloud project ID, e.g. `project-5e24ddd4-8856-4b35-aeb`)
-- **Secret**: `GCP_SA_KEY` (JSON key for a GCP service account with Cloud Build Editor, Cloud Run Admin, Artifact Registry Writer, and Service Account User roles)
-- **Secrets (Cloudflare)**: `CLOUDFLARE_API_TOKEN` (Workers edit permission) and `CLOUDFLARE_ACCOUNT_ID` (`0e9d9e3453b93f963b60116f28e8368a`)
+### A. Automated Real-Time Git Updates (No Manual Local Builds Required)
+Both the Cloud Run backend and Cloudflare Workers frontend are configured for **real-time `git push` updates**:
 
-*(Alternative native GCP option: In **Google Cloud Console → Cloud Build → Triggers**, connect `HarshithGadipelli/SmritiShuddhi`, set branch `^main$`, and select **Cloud Build configuration file: `/cloudbuild.yaml`**. Every `git push` builds from GitHub without uploading local tarballs.)*
+1. **Smart Path-Filtered GitHub Actions ([`.github/workflows/deploy.yml`](file:///c:/Users/Harshith%20Gadipelli/Documents/Projectlu/SmritiShuddhi/.github/workflows/deploy.yml))**:
+   - **Docs-only edits (`*.md`)**: Skip Docker/Worker deploys automatically.
+   - **Frontend edits (`templates/`, `static/`, `cloudflare/`)**: Deploy **only Cloudflare Workers** in ~15 seconds.
+   - **Backend edits (`app/`, `Dockerfile`, `requirements.txt`)**: Run cached Cloud Build ([cloudbuild.yaml](file:///c:/Users/Harshith%20Gadipelli/Documents/Projectlu/SmritiShuddhi/cloudbuild.yaml)) using `DOCKER_BUILDKIT=1` + `--cache-from :latest` + split HuggingFace pre-download layers in [Dockerfile](file:///c:/Users/Harshith%20Gadipelli/Documents/Projectlu/SmritiShuddhi/Dockerfile) so PyTorch & Transformers remain cached across code pushes.
+   - Add these GitHub **Settings → Secrets and variables → Actions**:
+     - **Variable**: `GCP_PROJECT_ID` (`project-5e24ddd4-8856-4b35-aeb`)
+     - **Secret**: `GCP_SA_KEY` (GCP Service Account JSON with Cloud Build Editor, Cloud Run Admin, Artifact Registry Writer, Service Account User)
+     - **Secrets**: `CLOUDFLARE_API_TOKEN` (Scoped API Token — never expiring OAuth) and `CLOUDFLARE_ACCOUNT_ID` (`0e9d9e3453b93f963b60116f28e8368a`)
+
+2. **Native Git Integrations (Zero Local CLI Auth Needed)**:
+   - **Google Cloud Run / Cloud Build GitHub Trigger**: In Google Cloud Console → **Cloud Build → Triggers**, link `HarshithGadipelli/SmritiShuddhi` (`^main$`) to `/cloudbuild.yaml` (or use **Cloud Run → Set up Continuous Deployment**). Every `git push` builds directly from GitHub.
+   - **Cloudflare Workers Builds (Native Git Integration)**: In **Cloudflare Dashboard → Workers & Pages → `smritishuddhi` → Settings → Builds**, connect `HarshithGadipelli/SmritiShuddhi` (`main` branch, root directory `cloudflare`, build command `npm ci && npm run sync`, deploy command `npx wrangler deploy --experimental-new-config`). Every `git push` deploys inside Cloudflare without ever running `wrangler login`.
+
+### B. Why Scoped API Tokens Replace `wrangler login` (Fixing `code: 10001`)
+Interactive OAuth (`wrangler login`) stores short-lived OAuth tokens in user profile config folders and frequently fails in non-interactive shells, CI pipelines, or during OAuth edge errors (`HTTP 503 / code: 10001: Unable to authenticate request`). Creating a **Scoped Cloudflare API Token** (`https://dash.cloudflare.com/profile/api-tokens` → **Edit Cloudflare Workers** template) fixes this permanently:
+```powershell
+$env:CLOUDFLARE_API_TOKEN="your-scoped-token"
+cd cloudflare
+npm run deploy
+```
 
 ### B. Manual Cloud Run Backend Deployment (Google Cloud SDK)
 ```powershell
