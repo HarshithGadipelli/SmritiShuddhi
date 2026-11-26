@@ -32,11 +32,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 KNOWN_COLUMNS = {
     "news": {
         "news_id", "sample_id", "title", "text", "category", "source", "region",
-        "language", "author", "image_url", "reading_time", "status", "real_probability",
+        "language", "author", "image_url", "url", "reading_time", "status", "real_probability",
         "fake_probability", "s_style", "s_fact", "s_quant", "s_prop", "s_propagation",
         "temporal_consistency", "xai", "created_at", "updated_at", "is_user_submission",
         "tag", "tag_display", "risk_band", "action_recommended", "unlearned_strategy",
-        "unlearned_at", "residual_influence_pct", "retain_accuracy_pct", "parameters_modified_pct"
+        "unlearned_at", "residual_influence_pct", "retain_accuracy_pct", "parameters_modified_pct",
+        "view_count", "share_count", "flag_count", "bookmark_count", "first_seen_at", "last_interacted_at"
     },
     "official_truth_vectors": {
         "id", "evidence_id", "news_id", "title", "text", "source", "source_type",
@@ -66,6 +67,9 @@ KNOWN_COLUMNS = {
         "metric_id", "category", "metric_name", "symbol", "unit", "baseline_value",
         "min_realistic", "max_realistic", "daily_swing_limit_pct", "extreme_anomaly_pct",
         "rule_summary", "last_updated"
+    },
+    "app_settings": {
+        "setting_key", "setting_value", "updated_by", "updated_at"
     }
 }
 
@@ -381,7 +385,8 @@ class SupabaseDB:
             host=p.hostname,
             port=p.port or 5432,
             database=p.path.lstrip("/") or "postgres",
-            ssl_context=ctx
+            ssl_context=ctx,
+            timeout=12
         )
 
     def get_connection(self):
@@ -419,9 +424,179 @@ class SupabaseDB:
                         conn.run(stmt + ";")
                     except Exception:
                         pass
+                # Ensure additive propagation columns exist on pre-existing Supabase news tables
+                alter_stmts = [
+                    "ALTER TABLE news ADD COLUMN IF NOT EXISTS url TEXT;",
+                    "ALTER TABLE news ADD COLUMN IF NOT EXISTS view_count INT DEFAULT 0;",
+                    "ALTER TABLE news ADD COLUMN IF NOT EXISTS share_count INT DEFAULT 0;",
+                    "ALTER TABLE news ADD COLUMN IF NOT EXISTS flag_count INT DEFAULT 0;",
+                    "ALTER TABLE news ADD COLUMN IF NOT EXISTS bookmark_count INT DEFAULT 0;",
+                    "ALTER TABLE news ADD COLUMN IF NOT EXISTS first_seen_at TIMESTAMPTZ DEFAULT NOW();",
+                    "ALTER TABLE news ADD COLUMN IF NOT EXISTS last_interacted_at TIMESTAMPTZ DEFAULT NOW();",
+                    "ALTER TABLE news ADD COLUMN IF NOT EXISTS s_propagation FLOAT DEFAULT 0.10;",
+                ]
+                for astmt in alter_stmts:
+                    try:
+                        conn.run(astmt)
+                    except Exception:
+                        pass
                 logger.info("Supabase schema verified and applied.")
             except Exception as e:
                 logger.warning("Schema initialization notice: %s", e)
+
+    def upsert_truth_vector(
+        self,
+        evidence_id: str,
+        title: str,
+        text: str,
+        source: str,
+        source_type: str,
+        truth_label: int,
+        category: str,
+        embedding: list,
+        news_id: Optional[str] = None,
+    ) -> bool:
+        """Upserts a 384-dim pgvector ground-truth or debunk record into official_truth_vectors."""
+        try:
+            conn = self.get_connection()
+            vec_literal = "[" + ",".join(f"{float(v):.6f}" for v in embedding[:384]) + "]"
+            sql = """
+                INSERT INTO official_truth_vectors
+                    (evidence_id, news_id, title, text, source, source_type, truth_label, category, embedding)
+                VALUES
+                    (:evidence_id, :news_id, :title, :text, :source, :source_type, :truth_label, :category, CAST(:vec AS vector))
+                ON CONFLICT (evidence_id) DO UPDATE SET
+                    title = EXCLUDED.title,
+                    text = EXCLUDED.text,
+                    source = EXCLUDED.source,
+                    source_type = EXCLUDED.source_type,
+                    truth_label = EXCLUDED.truth_label,
+                    category = EXCLUDED.category,
+                    embedding = EXCLUDED.embedding;
+            """
+            conn.run(
+                sql,
+                evidence_id=str(evidence_id)[:64],
+                news_id=(str(news_id)[:64] if news_id else None),
+                title=str(title)[:500],
+                text=str(text)[:2500],
+                source=str(source)[:120],
+                source_type=str(source_type)[:60],
+                truth_label=int(truth_label),
+                category=str(category)[:60],
+                vec=vec_literal,
+            )
+            return True
+        except Exception as e:
+            logger.warning("pgvector upsert notice for %s: %s", evidence_id, e)
+            self.invalidate_current_connection()
+            return False
+
+    def search_truth_vectors(self, query_embedding: list, top_k: int = 5) -> List[Dict[str, Any]]:
+        """Executes live pgvector HNSW cosine distance (<=>) query against official_truth_vectors."""
+        try:
+            conn = self.get_connection()
+            vec_literal = "[" + ",".join(f"{float(v):.6f}" for v in query_embedding[:384]) + "]"
+            sql = """
+                SELECT evidence_id, news_id, title, text, source, source_type, truth_label, category,
+                       1.0 - (embedding <=> CAST(:vec AS vector)) AS score
+                FROM official_truth_vectors
+                WHERE embedding IS NOT NULL
+                ORDER BY embedding <=> CAST(:vec AS vector)
+                LIMIT :lim;
+            """
+            rows = conn.run(sql, vec=vec_literal, lim=int(top_k))
+            cols = [c["name"] for c in conn.columns] if conn.columns else []
+            out = []
+            for r in rows:
+                d = dict(zip(cols, r))
+                d["score"] = round(float(d.get("score") or 0.0), 4)
+                out.append(d)
+            return out
+        except Exception as e:
+            logger.warning("pgvector search notice: %s", e)
+            self.invalidate_current_connection()
+            return []
+
+    def delete_truth_vector(self, identifier: str) -> int:
+        """Removes a purged/forgotten item from official_truth_vectors by evidence_id, news_id, or title substring."""
+        try:
+            conn = self.get_connection()
+            sql = """
+                DELETE FROM official_truth_vectors
+                WHERE evidence_id = :ident OR news_id = :ident OR title = :ident;
+            """
+            conn.run(sql, ident=str(identifier))
+            return 1
+        except Exception as e:
+            logger.warning("pgvector delete notice: %s", e)
+            self.invalidate_current_connection()
+            return 0
+
+    def get_truth_vector_count(self) -> int:
+        try:
+            conn = self.get_connection()
+            rows = conn.run("SELECT COUNT(*) FROM official_truth_vectors;")
+            return int(rows[0][0]) if rows else 0
+        except Exception:
+            return 0
+
+    def sync_training_samples_index(self, df_rows: list) -> int:
+        """Populates training_samples metadata table in Supabase via single batched JSONB insert."""
+        try:
+            conn = self.get_connection()
+            res = conn.run("SELECT COUNT(*) FROM training_samples;")
+            existing = int(res[0][0]) if res else 0
+            if existing >= 100 or not df_rows:
+                return existing
+            batch = []
+            for row in df_rows[:300]:
+                sid = str(row.get("sample_id") or "").replace("\x00", "")[:64]
+                if not sid:
+                    continue
+                nid = str(row.get("news_id") or "").replace("\x00", "")[:64] or None
+                batch.append({
+                    "sample_id": sid,
+                    "news_id": nid,
+                    "shard_id": int(row.get("shard_id", 0)),
+                    "slice_id": int(row.get("slice_id", 0)),
+                    "title": str(row.get("title") or "").replace("\x00", "")[:400],
+                    "text": str(row.get("text") or "").replace("\x00", "")[:1200],
+                    "label": int(row.get("label", 0)),
+                    "status": str(row.get("status") or "ACTIVE")[:48],
+                })
+            if not batch:
+                return existing
+            sql = """
+                INSERT INTO training_samples (sample_id, news_id, shard_id, slice_id, title, text, label, status)
+                SELECT sample_id, news_id, shard_id, slice_id, title, text, label, status
+                FROM jsonb_to_recordset(CAST(:rows_json AS jsonb))
+                  AS x(sample_id text, news_id text, shard_id int, slice_id int, title text, text text, label int, status text)
+                ON CONFLICT (sample_id) DO NOTHING;
+            """
+            conn.run(sql, rows_json=json.dumps(batch))
+            return len(batch)
+        except Exception as e:
+            logger.warning("Training samples index sync notice: %s", e)
+            return 0
+
+    def mark_training_samples_unlearned(self, sample_ids: list) -> int:
+        """Purges target sample_ids from Supabase training_samples in one SQL roundtrip."""
+        if not sample_ids:
+            return 0
+        try:
+            conn = self.get_connection()
+            clean_ids = [str(s) for s in sample_ids if s]
+            if not clean_ids:
+                return 0
+            conn.run(
+                "DELETE FROM training_samples WHERE sample_id = ANY(SELECT jsonb_array_elements_text(CAST(:sids AS jsonb)));",
+                sids=json.dumps(clean_ids),
+            )
+            return len(clean_ids)
+        except Exception as e:
+            logger.debug("Training sample unlearn update notice: %s", e)
+            return 0
 
     def _seed_initial_data(self, conn):
         """Seeds initial verified news dispatches into Supabase if empty."""

@@ -11,18 +11,16 @@
 </head>
 <body>
   <!-- =====================================================================
-       TOP TICKER: GLOBAL MARKETS & WEATHER (NEWSPAPER HEADER BAR)
+       TOP UTILITY BAR: LIVE WEATHER & VERIFIED BROADSHEET EDITION
        ===================================================================== -->
   <div class="market-ticker-bar">
-    <div class="market-ticker-track">
-      <span class="ticker-item"><span class="ticker-dot live-pulse"></span> <strong>EDITION:</strong> Global Digital & India National</span>
-      <span class="ticker-item">🌦️ New Delhi 28°C / Clear</span>
-      <span class="ticker-item">📈 BSE SENSEX <strong>81,452.80</strong> <span class="accent-green">+0.42%</span></span>
-      <span class="ticker-item">📈 NIFTY 50 <strong>24,815.10</strong> <span class="accent-green">+0.48%</span></span>
-      <span class="ticker-item">📉 BRENT CRUDE <strong>$74.20</strong> <span class="accent-crimson">-0.82%</span></span>
-      <span class="ticker-item">🟡 GOLD 24K <strong>₹78,400</strong>/10g</span>
-      <span class="ticker-item">🛡️ <strong>AI VERIFICATION:</strong> DeBERTa-v3 + BGE-M3 + Neo4j Active</span>
-      <span class="ticker-item">⚡ <strong>UNLEARN:</strong> 3 Exact Structural Families Ready</span>
+    <div class="market-ticker-track" id="liveUtilityTicker">
+      <span class="ticker-item"><span class="ticker-dot live-pulse"></span> <strong>EDITION:</strong> Digital Broadsheet • India &amp; Global Wire</span>
+      <span class="ticker-item" id="wxDelhi">🌦️ New Delhi: Loading live telemetry...</span>
+      <span class="ticker-item" id="wxHyderabad">🌦️ Hyderabad: Loading live telemetry...</span>
+      <span class="ticker-item" id="wxMumbai">🌦️ Mumbai: Loading live telemetry...</span>
+      <span class="ticker-item">🗞️ <strong>WIRES:</strong> The Hindu • The Guardian • TheNewsAPI • Indian Express • BBC • TechCrunch</span>
+      <span class="ticker-item">🛡️ <strong>VERIFICATION:</strong> Multi-Source Fact Check &amp; Right-to-Correction Active</span>
     </div>
   </div>
 
@@ -194,9 +192,9 @@
 
         <!-- RIGHT EARPIECE: BROADSHEET ARCHIVE -->
         <div class="masthead-ear ear-right">
-          <span class="ear-label">BROADSHEET REGISTRY</span>
-          <span class="ear-headline">VOL. LXXIV • THREE RUPEES</span>
-          <span class="ear-quote">100% UNLEARNING CERTIFIED</span>
+          <span class="ear-label">DIGITAL EDITION</span>
+          <span class="ear-headline">VERIFIED JOURNALISM</span>
+          <span class="ear-quote">REAL-TIME FACT INTEGRITY</span>
         </div>
       </div>
 
@@ -220,13 +218,13 @@
           <span class="breaking-item" onclick="openFeaturedLeadArticle()">🚨 <strong>PIB FACT CHECK:</strong> Viral WhatsApp claim on currency demonetization is fake and unsubstantiated.</span>
           <span class="breaking-item">🛰️ <strong>ISRO ARCHIVE:</strong> Lunar elemental spectrometry repository released on ISSDC portal for global researchers.</span>
           <span class="breaking-item">🌡️ <strong>IMD WARNING:</strong> Severe heatwave advisory active across northern states; public urged to take precautions.</span>
-          <span class="breaking-item">⚡ <strong>MACHINE UNLEARNING:</strong> 3 structural families active: SISA Partitioning, Decremental Closed-Form SVM, and Modular LoRA.</span>
+          <span class="breaking-item">⚡ <strong>MACHINE UNLEARNING:</strong> 5 strategies active: Baseline Retrain, SISA Partitioning, Decremental SVM, Modular LoRA & Unified Hybrid.</span>
         </div>
       </div>
       <button class="live-sync-btn" onclick="syncLiveNews()" title="Fetch live real-time RSS news wire">
         <span id="syncIcon">🔄</span> <span id="syncBtnText">Sync Live Wire</span>
       </button>
-      <button class="live-sync-btn api-settings-btn" onclick="openApiConfigModal()" title="Configure external live news APIs (NewsAPI.org / GNews.io)" style="background: rgba(255,255,255,0.08); border: 1px solid var(--border-subtle); margin-left: 6px;">
+      <button class="live-sync-btn api-settings-btn" onclick="openApiConfigModal()" title="View live news & fact-check API connections" style="background: rgba(255,255,255,0.08); border: 1px solid var(--border-subtle); margin-left: 6px;">
         <span>⚙️</span> <span>API Settings</span>
       </button>
       <button class="live-sync-btn graph-visual-btn" onclick="openKnowledgeGraphModal()" title="Explore Chronological Entity Knowledge Graph visually" style="background: rgba(2, 132, 199, 0.12); border: 1px solid var(--accent-cyan); margin-left: 6px; color: var(--accent-cyan);">
@@ -250,11 +248,11 @@
           <span class="nav-badge" id="mySubmissionsCount">0</span>
         </button>
         <button class="nav-tab admin-only-tab" id="tabAdminBtn" onclick="switchTab('admin')">
-          <span class="tab-icon">🛡️</span> <span id="tabAdminText">Admin Editorial & 3-Family Unlearning</span>
-          <span class="nav-badge badge-crimson" id="adminPendingBadge">2</span>
+          <span class="tab-icon">🛡️</span> <span id="tabAdminText">Admin Research Lab &amp; Unlearning</span>
+          <span class="nav-badge badge-crimson" id="adminPendingBadge">0</span>
         </button>
-        <button class="nav-tab" id="tabAuditBtn" onclick="switchTab('audit')">
-          <span class="tab-icon">📡</span> <span id="tabAuditText">Live WebSocket Stream</span>
+        <button class="nav-tab admin-only-tab" id="tabAuditBtn" onclick="switchTab('audit')">
+          <span class="tab-icon">📡</span> <span id="tabAuditText">System Telemetry Stream</span>
         </button>
       </div>
 
@@ -267,16 +265,16 @@
       <!-- Live Pipeline Health Meters -->
       <div class="nav-meters admin-only-ui" id="adminNavMeters">
         <div class="meter-chip">
-          <span class="meter-label">REDIS:</span>
-          <span class="meter-val accent-green" id="cacheHitRate">Sub-5ms</span>
+          <span class="meter-label">CACHE:</span>
+          <span class="meter-val accent-green" id="cacheHitRate">&lt;1ms Hit</span>
         </div>
         <div class="meter-chip">
-          <span class="meter-label">DeBERTa:</span>
-          <span class="meter-val accent-purple">W₀ Frozen</span>
+          <span class="meter-label">BACKBONE:</span>
+          <span class="meter-val accent-purple">DeBERTa-xsmall</span>
         </div>
         <div class="meter-chip">
           <span class="meter-label">UNLEARN:</span>
-          <span class="meter-val accent-cyan">O(1) Algebraic</span>
+          <span class="meter-val accent-cyan">5-Strategy Hybrid</span>
         </div>
       </div>
 
@@ -301,61 +299,59 @@
          TAB 1: FRONT PAGE NEWS WIRE
          ===================================================================== -->
     <section class="view-section active" id="viewWire">
-      <!-- ANIME NEWS ANCHOR BROADCAST DESK -->
-      <div class="anime-anchor-broadcast-card">
-        <div class="anchor-avatar-box">
-          <img src="/static/anime_reporter.png" alt="Aria Vance - Lead AI Fact Verification Anchor" class="anchor-portrait">
-          <span class="live-stream-badge"><span class="pulse-dot"></span> LIVE ON AIR</span>
-        </div>
+      <!-- EDITORIAL WIRE BRIEFING & LIVE TOPIC DISCOVERY BAR -->
+      <div class="anime-anchor-broadcast-card" style="grid-template-columns: 1fr;">
         <div class="anchor-briefing-box">
           <div class="anchor-identity">
             <div class="anchor-name-row">
-              <span class="anchor-name">Aria Vance</span>
-              <span class="anchor-badge" id="anchorRoleBadge">Lead Fact Verification Anchor</span>
-              <span class="anchor-studio-tag">Smriti Shuddhi Neural Broadcast Studio 1A</span>
+              <span class="anchor-name">Smriti Shuddhi Live Verification Desk</span>
+              <span class="anchor-badge">Automated Multi-Source Newsroom</span>
+              <span class="anchor-studio-tag">Real-Time RSS • Guardian • TheNewsAPI • Google Fact Check</span>
             </div>
             <div class="anchor-channel-status">
-              <span class="status-indicator"></span> Real-Time Indian & Global Wire Feeds: <strong>The Hindu</strong>, <strong>Times of India</strong>, <strong>NDTV</strong>, <strong>BBC News Hindi</strong>, <strong>PIB Fact Check</strong>
+              <span class="status-indicator"></span> Live Verified Feeds: <strong>The Hindu</strong>, <strong>Times of India</strong>, <strong>Indian Express</strong>, <strong>NDTV</strong>, <strong>The Guardian</strong>, <strong>TechCrunch</strong>, <strong>BBC</strong>
             </div>
           </div>
           <div class="anchor-dialogue" id="anchorDialogue">
-            "Good day. I am Aria Vance, anchoring live from the Smriti Shuddhi Fact Verification Desk. 
-            All dispatches published here undergo rigorous <strong>Dual-Track Neural Verification</strong> (DeBERTa-v3 stylistic scrutiny + 1024-dim BGE-M3 fact cross-referencing). 
-            Should misinformation enter the system, our platform executes <strong>Exact Mathematical Unlearning</strong> across 3 structural families with 0.00% residual memorization."
+            Independent headlines and citizen submissions are cross-verified in real time across trusted publisher RSS feeds, Google Fact Check records, live Open-Meteo climate telemetry, and semantic knowledge stores — with transparent plain-English explanations and full Right-to-be-Forgotten correction controls.
           </div>
-          <div class="anchor-actions-bar">
+          <div class="anchor-actions-bar" style="flex-wrap: wrap;">
             <button class="btn btn-primary btn-sm" onclick="switchTab('ingest')">
-              <span>🎙️</span> <span id="anchorBtnSubmit">Submit Story for Fact-Check</span>
+              <span>✍️</span> <span id="anchorBtnSubmit">Verify Headline, Text, or URL</span>
             </button>
             <button class="btn btn-secondary btn-sm" onclick="syncLiveNews()">
-              <span>🔄</span> <span id="anchorBtnSync">Refresh Live Indian Wire Feeds</span>
+              <span>🔄</span> <span id="anchorBtnSync">Refresh Live News Feeds</span>
             </button>
             <button class="btn btn-amber btn-sm admin-only-ui" onclick="switchTab('admin')">
-              <span>🛡️</span> <span id="anchorBtnUnlearn">Launch 3-Family Unlearning Workbench</span>
+              <span>🛡️</span> <span id="anchorBtnUnlearn">Open Admin Unlearning Lab</span>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- PROMINENT FRONT-PAGE NEWS WIRE SEARCH & TOPIC BAR -->
+      <!-- PROMINENT FRONT-PAGE NEWS WIRE SEARCH & LIVE GOOGLE NEWS TOPIC SEARCH -->
       <div class="wire-search-bar-wrap">
-        <div class="wire-search-input-group">
+        <div class="wire-search-input-group" style="gap: 8px;">
           <span class="wire-search-icon">🔍</span>
-          <input type="text" id="frontPageSearchInput" class="wire-search-input" 
-                 placeholder="Search verified news dispatches, topics, fact-checks, authors, entities (e.g., 'Sensex', 'ISRO', 'RBI', 'Gold')..." 
-                 oninput="handleFrontPageSearch(event)">
+          <input type="text" id="frontPageSearchInput" class="wire-search-input"
+                 placeholder="Search local feed OR press 'Live Topic Search' for any keyword (e.g., 'AI News', 'Hyderabad', 'Cricket', 'Budget')..."
+                 oninput="handleFrontPageSearch(event)"
+                 onkeydown="if(event.key==='Enter'){searchLiveTopic(this.value);}">
+          <button type="button" class="btn btn-primary btn-xs" onclick="searchLiveTopic(document.getElementById('frontPageSearchInput').value)" title="Search live Google News RSS for any topic">
+            🌐 Live Topic Search
+          </button>
           <button type="button" class="btn-clear-search" id="btnClearFrontSearch" onclick="clearFrontPageSearch()" title="Clear search" style="display: none;">✕</button>
         </div>
         <div class="wire-search-stats" id="wireSearchStats">
-          <span class="search-badge" id="wireSearchCountBadge">Showing All Stories</span>
+          <span class="search-badge" id="wireSearchCountBadge">Showing Verified Dispatches</span>
         </div>
         <div class="wire-search-quick-tags">
-          <span class="quick-tag-label">Trending Topics:</span>
+          <span class="quick-tag-label">Live Topic Search:</span>
+          <button type="button" class="quick-topic-tag" onclick="searchLiveTopic('AI News')">🤖 AI News</button>
+          <button type="button" class="quick-topic-tag" onclick="searchLiveTopic('Hyderabad')">🏙️ Hyderabad</button>
+          <button type="button" class="quick-topic-tag" onclick="searchLiveTopic('Cricket')">🏏 Cricket</button>
           <button type="button" class="quick-topic-tag" onclick="quickFilterTopic('ISRO')">🛰️ ISRO Science</button>
-          <button type="button" class="quick-topic-tag" onclick="quickFilterTopic('Sensex')">📈 BSE Sensex</button>
-          <button type="button" class="quick-topic-tag" onclick="quickFilterTopic('RBI')">🏦 RBI Currency</button>
-          <button type="button" class="quick-topic-tag" onclick="quickFilterTopic('Gold')">🪙 24K Gold</button>
-          <button type="button" class="quick-topic-tag" onclick="quickFilterTopic('Weather')">🌦️ IMD Weather</button>
+          <button type="button" class="quick-topic-tag" onclick="quickFilterTopic('RBI')">🏦 RBI &amp; Economy</button>
         </div>
       </div>
 
@@ -365,11 +361,12 @@
         <div class="category-filters-bar">
           <span class="filter-label" id="lblSectionsFilter">Sections:</span>
           <button class="cat-pill active" onclick="filterCategory('All')">All Stories</button>
-          <button class="cat-pill" onclick="filterCategory('Science & Space')">Science & Space</button>
-          <button class="cat-pill" onclick="filterCategory('Banking & Economy')">Banking & Economy</button>
-          <button class="cat-pill" onclick="filterCategory('Governance & Policy')">Governance & Policy</button>
-          <button class="cat-pill" onclick="filterCategory('Technology & AI')">Technology & AI</button>
-          <button class="cat-pill" onclick="filterCategory('Weather & Safety')">Weather & Safety</button>
+          <button class="cat-pill" onclick="filterCategory('Governance & Policy')">India &amp; Policy</button>
+          <button class="cat-pill" onclick="filterCategory('Technology & AI')">Technology &amp; AI</button>
+          <button class="cat-pill" onclick="filterCategory('Banking & Economy')">Finance &amp; Business</button>
+          <button class="cat-pill" onclick="filterCategory('Sports')">Sports</button>
+          <button class="cat-pill" onclick="filterCategory('Science & Space')">Science &amp; Space</button>
+          <button class="cat-pill" onclick="filterCategory('Weather & Safety')">Weather</button>
         </div>
 
         <!-- LANGUAGE FILTER PILLS -->
@@ -502,6 +499,13 @@
 
           <!-- FORM INPUTS -->
           <div class="input-form">
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label for="articleUrlInput">Optional: Extract From Live News Article URL</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="url" id="articleUrlInput" placeholder="https://www.thehindu.com/..." style="flex: 1;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btnFetchUrl" onclick="extractArticleFromUrl()">🌐 Fetch Article</button>
+              </div>
+            </div>
             <div class="form-row">
               <div class="form-group flex-2">
                 <label for="headlineInput">Headline / Title *</label>
@@ -583,6 +587,8 @@
               <p id="citizenExplanationText">
                 Your submitted story has successfully passed independent multi-source verification and is published immediately to the public front-page wire!
               </p>
+              <ul id="citizenJustificationBullets" style="margin: 10px 0 0 18px; font-size: 0.84rem; color: var(--text-main); line-height: 1.55;"></ul>
+              <div id="citizenSubclaimBox" style="display: none; margin-top: 12px; padding: 10px 12px; border-radius: 6px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); font-size: 0.82rem;"></div>
             </div>
 
             <div class="citizen-checks-row">
@@ -676,6 +682,12 @@
               <ul class="xai-list" id="xaiList">
                 <li>Official verification evidence matched in Qdrant truth vectors.</li>
               </ul>
+            </div>
+
+            <!-- EXTENDED PART 1 VERIFIER SIGNALS -->
+            <div class="xai-box" id="extendedSignalsPanel" style="display: none; margin-top: 10px; border-left: 3px solid var(--accent-cyan);">
+              <div class="xai-header">🛡️ Extended Part 1 Neural & External Verifier Signals</div>
+              <div id="extendedSignalsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 8px; margin-top: 8px; font-size: 0.8rem;"></div>
             </div>
 
             <!-- LINGUISTIC DECEPTION HEATMAP -->
@@ -851,36 +863,47 @@
 
           <div class="admin-card unlearning-workbench">
             <div class="card-header header-green">
-              <h3>Exact Machine Unlearning Workbench (3 Structural Families)</h3>
+              <h3>Exact Machine Unlearning Workbench (5-Strategy Suite)</h3>
               <span class="badge-pill badge-green">Exact Removal Guarantee</span>
             </div>
 
             <!-- TARGET ARTICLE INSPECTOR -->
             <div class="target-inspector">
               <div class="target-meta">
-                <span class="target-id" id="targetSampleIdDisplay">TARGET SAMPLE: SYN_R_00445</span>
+                <span class="target-id" id="targetSampleIdDisplay">TARGET SAMPLE: Select or Load Story</span>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <span class="badge-pill badge-crimson" id="targetRiskTag">HIGH_RISK_FAKE</span>
+                  <span class="badge-pill badge-crimson" id="targetRiskTag">AWAITING_TARGET</span>
                   <button class="btn btn-secondary btn-xs" id="btnEditTargetArticle" onclick="openEditTargetArticle()" title="Edit or review this target article">
                     <span>✏️</span> Edit Target Article
                   </button>
                 </div>
               </div>
               <h4 class="target-headline" id="targetTitleDisplay">
-                VIRAL ALERT: RBI Invaliding All 500 Rupee Currency Notes Tonight
+                Select any quarantined, pending, or live dispatch from the queues
               </h4>
               <p class="target-excerpt" id="targetBodyDisplay">
-                Urgent WhatsApp warning: Reserve Bank of India is withdrawing all 500 currency notes from circulation midnight. Secret exposed share immediately before ban!
+                Click any dispatch card in the Editorial Queues or Reader Modal to inspect and execute exact unlearning across SISA shards, SVM weights, Modular LoRA slices, and Supabase records.
               </p>
             </div>
 
-            <!-- ALGORITHM SELECTOR: 3 STRUCTURAL FAMILIES + BASELINE -->
+            <!-- ALGORITHM SELECTOR: 5 EXACT STRATEGIES + SINGLE/BATCH CONTROLS -->
             <div class="unlearning-selector-box">
-              <div class="selector-header">
-                <span class="selector-title">Select Unlearning Algorithm to Execute:</span>
-                <button class="btn btn-amber btn-sm" onclick="executeSelectedUnlearning('all_benchmark')">
-                  <span>📊</span> Benchmark All 4 Concurrently
-                </button>
+              <div class="selector-header" style="flex-wrap: wrap; gap: 8px;">
+                <span class="selector-title">Select Unlearning Strategy (Single or Batch):</span>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <select id="adminActiveStrategySelect" style="padding: 5px 10px; border-radius: 6px; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-subtle); font-size: 0.8rem;">
+                    <option value="algorithm_4_hybrid">Algorithm 4: Unified Hybrid (Active)</option>
+                    <option value="algorithm_2_svm">Algorithm 2: Decremental SVM</option>
+                    <option value="algorithm_1_sisa">Algorithm 1: SISA Sharding</option>
+                    <option value="algorithm_3_lora">Algorithm 3: Modular LoRA</option>
+                    <option value="baseline_retrain">Baseline: Full Retrain</option>
+                  </select>
+                  <button class="btn btn-secondary btn-xs" onclick="saveActiveUnlearningStrategy()">💾 Set Active</button>
+                  <button class="btn btn-crimson btn-xs" onclick="executeBatchUnlearning()">⚡ Batch Unlearn Top 3</button>
+                  <button class="btn btn-amber btn-sm" onclick="executeSelectedUnlearning('all_benchmark')">
+                    <span>📊</span> Benchmark All 5 Models
+                  </button>
+                </div>
               </div>
 
               <div class="algorithm-cards-grid">
@@ -890,16 +913,16 @@
                   <div class="algo-name">🔄 Full Retraining</div>
                   <div class="algo-family">Exhaustive Optimization</div>
                   <div class="algo-complexity">O(N • epochs) • 100% Weights</div>
-                  <div class="algo-desc">Retrains model from scratch on D \ {x*}. Reference point.</div>
+                  <div class="algo-desc">Gold reference retraining from scratch on D \ D_f.</div>
                 </button>
 
                 <!-- ALGORITHM 1: SISA -->
-                <button class="algo-card-btn active" onclick="executeSelectedUnlearning('algorithm_1_sisa')">
+                <button class="algo-card-btn" onclick="executeSelectedUnlearning('algorithm_1_sisa')">
                   <div class="algo-family-tag tag-purple">FAMILY 1: PARTITIONING</div>
                   <div class="algo-name">🛡️ SISA Sharding</div>
                   <div class="algo-family">Data-Partitioning System</div>
-                  <div class="algo-complexity">O((N/K) • epochs) • 80% Faster</div>
-                  <div class="algo-desc">Retrains only shard k containing x*. Other 4 shards untouched.</div>
+                  <div class="algo-complexity">O((N/K) • epochs) • K=5</div>
+                  <div class="algo-desc">Retrains only shard k containing D_f. Sibling shards untouched.</div>
                 </button>
 
                 <!-- ALGORITHM 2: DECREMENTAL SVM -->
@@ -907,17 +930,26 @@
                   <div class="algo-family-tag tag-cyan">FAMILY 2: ALGEBRAIC</div>
                   <div class="algo-name">⚡ Decremental SVM</div>
                   <div class="algo-family">Closed-Form Matrix Updates</div>
-                  <div class="algo-complexity">O(1) Instant • Sub-Millisecond</div>
+                  <div class="algo-complexity">O(d^2) • Gold L2 Parity</div>
                   <div class="algo-desc">Sherman-Morrison rank-1 downdate on inverse Hessian matrix.</div>
                 </button>
 
                 <!-- ALGORITHM 3: MODULAR LORA -->
                 <button class="algo-card-btn" onclick="executeSelectedUnlearning('algorithm_3_lora')">
                   <div class="algo-family-tag tag-green">FAMILY 3: MODULAR PEFT</div>
-                  <div class="algo-name">🧩 Modular LoRA (S3T)</div>
-                  <div class="algo-family">Parameter Deactivation</div>
-                  <div class="algo-complexity">O(1) Pointer Drop • Base W₀ Frozen</div>
-                  <div class="algo-desc">Deactivates fine-tuned LoRA card. 0.0% damage to general domain.</div>
+                  <div class="algo-name">🧩 Modular LoRA</div>
+                  <div class="algo-family">Domain Slice Deactivation</div>
+                  <div class="algo-complexity">O(1) Mask • W₀ Frozen</div>
+                  <div class="algo-desc">Targeted domain LoRA slice deactivation without touching base weights.</div>
+                </button>
+
+                <!-- ALGORITHM 4: UNIFIED HYBRID -->
+                <button class="algo-card-btn active" onclick="executeSelectedUnlearning('algorithm_4_hybrid')">
+                  <div class="algo-family-tag tag-amber">RECOMMENDED HYBRID</div>
+                  <div class="algo-name">🚀 Hybrid Full-Stack</div>
+                  <div class="algo-family">SISA LoRA + H⁻¹ + Vector Purge</div>
+                  <div class="algo-complexity">Single &amp; Batch + Chained Proof</div>
+                  <div class="algo-desc">Erases partition CSV, LoRA card, SVM Hessian, Redis cache &amp; pgvector.</div>
                 </button>
               </div>
             </div>
@@ -925,19 +957,19 @@
             <!-- SYSTEM BEHAVIOUR & EVALUATION METRICS TABLE -->
             <div class="benchmark-results-box" id="benchmarkTableBox">
               <div class="results-header">
-                <h4>System Behaviour & Model Evaluation Metrics (Before vs After)</h4>
-                <span class="badge-pill badge-green">0.00% Residual Influence</span>
+                <h4>Empirical Multi-Model Evaluation (Real Sklearn Precision / Recall / F1 / MIA / L2 Parity)</h4>
+                <span class="badge-pill badge-green" id="benchmarkBatchBadge">Active Strategy: Hybrid</span>
               </div>
 
               <!-- RECOMMENDED BEST MODEL BANNER -->
               <div class="recommended-model-banner" id="recommendedModelBanner">
-                <div class="rec-banner-badge">⭐ SYSTEM RECOMMENDATION</div>
+                <div class="rec-banner-badge">⭐ ACTIVE PRODUCTION ENGINE</div>
                 <div class="rec-banner-content">
-                  <div class="rec-banner-title" id="recModelTitle">Algorithm 2: Decremental Closed-Form SVM (O(1) Algebraic)</div>
-                  <div class="rec-banner-desc" id="recModelDesc">Sherman-Morrison inverse Hessian downdate achieves mathematically instantaneous 0.27ms execution, >1,800x speedup, and 0.0000% residual influence without gradient re-training.</div>
+                  <div class="rec-banner-title" id="recModelTitle">Algorithm 4: Unified Hybrid Engine (SISA LoRA + H⁻¹ + pgvector Purge)</div>
+                  <div class="rec-banner-desc" id="recModelDesc">Combines isolated PyTorch Rank-8 SISA retraining, Sherman-Morrison algebraic Hessian downdate, and vector/cache purge with chained SHA-256 ledger proofs.</div>
                 </div>
                 <button class="btn btn-primary btn-rec-action" id="btnExecuteRecommended" onclick="executeRecommendedUnlearning()">
-                  <span>⚡</span> Execute Recommended Model
+                  <span>⚡</span> Execute Active Strategy
                 </button>
               </div>
 
@@ -946,14 +978,14 @@
                   <thead>
                     <tr>
                       <th>Algorithm</th>
-                      <th>Structural Family</th>
                       <th>Latency</th>
                       <th>Speedup</th>
                       <th>Retain Acc (B/A)</th>
                       <th>Precision (B/A)</th>
                       <th>Recall (B/A)</th>
                       <th>F1 (B/A)</th>
-                      <th>Influence</th>
+                      <th>MIA AUC</th>
+                      <th>L2 Parity</th>
                       <th>Weights Mod</th>
                     </tr>
                   </thead>
@@ -994,7 +1026,7 @@
                   <div class="step-badge">3</div>
                   <div class="step-info">
                     <div class="step-title">Disk Weight Eviction</div>
-                    <div class="step-desc" id="step3Desc">Executes rm -rf ./sisa_adapters/shard_X/</div>
+                    <div class="step-desc" id="step3Desc">Purges shard adapter weights &amp; deactivates LoRA slice</div>
                   </div>
                   <div class="step-time" id="step3Time">--</div>
                 </div>
@@ -1002,8 +1034,8 @@
                 <div class="step-card" id="step4Card">
                   <div class="step-badge">4</div>
                   <div class="step-info">
-                    <div class="step-title">Redis Signature Flush</div>
-                    <div class="step-desc" id="step4Desc">Evicts related SHA-256 keys from RAM</div>
+                    <div class="step-title">Cache &amp; Vector Purge</div>
+                    <div class="step-desc" id="step4Desc">Evicts SHA-256 cache, Qdrant &amp; pgvector anchors</div>
                   </div>
                   <div class="step-time" id="step4Time">--</div>
                 </div>
@@ -1012,7 +1044,7 @@
                   <div class="step-badge">5</div>
                   <div class="step-info">
                     <div class="step-title">Micro-Retraining Core</div>
-                    <div class="step-desc" id="step5Desc">Recalibrates sub-parameters (W₀ frozen)</div>
+                    <div class="step-desc" id="step5Desc">Retrains shard LoRA &amp; downdates H⁻¹ (W₀ frozen)</div>
                   </div>
                   <div class="step-time" id="step5Time">--</div>
                 </div>
@@ -1021,7 +1053,7 @@
                   <div class="step-badge">6</div>
                   <div class="step-info">
                     <div class="step-title">Post-Unlearning Audit</div>
-                    <div class="step-desc" id="step6Desc">Verifies 100.0% retain accuracy preservation</div>
+                    <div class="step-desc" id="step6Desc">Verifies retain F1, MIA ROC-AUC &amp; L2 weight parity</div>
                   </div>
                   <div class="step-time" id="step6Time">--</div>
                 </div>
@@ -1043,45 +1075,45 @@
                     <span class="shard-name">Shard 0 (D₀)</span>
                     <span class="shard-status-tag tag-green" id="shardStatus0">✓ Active</span>
                   </div>
-                  <div class="shard-stat-line"><span>Partition:</span> <strong>192 Samples</strong></div>
-                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_0/adapter.npz</code></div>
-                  <div class="shard-stat-line"><span>Weight State:</span> <strong class="accent-green">Preserved</strong></div>
+                  <div class="shard-stat-line"><span>Partition:</span> <strong id="shardCount0">-- Samples</strong></div>
+                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_0/adapter_model.pt</code></div>
+                  <div class="shard-stat-line"><span>Size:</span> <strong class="accent-green" id="shardSize0">--</strong></div>
                 </div>
                 <div class="shard-node-card" id="shardNode1">
                   <div class="shard-node-top">
                     <span class="shard-name">Shard 1 (D₁)</span>
                     <span class="shard-status-tag tag-green" id="shardStatus1">✓ Active</span>
                   </div>
-                  <div class="shard-stat-line"><span>Partition:</span> <strong>192 Samples</strong></div>
-                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_1/adapter.npz</code></div>
-                  <div class="shard-stat-line"><span>Weight State:</span> <strong class="accent-green">Preserved</strong></div>
+                  <div class="shard-stat-line"><span>Partition:</span> <strong id="shardCount1">-- Samples</strong></div>
+                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_1/adapter_model.pt</code></div>
+                  <div class="shard-stat-line"><span>Size:</span> <strong class="accent-green" id="shardSize1">--</strong></div>
                 </div>
                 <div class="shard-node-card" id="shardNode2">
                   <div class="shard-node-top">
                     <span class="shard-name">Shard 2 (D₂)</span>
                     <span class="shard-status-tag tag-green" id="shardStatus2">✓ Active</span>
                   </div>
-                  <div class="shard-stat-line"><span>Partition:</span> <strong>192 Samples</strong></div>
-                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_2/adapter.npz</code></div>
-                  <div class="shard-stat-line"><span>Weight State:</span> <strong class="accent-green">Preserved</strong></div>
+                  <div class="shard-stat-line"><span>Partition:</span> <strong id="shardCount2">-- Samples</strong></div>
+                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_2/adapter_model.pt</code></div>
+                  <div class="shard-stat-line"><span>Size:</span> <strong class="accent-green" id="shardSize2">--</strong></div>
                 </div>
                 <div class="shard-node-card" id="shardNode3">
                   <div class="shard-node-top">
                     <span class="shard-name">Shard 3 (D₃)</span>
                     <span class="shard-status-tag tag-green" id="shardStatus3">✓ Active</span>
                   </div>
-                  <div class="shard-stat-line"><span>Partition:</span> <strong>192 Samples</strong></div>
-                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_3/adapter.npz</code></div>
-                  <div class="shard-stat-line"><span>Weight State:</span> <strong class="accent-green">Preserved</strong></div>
+                  <div class="shard-stat-line"><span>Partition:</span> <strong id="shardCount3">-- Samples</strong></div>
+                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_3/adapter_model.pt</code></div>
+                  <div class="shard-stat-line"><span>Size:</span> <strong class="accent-green" id="shardSize3">--</strong></div>
                 </div>
                 <div class="shard-node-card" id="shardNode4">
                   <div class="shard-node-top">
                     <span class="shard-name">Shard 4 (D₄)</span>
                     <span class="shard-status-tag tag-green" id="shardStatus4">✓ Active</span>
                   </div>
-                  <div class="shard-stat-line"><span>Partition:</span> <strong>192 Samples</strong></div>
-                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_4/adapter.npz</code></div>
-                  <div class="shard-stat-line"><span>Weight State:</span> <strong class="accent-green">Preserved</strong></div>
+                  <div class="shard-stat-line"><span>Partition:</span> <strong id="shardCount4">-- Samples</strong></div>
+                  <div class="shard-stat-line"><span>LoRA Card:</span> <code>shard_4/adapter_model.pt</code></div>
+                  <div class="shard-stat-line"><span>Size:</span> <strong class="accent-green" id="shardSize4">--</strong></div>
                 </div>
               </div>
             </div>
@@ -1142,13 +1174,14 @@
                       <th>Timestamp</th>
                       <th>Sample ID</th>
                       <th>Headline</th>
-                      <th>Algorithm Chosen</th>
-                      <th>Residual Influence</th>
+                      <th>Algorithm</th>
+                      <th>L2 / Residual</th>
+                      <th>Proof Hash</th>
                       <th>Status</th>
                     </tr>
                   </thead>
                   <tbody id="ledgerTableBody">
-                    <tr><td colspan="6" style="text-align: center; color: var(--text-dim);">No unlearning operations executed yet.</td></tr>
+                    <tr><td colspan="7" style="text-align: center; color: var(--text-dim);">No unlearning operations executed yet.</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -1163,7 +1196,7 @@
                 </button>
               </div>
               <p class="card-caption" style="padding: 0 16px; margin-top: 8px;">
-                Inspect real-time state across MongoDB collections, in-memory Redis cache signatures, Qdrant truth vectors, and SISA shard physical disk adapters.
+                Inspect real-time state across Supabase PostgreSQL &amp; pgvector tables, Redis cache signatures, Qdrant truth vectors, and SISA shard physical disk adapters.
               </p>
               <div style="padding: 12px 16px 16px;">
                 <div class="db-telemetry-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px;" id="dbExplorerGrid">
@@ -1312,6 +1345,9 @@
           <button class="btn btn-listen-anchor btn-xs" type="button" onclick="playCurrentModalAnchor()">
             <span>🎙️</span> Listen to Dispatch
           </button>
+          <button class="btn btn-secondary btn-xs" type="button" onclick="shareCurrentModalArticle()">
+            <span>🔗</span> Share Dispatch
+          </button>
           <button class="btn btn-outline btn-xs" type="button" onclick="openRemovalRequestModal()" style="border-color: var(--accent-amber); color: var(--accent-amber);">
             <span>🚩</span> Request Removal / Outdated Story
           </button>
@@ -1324,7 +1360,7 @@
           <div class="cert-seal">🛡️</div>
           <div>
             <h3>ADMINISTRATIVE 5-PILLAR XAI & MACHINE UNLEARNING INSPECTOR</h3>
-            <span class="cert-subtext">DeBERTa-v3 Stylometry • BGE-M3 Vector Store • Neo4j Graph • Quantitative Anomaly • Viral Propagation</span>
+            <span class="cert-subtext">DeBERTa-v3-xsmall Stylometry • BGE-small Vector Store • Chronological Graph • Quantitative Base • Site Diffusion</span>
           </div>
         </div>
         <div class="cert-meters-row">
@@ -1341,7 +1377,7 @@
             <span class="cert-meter-val accent-cyan" id="modalFactScore">Qdrant PIB Match</span>
           </div>
           <div class="cert-meter">
-            <span class="cert-meter-name">Track C: Neo4j Linearity</span>
+            <span class="cert-meter-name">Track C: Chronological Graph</span>
             <span class="cert-meter-val accent-green" id="modalGraphScore">Consistent</span>
           </div>
           <div class="cert-meter">
@@ -1370,7 +1406,7 @@
             <span>✏️</span> Edit & Review Article
           </button>
           <button class="btn btn-amber btn-sm" id="btnModalSendWorkbench" onclick="sendCurrentModalToWorkbench()">
-            <span>⚡</span> Load into 3-Family Unlearning Workbench
+            <span>⚡</span> Load into Unlearning Workbench
           </button>
           <button class="btn btn-crimson btn-sm" onclick="directPurgeCurrentModalArticle()">
             <span>🗑️</span> Direct Purge & Delete
@@ -1470,7 +1506,7 @@
         <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(2, 132, 199, 0.06); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 6px;">
           <input type="checkbox" id="editReverifyCheck" checked style="width: 16px; height: 16px; cursor: pointer;">
           <label for="editReverifyCheck" style="font-size: 0.82rem; color: var(--text-main); cursor: pointer; margin: 0;">
-            <strong>Re-evaluate with Dual-Track AI:</strong> Automatically calculate new DeBERTa-v3 stylometry + BGE-M3 factual consistency scores upon save.
+            <strong>Re-evaluate with Dual-Track AI:</strong> Automatically calculate new DeBERTa-v3 stylometry + BGE-small neural factual consistency scores upon save.
           </label>
         </div>
 
@@ -1603,30 +1639,48 @@
     <div class="auth-modal-card" style="max-width: 520px;">
       <button class="modal-close-btn" onclick="closeApiConfigModal()">×</button>
       <div class="auth-header">
-        <h2>📡 Live Real-Time News API Settings</h2>
-        <p class="auth-sub">Link dedicated news APIs or use Smriti Shuddhi's built-in Google News & public RSS feed aggregator.</p>
+        <h2>📡 Live News Wire & Fact-Check API Status</h2>
+        <p class="auth-sub">Configure real-time wire APIs or monitor active zero-key aggregators (RSS, Google News, PIB, Wikidata, Open-Meteo).</p>
       </div>
 
-      <div style="background: rgba(2, 132, 199, 0.08); border-left: 3px solid var(--accent-cyan); padding: 12px; border-radius: 4px; margin-bottom: 18px; font-size: 0.85rem; line-height: 1.5;">
-        <strong>💡 Note on Live News Updates:</strong><br>
-        • Smriti Shuddhi automatically polls real-time Indian & global news feeds (Google News, BBC Hindi/Telugu/World, The Hindu, TOI) every 15 minutes.<br>
-        • For 100% direct REST API ingestion with guaranteed uptime, you can enter a free API key from <a href="https://newsapi.org" target="_blank" style="color: var(--accent-cyan); text-decoration: underline;">NewsAPI.org</a> or <a href="https://gnews.io" target="_blank" style="color: var(--accent-cyan); text-decoration: underline;">GNews.io</a> below.
+      <div id="apiStatusBadges" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;">
+        <span class="badge-pill badge-green">✓ Public RSS Feeds Active</span>
+        <span class="badge-pill badge-cyan">Checking API status...</span>
+      </div>
+
+      <div style="background: rgba(2, 132, 199, 0.08); border-left: 3px solid var(--accent-cyan); padding: 12px; border-radius: 4px; margin-bottom: 16px; font-size: 0.84rem; line-height: 1.5;">
+        <strong>💡 Active Live Feed & Verification Stack:</strong><br>
+        • Zero-key real-time ingestion polls The Hindu, Times of India, Indian Express, NDTV, BBC Hindi/Telugu/World, Reuters India, PIB India, Google News Topic RSS, Wikidata & Open-Meteo.<br>
+        • Optional API tokens below unlock higher rate limits and direct REST synthesis (existing configured server tokens stay active unless overwritten).
       </div>
 
       <form id="apiConfigForm" onsubmit="saveApiConfig(event)">
         <div class="form-group">
+          <label for="cfgGuardianApiKey">The Guardian Open Platform Key (Optional)</label>
+          <input type="text" id="cfgGuardianApiKey" placeholder="Leave blank to preserve configured key" autocomplete="off">
+        </div>
+
+        <div class="form-group" style="margin-top: 10px;">
+          <label for="cfgTheNewsApiToken">TheNewsAPI Token (Optional)</label>
+          <input type="text" id="cfgTheNewsApiToken" placeholder="Leave blank to preserve configured token" autocomplete="off">
+        </div>
+
+        <div class="form-group" style="margin-top: 10px;">
+          <label for="cfgFactCheckApiKey">Google Fact Check Tools API Key (Optional)</label>
+          <input type="text" id="cfgFactCheckApiKey" placeholder="Leave blank to preserve configured key" autocomplete="off">
+        </div>
+
+        <div class="form-group" style="margin-top: 10px;">
           <label for="cfgNewsApiKey">NewsAPI.org Key (Optional)</label>
           <input type="text" id="cfgNewsApiKey" placeholder="e.g. 8a34bc1234567890abcdef..." autocomplete="off">
-          <span style="font-size: 0.72rem; color: var(--text-dim); margin-top: 3px;">Free tier available at newsapi.org (provides 100 requests/day).</span>
         </div>
 
-        <div class="form-group" style="margin-top: 14px;">
+        <div class="form-group" style="margin-top: 10px;">
           <label for="cfgGnewsApiKey">GNews.io Token (Optional)</label>
           <input type="text" id="cfgGnewsApiKey" placeholder="e.g. d41d8cd98f00b204e9800998ecf8427e..." autocomplete="off">
-          <span style="font-size: 0.72rem; color: var(--text-dim); margin-top: 3px;">Free tier available at gnews.io.</span>
         </div>
 
-        <div style="display: flex; gap: 10px; margin-top: 22px;">
+        <div style="display: flex; gap: 10px; margin-top: 18px;">
           <button type="submit" class="btn btn-primary" style="flex: 1;">
             Save & Sync Live Wire Now
           </button>

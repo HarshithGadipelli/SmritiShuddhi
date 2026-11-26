@@ -1,0 +1,53 @@
+# =====================================================================
+# SMRITI SHUDDHI - GOOGLE CLOUD BUILD -> CLOUD RUN PIPELINE
+# Usage:
+#   gcloud builds submit --config cloudbuild.yaml
+# Set runtime secrets in Cloud Run (Secret Manager or env vars):
+#   DATABASE_URL, SUPABASE_URL, SUPABASE_KEY, GUARDIAN_API_KEY,
+#   THE_NEWS_API_TOKEN, GOOGLE_FACTCHECK_API_KEY, GEMINI_API_KEY, SECRET_KEY
+# =====================================================================
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi:${BUILD_ID}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi:latest'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}'
+      - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi:latest'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--port=8080'
+      - '--memory=2Gi'
+      - '--cpu=2'
+      - '--concurrency=40'
+      - '--timeout=300'
+      - '--min-instances=0'
+      - '--max-instances=3'
+      - '--session-affinity'
+      - '--cpu-boost'
+
+timeout: '1800s'
+
+substitutions:
+  _REGION: asia-south1
+  _REPO: smriti-shuddhi
+  _SERVICE_NAME: smriti-shuddhi-app
+
+images:
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi:latest'

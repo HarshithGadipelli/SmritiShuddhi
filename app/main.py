@@ -2,7 +2,9 @@ import os
 import re
 import time
 import uuid
+import hashlib
 import asyncio
+import threading
 import logging
 from typing import Optional, Dict, Any, List
 from contextlib import asynccontextmanager
@@ -34,12 +36,23 @@ from app.retrieval.knowledge_base import (
 )
 from app.unlearning.engine import unlearning_engine
 from app.unlearning.algorithms import multi_model_suite
-from db import init_db, news_col, training_col, requests_col, unlearning_col, audit_col, users_col, unlearning_ledger_col, using_supabase, using_mongo, now
+from app.retrieval.external_verifiers import (
+    adversarial_defense,
+    structured_ner,
+    live_factcheck_client,
+    live_weather_verifier,
+    headline_stance_analyzer,
+    website_propagation_tracker,
+    gemini_synthesizer,
+)
+from db import init_db, db, news_col, training_col, requests_col, unlearning_col, audit_col, users_col, unlearning_ledger_col, settings_col, using_supabase, using_mongo, now
 from app.utils.document_parser import parse_base64_document
 from app.utils.storage import store_document_attachment
 from app.retrieval.news_feed import (
     fetch_realtime_news,
     fetch_live_rss_feed,
+    fetch_topic_search,
+    extract_article_from_url,
     get_curated_live_stories,
     generate_dynamic_realtime_stories,
     TOPIC_IMAGE_MAP,
@@ -92,6 +105,10 @@ class RegisterRequest(BaseModel):
 class NewsApiConfigRequest(BaseModel):
     news_api_key: Optional[str] = Field(None, description="API Key for NewsAPI.org")
     gnews_api_key: Optional[str] = Field(None, description="API Key for GNews.io")
+    the_news_api_token: Optional[str] = Field(None, description="API Token for TheNewsAPI.com")
+    guardian_api_key: Optional[str] = Field(None, description="API Key for The Guardian Open Platform")
+    google_factcheck_api_key: Optional[str] = Field(None, description="API Key for Google Fact Check Tools")
+    gemini_api_key: Optional[str] = Field(None, description="API Key for Google Gemini")
 
 
 class NewsUpdateRequest(BaseModel):
@@ -109,8 +126,26 @@ class UnlearningExecutionRequest(BaseModel):
     news_id: Optional[str] = Field(None, description="Associated news article ID if present")
     title: Optional[str] = Field("", description="Article title for feature extraction")
     text: Optional[str] = Field("", description="Article text for feature extraction")
-    strategy: Optional[str] = Field("all_benchmark", description="baseline_retrain | algorithm_1_sisa | algorithm_2_svm | algorithm_3_lora | all_benchmark")
+    strategy: Optional[str] = Field(None, description="baseline_retrain | algorithm_1_sisa | algorithm_2_svm | algorithm_3_lora | algorithm_4_hybrid | all_benchmark")
     reason: Optional[str] = Field("RETRACTION_MANDATE", description="Legal, editorial, or privacy mandate")
+
+
+class BatchUnlearningRequest(BaseModel):
+    sample_ids: List[str] = Field(..., min_length=1, description="List of target sample_ids for multi-article batch unlearning")
+    news_ids: Optional[List[str]] = Field(None, description="Optional matching news_ids")
+    strategy: Optional[str] = Field("algorithm_4_hybrid", description="Strategy to execute across batch")
+
+
+class ActiveStrategyRequest(BaseModel):
+    strategy: str = Field(..., description="baseline_retrain | algorithm_1_sisa | algorithm_2_svm | algorithm_3_lora | algorithm_4_hybrid")
+
+
+class UrlExtractRequest(BaseModel):
+    url: str = Field(..., min_length=8, description="News article HTTP/HTTPS URL to scrape and analyze")
+
+
+class ArticleEngagementRequest(BaseModel):
+    action: str = Field(..., description="view | share | bookmark | flag")
 
 
 class ModelProbeRequest(BaseModel):
@@ -296,7 +331,7 @@ def seed_initial_demo_news():
 
 async def background_news_sync_loop():
     """Periodically fetches and verifies live breaking news in the background."""
-    await asyncio.sleep(4)
+    await asyncio.sleep(60)
     while True:
         try:
             logger.info("Executing periodic live news background sync...")
@@ -307,22 +342,94 @@ async def background_news_sync_loop():
         await asyncio.sleep(max(5, config.NEWS_AUTO_SYNC_MINUTES) * 60)
 
 
+def _sync_supabase_training_index():
+    """Populates Supabase training_samples metadata table from surviving SISA shard partitions."""
+    if not using_supabase or not hasattr(db, "sync_training_samples_index"):
+        return
+    try:
+        import pandas as pd
+        rows = []
+        n_slices = getattr(config, "SISA_SLICES", 5)
+        for sid in range(config.SISA_SHARDS):
+            p = unlearning_engine._shard_csv_path(sid)
+            if p.exists():
+                sdf = pd.read_csv(p).fillna("")
+                for idx, r in sdf.iterrows():
+                    rows.append({
+                        "sample_id": str(r.get("sample_id", "")),
+                        "news_id": str(r.get("news_id", "")) or None,
+                        "shard_id": int(r.get("shard_id", sid)) if str(r.get("shard_id", "")).isdigit() else sid,
+                        "slice_id": int(idx) % n_slices,
+                        "title": str(r.get("title", "")),
+                        "text": str(r.get("text", "")),
+                        "label": int(float(r.get("label", 0))) if str(r.get("label", "")).strip() else 0,
+                        "status": "ACTIVE",
+                    })
+                    if len(rows) >= 300:
+                        break
+            if len(rows) >= 300:
+                break
+        if rows:
+            db.sync_training_samples_index(rows)
+    except Exception as e:
+        logger.warning("Supabase training_samples index sync notice: %s", e)
+
+
+_ML_READY = False
+_ML_WARMUP_LOCK = threading.Lock()
+
+
+def _ensure_ml_ready():
+    """Ensures ML suites, DeBERTa/BGE weights, shards, and persisted unlearning masks are initialized."""
+    global _ML_READY
+    if _ML_READY:
+        return
+    with _ML_WARMUP_LOCK:
+        if _ML_READY:
+            return
+        try:
+            init_db()
+            seed_initial_demo_news()
+            unlearning_engine.get_manifest()
+            has_trained = any(adapter.is_trained for adapter in lora_sisa_engine.adapters)
+            if not has_trained:
+                logger.info("Training initial LoRA SISA shards from dataset...")
+                unlearning_engine.initialize_shards_from_dataset(respect_purged=True)
+            multi_model_suite._lazy_init()
+            try:
+                saved_pref = settings_col.find_one({"setting_key": "active_unlearning_strategy"})
+                if saved_pref and saved_pref.get("setting_value"):
+                    multi_model_suite.active_strategy = str(saved_pref["setting_value"])
+            except Exception:
+                pass
+            lora_sisa_engine.backbone._try_load()
+            regional_encoder._try_init_neural()
+            _ML_READY = True
+            logger.info("Smriti Shuddhi ML engines and unlearning shards ready.")
+        except Exception as e:
+            logger.warning("ML warmup notice: %s", e)
+
+
+def _background_startup_warmup():
+    _ensure_ml_ready()
+    try:
+        vector_store.sync_to_supabase_pgvector(db, 120)
+    except Exception:
+        pass
+    try:
+        _sync_supabase_training_index()
+    except Exception:
+        pass
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Initializing Enterprise Fake News Detection & Multi-Model Unlearning Platform...")
+    logger.info("Booting Enterprise Fake News Detection & Multi-Model Unlearning Platform...")
     sync_task = None
     try:
         init_db()
-        seed_initial_demo_news()
-        # Initialize LoRA SISA shards if uninitialized
-        manifest = unlearning_engine.get_manifest()
-        has_trained = any(adapter.is_trained for adapter in lora_sisa_engine.adapters)
-        if not has_trained:
-            logger.info("Training initial LoRA SISA shards from demo training set...")
-            unlearning_engine.initialize_shards_from_dataset()
-        # Initialize Multi-Model Unlearning Suite
-        multi_model_suite._lazy_init()
-        # Launch automated background live news synchronizer
+        # Run ML weight loading, shard calibration & DB index sync asynchronously so Cloud Run /api/v1/health binds <1s
+        asyncio.create_task(asyncio.to_thread(_background_startup_warmup))
         sync_task = asyncio.create_task(background_news_sync_loop())
     except Exception as e:
         logger.warning("Startup initialization notice: %s", e)
@@ -334,18 +441,34 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="SMRITI SHUDDHI // Hybrid Fake News Detection & Exact Multi-Model Machine Unlearning",
-    description="Enterprise-grade architecture with DeBERTa LoRA Stylistic Parsing + Qdrant/Neo4j Fact Checking + 3 Exact Unlearning Structural Families.",
+    description="Enterprise-grade architecture with DeBERTa LoRA Stylistic Parsing + BGE-small Vector Retrieval + Exact 5-Strategy Machine Unlearning.",
     version="3.0.0",
     lifespan=lifespan
 )
 
+_allowed_origins_raw = os.getenv("ALLOWED_ORIGINS", "*").strip()
+_allowed_origins = [o.strip() for o in _allowed_origins_raw.split(",") if o.strip()] if _allowed_origins_raw and _allowed_origins_raw != "*" else ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=_allowed_origins,
+    allow_credentials=(_allowed_origins != ["*"]),
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def cloudflare_proxy_headers_middleware(request, call_next):
+    response = await call_next(request)
+    path = request.url.path or ""
+    if path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store, max-age=0"
+    elif path.startswith("/static/"):
+        response.headers.setdefault("Cache-Control", "public, max-age=3600")
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    return response
 
 static_path = config.BASE_DIR / "static"
 if static_path.exists():
@@ -362,7 +485,8 @@ def execute_hybrid_inference(
     source: str = "",
     author: str = "",
     image_url: Optional[str] = None,
-    category: Optional[str] = "General"
+    category: Optional[str] = "General",
+    fast_mode: bool = False
 ) -> Dict[str, Any]:
     """Concurrent Multi-Aspect Hybrid Inference:
     Track A: Stylistic Intention Parsing (DeBERTa-v3 frozen base + LoRA adapters)
@@ -379,44 +503,69 @@ def execute_hybrid_inference(
     Track L: Multimodal Asset & Metadata Provenance Forensics
     Fusion: 5-pillar Multi-Aspect Weighted Ensemble + Statistical Epistemic Calibration
     """
-    # Track A: Stylistic & Linguistic Intention
-    style_res = lora_sisa_engine.predict_style(title, text)
+    _ensure_ml_ready()
+    adv_res = adversarial_defense.analyze_and_sanitize(title, text)
+    clean_title = adv_res["sanitized_title"] or title
+    clean_text = adv_res["sanitized_text"] or text
 
-    # Track B: Semantic Vector Space Evidence
-    combined_text = f"{title} {text}".strip()
+    # Track A: Stylistic & Linguistic Intention (Frozen DeBERTa/BGE + PyTorch Rank-8 LoRA SISA)
+    style_res = lora_sisa_engine.predict_style(clean_title, clean_text)
+
+    # Track B: Semantic Vector Space Evidence (Dense Transformer + Qdrant HNSW + Supabase pgvector)
+    combined_text = f"{clean_title} {clean_text}".strip()
     regional_info = regional_encoder.detect_regional_cues(combined_text)
-    retrieval_res = vector_store.search_evidence(combined_text, top_k=3)
+    retrieval_res = vector_store.search_evidence(combined_text, top_k=4, query_pgvector=not fast_mode)
 
     # Track C: Temporal Knowledge Graph
-    graph_res = graph_engine.verify_timeline(title, text)
+    graph_res = graph_engine.verify_timeline(clean_title, clean_text)
 
-    # Track D: Quantitative Knowledge Base & Anomaly Detection
-    quant_res = quantitative_anomaly_engine.analyze_quantities(title, text)
+    # Track D: Quantitative Knowledge Base & Live Open-Meteo Grounding
+    quant_res = quantitative_anomaly_engine.analyze_quantities(clean_title, clean_text)
+    wx_res = {"triggered": False} if fast_mode else live_weather_verifier.verify_weather_claim(combined_text)
 
-    # Track E: Context & Viral Propagation Dynamics
-    prop_res = propagation_analyzer.analyze_context_and_propagation(source, author, title, text)
+    # Track E: Context & Real Website-User Propagation Dynamics
+    prop_res = propagation_analyzer.analyze_context_and_propagation(source, author, clean_title, clean_text)
+    w_prop_res = (
+        {"website_propagation_risk_delta": 0.0, "viral_burst_alert": False, "velocity_dm_dt_per_min": 0.0}
+        if fast_mode else website_propagation_tracker.measure_website_diffusion(news_col, clean_title, clean_text)
+    )
 
-    # Track F: Stored Internal Evidence Archive
-    int_evid_res = internal_evidence_engine.query_evidence(title, text)
+    # Track F: Internal Archive + Structured NER/SPO + Quote Lineage + Live Fact-Check API
+    int_evid_res = internal_evidence_engine.query_evidence(clean_title, clean_text)
+    ner_entities = structured_ner.extract_entities(clean_title, clean_text)
+    spo_triples = structured_ner.extract_spo_triples(clean_title, clean_text, ner_entities)
+    quote_lineage = structured_ner.audit_quotes_and_lineage(clean_text, source, ner_entities)
+    wikidata_hits = [] if fast_mode else structured_ner.query_wikidata_entities(ner_entities)
+    ner_spo_res = {
+        "entities": ner_entities,
+        "spo_triples": spo_triples,
+        "quote_lineage": quote_lineage,
+        "wikidata": wikidata_hits,
+    }
+    fc_res = {"status": "FAST_WIRE_SKIPPED", "matches": [], "factcheck_risk": None} if fast_mode else live_factcheck_client.check_claim(clean_title, clean_text, spo_triples)
 
     # Track G: Informational Density & Entity Specificity
-    spec_res = entity_specificity_analyzer.analyze_specificity(title, text)
+    spec_res = entity_specificity_analyzer.analyze_specificity(clean_title, clean_text)
 
-    # Track H: Evidentiary Justification Metrics (HSDI, Shannon Entropy, TTR, EPPI)
-    just_res = justification_metrics_engine.compute_metrics(title, text)
+    # Track H: Evidentiary Justification Metrics + Neural Paragraph Stance Consistency
+    just_res = justification_metrics_engine.compute_metrics(clean_title, clean_text)
+    stance_res = headline_stance_analyzer.analyze(clean_title, clean_text)
 
     # Track I: Zero-Day Breaking News Corroboration Protocol (CSCI & Multi-Wire Cross-Check)
-    breaking_res = breaking_corroboration_engine.corroborate_breaking_story(
-        title=title,
-        text=text,
-        news_collection=news_col,
-        claim_criticality=just_res.get("claim_criticality_index", 0.25)
+    breaking_res = (
+        {"is_breaking": False, "breaking_protocol_verdict": "LIVE_PUBLISHER_WIRE", "distinct_publishers_count": 1, "cross_source_corroboration_index": 0.5}
+        if fast_mode else breaking_corroboration_engine.corroborate_breaking_story(
+            title=clean_title,
+            text=clean_text,
+            news_collection=news_col,
+            claim_criticality=just_res.get("claim_criticality_index", 0.25)
+        )
     )
 
     # Track J: Atomic Fact Sub-Claim Decomposition (Partial Truth & Half-Truth Handling)
     subclaim_res = subclaim_decomposition_engine.decompose_and_verify(
-        title=title,
-        text=text,
+        title=clean_title,
+        text=clean_text,
         evidence_engine=internal_evidence_engine,
         anomaly_engine=quantitative_anomaly_engine
     )
@@ -431,15 +580,15 @@ def execute_hybrid_inference(
 
     # Track L: Multimodal Asset & Metadata Provenance Forensics
     multi_res = multimodal_forensics_engine.analyze_multimodal(
-        title=title,
-        text=text,
+        title=clean_title,
+        text=clean_text,
         image_url=image_url,
         source=source,
         author=author,
         category=category
     )
 
-    # Multi-Aspect 5-Pillar Fusion with Multimodal and Epistemic Calibration
+    # Multi-Aspect 5-Pillar Fusion with External Verifiers
     verdict = fusion_layer.fuse(
         style_result=style_res,
         retrieval_result=retrieval_res,
@@ -453,8 +602,24 @@ def execute_hybrid_inference(
         breaking_result=breaking_res,
         subclaim_result=subclaim_res,
         zero_knowledge_result=zk_res,
-        multimodal_result=multi_res
+        multimodal_result=multi_res,
+        factcheck_result=fc_res,
+        weather_result=wx_res,
+        adversarial_result=adv_res,
+        stance_result=stance_res,
+        ner_spo_result=ner_spo_res,
+        website_prop_result=w_prop_res
     )
+
+    p_fake = float(verdict.get("fake_probability", 0.5))
+    if not fast_mode and 0.28 <= p_fake <= 0.72 and getattr(config, "GEMINI_API_KEY", ""):
+        ev_snips = [m.get("snippet", "") for m in retrieval_res.get("matches", [])[:2]]
+        ev_snips.extend([m.get("claim_text", "") for m in fc_res.get("matches", [])[:2]])
+        gem_note = gemini_synthesizer.synthesize(clean_title, clean_text, verdict.get("prediction", "UNCERTAIN"), ev_snips)
+        if gem_note:
+            verdict["xai"]["gemini_analyst_note"] = gem_note
+            verdict["xai"].setdefault("plain_english_summary", []).insert(0, gem_note)
+
     return verdict
 
 
@@ -464,9 +629,11 @@ def execute_hybrid_inference(
 
 @app.get("/api/v1/health")
 def get_health():
-    """System health and operational readiness status."""
+    """Fast Cloud Run health & readiness probe."""
     return {
         "status": "healthy",
+        "ml_ready": _ML_READY,
+        "database": "supabase_pgvector" if using_supabase else ("mongodb" if using_mongo else "local_json"),
         "service": "Smriti Shuddhi Fake News Detection & Exact Machine Unlearning Platform",
         "version": "3.0.0",
         "timestamp": now()
@@ -735,68 +902,150 @@ def extract_document(payload: DocumentExtractRequest):
         raise HTTPException(status_code=400, detail=f"Failed to parse document: {str(e)}")
 
 
+_NEWS_SYNC_LOCK = threading.Lock()
+
+
 def perform_news_sync(background_tasks: Optional[BackgroundTasks] = None) -> Dict[str, Any]:
-    """Coordinates fetching real-time news across NewsAPI, GNews, public Google News/BBC RSS feeds,
-    runs Dual-Track Hybrid verification, and broadcasts new stories to connected clients."""
-    result = fetch_realtime_news(max_items=40)
-    stories = result.get("stories", [])
-    synced_count = 0
-
-    for story in stories:
-        title = story.get("title", "").strip()
-        if not title:
-            continue
-        existing = news_col.find_one({"title": title})
-        if existing:
-            continue
-
-        text = story.get("text", "")
-        source_name = story.get("source", "Real-Time News Wire")
-        author_name = story.get("author", "Wire Bureau")
-        verdict = execute_hybrid_inference(title, text, source=source_name, author=author_name)
-        status = "PUBLISHED" if verdict["risk_band"] != "HIGH_RISK_FAKE" else "BLOCKED_HIGH_RISK_FAKE"
-        news_id = f"NEWS_{uuid.uuid4().hex[:8].upper()}"
-        sample_id = f"SYN_LIVE_{uuid.uuid4().hex[:6].upper()}"
-
-        doc = {
-            "news_id": news_id,
-            "sample_id": sample_id,
-            "title": title,
-            "text": text,
-            "source": source_name,
-            "author": author_name,
-            "category": story.get("category", "General"),
-            "language": story.get("language", "English"),
-            "region": story.get("region", "India National"),
-            "image_url": story.get("image_url", TOPIC_IMAGE_MAP.get(story.get("category"), FALLBACK_IMAGE)),
-            "reading_time": story.get("reading_time", f"{max(1, len(text.split()) // 55)} min read"),
-            "status": status,
-            "fake_probability": verdict["fake_probability"],
-            "real_probability": verdict["real_probability"],
-            "risk_band": verdict["risk_band"],
-            "action_recommended": verdict["action_recommended"],
-            "s_style": verdict["s_style"],
-            "s_fact": verdict["s_fact"],
-            "temporal_consistency": verdict["temporal_consistency"],
-            "xai": verdict["xai"],
-            "created_at": now()
+    """Coordinates fast concurrent fetching of live news, fast deduplication, and vector indexing."""
+    if not _NEWS_SYNC_LOCK.acquire(blocking=False):
+        return {
+            "status": "SYNC_IN_PROGRESS",
+            "synced_count": 0,
+            "sources_used": ["Concurrent Sync Guard"],
+            "api_linked": True,
+            "total_published": news_col.count_documents({"status": "PUBLISHED"}),
+            "synced_at": now(),
         }
-        news_col.insert_one(doc)
-        synced_count += 1
-        if status == "PUBLISHED" and background_tasks:
-            background_tasks.add_task(
-                ws_manager.broadcast,
-                {"event": "LIVE_FEED_ITEM_SYNCED", "article": {**doc, "_id": str(doc.get("_id", ""))}}
-            )
+    try:
+        result = fetch_realtime_news(max_items=24)
+        stories = result.get("stories", [])
+        synced_count = 0
 
-    return {
-        "status": "SYNC_SUCCESS",
-        "synced_count": synced_count,
-        "sources_used": result.get("sources_used", []),
-        "api_linked": result.get("api_linked", False),
-        "total_published": news_col.count_documents({"status": "PUBLISHED"}),
-        "synced_at": now()
-    }
+        try:
+            existing_docs = list(news_col.find({}).limit(250))
+            existing_titles = {str(d.get("title") or "").strip().lower() for d in existing_docs}
+        except Exception:
+            existing_titles = set()
+
+        for story in stories:
+            if synced_count >= 12:
+                break
+            title = story.get("title", "").strip()
+            if not title or title.lower() in existing_titles:
+                continue
+            existing_titles.add(title.lower())
+
+            text = story.get("text", "")
+            source_name = story.get("source", "Real-Time News Wire")
+            author_name = story.get("author", "Wire Bureau")
+            verdict = execute_hybrid_inference(title, text, source=source_name, author=author_name, fast_mode=True)
+            status = "PUBLISHED" if verdict["risk_band"] != "HIGH_RISK_FAKE" else "BLOCKED_HIGH_RISK_FAKE"
+            news_id = f"NEWS_{uuid.uuid4().hex[:8].upper()}"
+            sample_id = f"SYN_LIVE_{uuid.uuid4().hex[:6].upper()}"
+
+            doc = {
+                "news_id": news_id,
+                "sample_id": sample_id,
+                "title": title,
+                "text": text,
+                "source": source_name,
+                "author": author_name,
+                "category": story.get("category", "General"),
+                "language": story.get("language", "English"),
+                "region": story.get("region", "India National"),
+                "image_url": story.get("image_url", TOPIC_IMAGE_MAP.get(story.get("category"), FALLBACK_IMAGE)),
+                "url": story.get("url", ""),
+                "reading_time": story.get("reading_time", f"{max(1, len(text.split()) // 55)} min read"),
+                "status": status,
+                "fake_probability": verdict["fake_probability"],
+                "real_probability": verdict["real_probability"],
+                "risk_band": verdict["risk_band"],
+                "action_recommended": verdict["action_recommended"],
+                "s_style": verdict["s_style"],
+                "s_fact": verdict["s_fact"],
+                "s_propagation": verdict.get("s_propagation", 0.10),
+                "temporal_consistency": verdict["temporal_consistency"],
+                "xai": verdict["xai"],
+                "view_count": 0,
+                "share_count": 0,
+                "flag_count": 0,
+                "bookmark_count": 0,
+                "created_at": now()
+            }
+            news_col.insert_one(doc)
+            if status == "PUBLISHED" and synced_count < 5:
+                try:
+                    vector_store.index_live_dispatch(
+                        news_id=news_id,
+                        title=title,
+                        text=text,
+                        source=source_name,
+                        category=story.get("category", "General"),
+                        truth_label=0,
+                    )
+                except Exception:
+                    pass
+            synced_count += 1
+            if status == "PUBLISHED" and background_tasks:
+                background_tasks.add_task(
+                    ws_manager.broadcast,
+                    {"event": "LIVE_FEED_ITEM_SYNCED", "article": {**doc, "_id": str(doc.get("_id", ""))}}
+                )
+
+        return {
+            "status": "SYNC_SUCCESS",
+            "synced_count": synced_count,
+            "sources_used": result.get("sources_used", []),
+            "api_linked": result.get("api_linked", False),
+            "total_published": news_col.count_documents({"status": "PUBLISHED"}),
+            "synced_at": now()
+        }
+    finally:
+        _NEWS_SYNC_LOCK.release()
+
+
+@app.get("/api/v1/news/search-topic")
+def search_live_topic(q: str, limit: int = 12):
+    """Dynamic Google News topic/keyword search endpoint (e.g., AI News, Hyderabad, Cricket)."""
+    if not q or not q.strip():
+        raise HTTPException(status_code=400, detail="Topic query 'q' is required")
+    return fetch_topic_search(q.strip(), max_items=min(max(limit, 1), 25))
+
+
+@app.get("/api/v1/weather/live")
+def get_live_weather_endpoint(city: str = "New Delhi"):
+    """Returns live Open-Meteo weather telemetry for Indian cities (replaces static ticker values)."""
+    wx = live_weather_verifier.fetch_city_weather(city)
+    if not wx:
+        return {"city": city, "status": "UNAVAILABLE"}
+    return {"status": "LIVE", **wx}
+
+
+@app.post("/api/v1/news/extract-url")
+def extract_url_endpoint(payload: UrlExtractRequest):
+    """Extracts headline, publisher domain, and full article text from any live news URL."""
+    try:
+        return {"success": True, **extract_article_from_url(payload.url)}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Could not extract article from URL: {e}")
+
+
+@app.post("/api/v1/news/{news_id}/engage")
+def record_article_engagement(news_id: str, payload: ArticleEngagementRequest):
+    """Records real website-user views, shares, bookmarks, and citizen flags for propagation tracking."""
+    doc = news_col.find_one({"news_id": news_id})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Article not found")
+    act = (payload.action or "").strip().lower()
+    field_map = {"view": "view_count", "share": "share_count", "bookmark": "bookmark_count", "flag": "flag_count"}
+    col_field = field_map.get(act)
+    if not col_field:
+        raise HTTPException(status_code=400, detail="Unsupported action")
+    new_val = int(doc.get(col_field) or 0) + 1
+    updates = {col_field: new_val, "last_interacted_at": now()}
+    news_col.update_one({"news_id": news_id}, {"$set": updates})
+    diff = website_propagation_tracker.measure_website_diffusion(news_col, doc.get("title", ""), doc.get("text", ""))
+    return {"success": True, "news_id": news_id, col_field: new_val, "website_propagation": diff}
 
 
 @app.post("/api/v1/news/sync-live")
@@ -807,26 +1056,43 @@ def sync_live_news_feed(background_tasks: BackgroundTasks):
 
 @app.post("/api/v1/news/configure-api")
 def configure_news_api(payload: NewsApiConfigRequest):
-    """Configures official NewsAPI.org or GNews.io API keys dynamically from the UI or environment."""
-    if payload.news_api_key is not None:
+    """Configures live news & verification API keys dynamically without clearing unset env keys."""
+    if payload.news_api_key and payload.news_api_key.strip():
         config.NEWS_API_KEY = payload.news_api_key.strip()
-    if payload.gnews_api_key is not None:
+    if payload.gnews_api_key and payload.gnews_api_key.strip():
         config.GNEWS_API_KEY = payload.gnews_api_key.strip()
+    if payload.the_news_api_token and payload.the_news_api_token.strip():
+        config.THE_NEWS_API_TOKEN = payload.the_news_api_token.strip()
+    if payload.guardian_api_key and payload.guardian_api_key.strip():
+        config.GUARDIAN_API_KEY = payload.guardian_api_key.strip()
+    if payload.google_factcheck_api_key and payload.google_factcheck_api_key.strip():
+        config.GOOGLE_FACTCHECK_API_KEY = payload.google_factcheck_api_key.strip()
+    if payload.gemini_api_key and payload.gemini_api_key.strip():
+        config.GEMINI_API_KEY = payload.gemini_api_key.strip()
     return {
         "status": "CONFIG_SAVED",
         "has_newsapi": bool(config.NEWS_API_KEY),
         "has_gnews": bool(config.GNEWS_API_KEY),
-        "message": "Live news feed API credentials updated successfully."
+        "has_thenewsapi": bool(getattr(config, "THE_NEWS_API_TOKEN", "")),
+        "has_guardian": bool(getattr(config, "GUARDIAN_API_KEY", "")),
+        "has_factcheck": bool(getattr(config, "GOOGLE_FACTCHECK_API_KEY", "")),
+        "has_gemini": bool(getattr(config, "GEMINI_API_KEY", "")),
+        "message": "Live news & fact-check API credentials updated successfully."
     }
 
 
 @app.get("/api/v1/news/status")
 def get_news_sync_status():
-    """Returns live news wire connection status, linked APIs, and total published dispatches."""
+    """Returns live news wire & verifier API status plus total published dispatches."""
     return {
         "total_published": news_col.count_documents({"status": "PUBLISHED"}),
+        "has_guardian": bool(getattr(config, "GUARDIAN_API_KEY", "")),
+        "has_thenewsapi": bool(getattr(config, "THE_NEWS_API_TOKEN", "")),
+        "has_factcheck": bool(getattr(config, "GOOGLE_FACTCHECK_API_KEY", "")),
+        "has_gemini": bool(getattr(config, "GEMINI_API_KEY", "")),
         "has_newsapi": bool(config.NEWS_API_KEY),
         "has_gnews": bool(config.GNEWS_API_KEY),
+        "zero_key_feeds": ["Official RSS (Hindu/TOI/Express/NDTV/BBC/Reuters)", "Google News RSS", "PIB Fact Check", "Wikidata", "Open-Meteo"],
         "auto_sync_interval_minutes": config.NEWS_AUTO_SYNC_MINUTES
     }
 
@@ -1075,13 +1341,14 @@ def approve_removal_request(request_id: str, background_tasks: BackgroundTasks):
     sample_id = req_doc.get("sample_id") or f"SYN_{news_id}"
     title = req_doc.get("title", "")
 
-    # Execute best machine unlearning strategy (algorithm_2_svm for instant closed-form unlearning)
+    # Execute admin's active machine unlearning strategy (default algorithm_4_hybrid)
+    active_strat = multi_model_suite.active_strategy or "algorithm_4_hybrid"
     unlearn_payload = UnlearningExecutionRequest(
         sample_id=sample_id,
         news_id=news_id,
         title=title,
         text="",
-        strategy="algorithm_2_svm",
+        strategy=active_strat,
         reason=f"CITIZEN_REMOVAL_APPROVED: {req_doc.get('reason')}"
     )
     execute_unlearning(unlearn_payload, background_tasks)
@@ -1091,7 +1358,7 @@ def approve_removal_request(request_id: str, background_tasks: BackgroundTasks):
         {"$set": {
             "status": "APPROVED_AND_UNLEARNED",
             "unlearned_at": now(),
-            "unlearned_strategy": "algorithm_2_svm"
+            "unlearned_strategy": active_strat
         }}
     )
     return {
@@ -1238,13 +1505,65 @@ def update_news_article(news_id: str, payload: NewsUpdateRequest, background_tas
 # EXACT MACHINE UNLEARNING EXECUTION & MULTI-MODEL BENCHMARK
 # -----------------------------------------------------------------------------
 
+def _next_chained_proof_hash(sample_id: str, strategy: str, residual_pct: float) -> str:
+    prev_hash = "GENESIS_SMRITI_SHUDDHI_2026"
+    try:
+        latest = list(unlearning_ledger_col.find({}).limit(5))
+        for row in latest:
+            if row.get("proof_hash"):
+                prev_hash = str(row["proof_hash"])
+                break
+    except Exception:
+        pass
+    raw = f"{prev_hash}|{sample_id}|{strategy}|{residual_pct:.6f}|{time.time()}"
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+@app.get("/api/v1/admin/unlearning-strategy")
+def get_active_unlearning_strategy():
+    return {
+        "active_strategy": multi_model_suite.active_strategy,
+        "available_strategies": [
+            {"id": "algorithm_4_hybrid", "label": "Algorithm 4: Unified Hybrid Engine (Recommended)"},
+            {"id": "algorithm_2_svm", "label": "Algorithm 2: Decremental Closed-Form SVM"},
+            {"id": "algorithm_1_sisa", "label": "Algorithm 1: SISA Sharded Partitioning"},
+            {"id": "algorithm_3_lora", "label": "Algorithm 3: Modular LoRA Domain Deactivation"},
+            {"id": "baseline_retrain", "label": "Baseline: Full Retraining from Scratch"},
+        ],
+    }
+
+
+@app.post("/api/v1/admin/unlearning-strategy")
+def set_active_unlearning_strategy(payload: ActiveStrategyRequest):
+    valid = {"algorithm_4_hybrid", "algorithm_2_svm", "algorithm_1_sisa", "algorithm_3_lora", "baseline_retrain"}
+    if payload.strategy not in valid:
+        raise HTTPException(status_code=400, detail=f"Strategy must be one of {sorted(valid)}")
+    multi_model_suite.active_strategy = payload.strategy
+    try:
+        existing = settings_col.find_one({"setting_key": "active_unlearning_strategy"})
+        if existing:
+            settings_col.update_one(
+                {"setting_key": "active_unlearning_strategy"},
+                {"$set": {"setting_value": payload.strategy, "updated_by": "ADMIN", "updated_at": now()}},
+            )
+        else:
+            settings_col.insert_one({
+                "setting_key": "active_unlearning_strategy",
+                "setting_value": payload.strategy,
+                "updated_by": "ADMIN",
+                "updated_at": now(),
+            })
+    except Exception:
+        pass
+    return {"status": "STRATEGY_UPDATED", "active_strategy": payload.strategy}
+
+
 @app.post("/api/v1/admin/unlearn")
 def execute_unlearning(payload: UnlearningExecutionRequest, background_tasks: BackgroundTasks):
     sample_id = payload.sample_id
     news_id = payload.news_id
-    strategy = payload.strategy or "all_benchmark"
+    strategy = payload.strategy or multi_model_suite.active_strategy or "algorithm_4_hybrid"
 
-    # Fetch title & text if not provided
     title = payload.title or ""
     text = payload.text or ""
     if not title and news_id:
@@ -1255,37 +1574,43 @@ def execute_unlearning(payload: UnlearningExecutionRequest, background_tasks: Ba
 
     logger.info("[UNLEARN] Executing unlearning strategy '%s' for sample: %s", strategy, sample_id)
 
-    # Execute strategy: returns full comparative benchmark matrix with executed model flagged
     benchmark_report = multi_model_suite.run_all_benchmark(sample_id, title, text, executed_strategy=strategy)
     result = benchmark_report
+    sisa_telemetry = unlearning_engine.execute_unlearning_sequence(sample_id=sample_id, sample_text=f"{title} {text}")
 
-    # Execute the 6-step physical shard purge on disk & Redis cache eviction
-    unlearning_engine.execute_unlearning_sequence(sample_id=sample_id, sample_text=f"{title} {text}")
+    # Pick genuine metrics from the executed strategy (or hybrid default)
+    exec_row = next(
+        (r for r in result.get("results", []) if r["algorithm_id"] == strategy),
+        next((r for r in result.get("results", []) if r["algorithm_id"] == "algorithm_4_hybrid"), result["results"][0]),
+    )
+    res_inf = float(exec_row.get("forget_influence_remaining_pct", 0.0))
+    retain_pct = round(float(exec_row.get("retain_accuracy_after", 0.90)) * 100.0, 2)
+    params_pct = float(exec_row.get("parameters_modified_pct", 20.0))
+    exec_ms = float(exec_row.get("execution_time_ms", 1.0))
+    proof_hash = _next_chained_proof_hash(sample_id, strategy, res_inf)
 
-    # Update status in persistent news database to REVOKED_AND_UNLEARNED with 0.00% residual influence
-    # This removes it from public wire feed and admin blocked queues while preserving the audit receipt for citizen journalists
     unlearned_updates = {
         "status": "REVOKED_AND_UNLEARNED",
         "tag": "UNLEARNED",
-        "tag_display": "UNLEARNED & REVOKED (0.00% INFLUENCE)",
+        "tag_display": f"UNLEARNED & REVOKED ({res_inf:.4f}% INFLUENCE)",
         "unlearned_strategy": strategy,
         "unlearned_at": now(),
-        "residual_influence_pct": 0.0,
-        "retain_accuracy_pct": 100.0,
-        "parameters_modified_pct": 0.0 if "svm" in strategy or "lora" in strategy else (20.0 if "sisa" in strategy else 100.0)
+        "residual_influence_pct": res_inf,
+        "retain_accuracy_pct": retain_pct,
+        "parameters_modified_pct": params_pct,
     }
     if news_id:
         news_col.update_many({"$or": [{"news_id": news_id}, {"sample_id": sample_id}]}, {"$set": unlearned_updates})
     else:
         news_col.update_many({"sample_id": sample_id}, {"$set": unlearned_updates})
+    if using_supabase and hasattr(db, "mark_training_samples_unlearned"):
+        db.mark_training_samples_unlearned([sample_id])
 
-    # Evict signatures from Redis cache
     if title or text:
         sig = cache_controller.generate_signature(title, text)
         cache_controller.evict_signature(sig)
     cache_controller.evict_signature(sample_id)
 
-    # Broadcast purge event via WebSocket
     background_tasks.add_task(
         ws_manager.broadcast,
         {
@@ -1293,61 +1618,152 @@ def execute_unlearning(payload: UnlearningExecutionRequest, background_tasks: Ba
             "sample_id": sample_id,
             "news_id": news_id,
             "strategy": strategy,
-            "benchmark": result
+            "proof_hash": proof_hash,
+            "benchmark": result,
         }
     )
 
-    # Log audit entry & persistent unlearning ledger
     ledger_entry = {
         "sample_id": sample_id,
         "news_id": news_id,
-        "title": title or f"Revoked fake story ({sample_id})",
+        "title": title or f"Revoked story ({sample_id})",
         "strategy": strategy,
         "results": result.get("results", []) if isinstance(result, dict) else [],
-        "residual_influence_pct": 0.0,
-        "retain_accuracy_pct": 100.0,
-        "created_at": now()
+        "residual_influence": round(float(exec_row.get("weight_l2_parity", 0.0)), 8),
+        "residual_influence_pct": res_inf,
+        "retain_accuracy_pct": retain_pct,
+        "execution_time_ms": exec_ms,
+        "proof_hash": proof_hash,
+        "status": "PURGED",
+        "created_at": now(),
     }
     try:
         audit_col.insert_one({
             "action": "EXACT_UNLEARNING_EXECUTED",
+            "details": f"proof={proof_hash[:16]}...",
             "sample_id": sample_id,
             "news_id": news_id,
             "strategy": strategy,
-            "created_at": now()
+            "created_at": now(),
         })
         unlearning_ledger_col.insert_one(ledger_entry)
     except Exception as e:
         logger.warning("Unlearning ledger recording notice: %s", e)
 
-    target_shard_id = int(abs(hash(sample_id)) % 5)
-
+    target_shard_id = sisa_telemetry.get("steps", {}).get("step_1_metadata_routing", {}).get("target_shard_id", 0)
     return {
         "status": "UNLEARNING_COMPLETE_AND_PURGED",
         "sample_id": sample_id,
         "news_id": news_id,
         "strategy": strategy,
         "target_shard_id": target_shard_id,
-        "benchmark": result
+        "proof_hash": proof_hash,
+        "sisa_sequence": sisa_telemetry,
+        "benchmark": result,
+    }
+
+
+@app.post("/api/v1/admin/unlearn-batch")
+def execute_batch_unlearning(payload: BatchUnlearningRequest, background_tasks: BackgroundTasks):
+    """Multi-article batch unlearning across SISA shards, SVM Hessian, Vector Store & Supabase Ledger."""
+    strategy = payload.strategy or multi_model_suite.active_strategy or "algorithm_4_hybrid"
+    sample_ids = [str(s) for s in payload.sample_ids if s]
+    news_ids = [str(n) for n in (payload.news_ids or []) if n]
+
+    sample_texts = {}
+    if news_ids:
+        for doc in news_col.find({"news_id": {"$in": news_ids}}):
+            sid = str(doc.get("sample_id") or doc.get("news_id") or "")
+            if sid:
+                sample_texts[sid] = f"{doc.get('title', '')} {doc.get('text', '')}".strip()
+
+    benchmark_report = multi_model_suite.run_all_benchmark(
+        sample_id=sample_ids[0],
+        sample_title=f"Batch Purge ({len(sample_ids)} articles)",
+        sample_text=" ".join(list(sample_texts.values())[:2]),
+        executed_strategy=strategy,
+        sample_ids=sample_ids,
+    )
+    batch_telemetry = unlearning_engine.execute_batch_unlearning_sequence(sample_ids=sample_ids, sample_texts=sample_texts)
+
+    exec_row = next(
+        (r for r in benchmark_report.get("results", []) if r["algorithm_id"] == strategy),
+        benchmark_report["results"][-1],
+    )
+    res_inf = float(exec_row.get("forget_influence_remaining_pct", 0.0))
+    retain_pct = round(float(exec_row.get("retain_accuracy_after", 0.90)) * 100.0, 2)
+    proof_hash = _next_chained_proof_hash(",".join(sample_ids), strategy, res_inf)
+
+    unlearned_updates = {
+        "status": "REVOKED_AND_UNLEARNED",
+        "tag": "UNLEARNED",
+        "tag_display": f"BATCH UNLEARNED ({len(sample_ids)} items)",
+        "unlearned_strategy": strategy,
+        "unlearned_at": now(),
+        "residual_influence_pct": res_inf,
+        "retain_accuracy_pct": retain_pct,
+    }
+    conds = [{"sample_id": {"$in": sample_ids}}]
+    if news_ids:
+        conds.append({"news_id": {"$in": news_ids}})
+    news_col.update_many({"$or": conds}, {"$set": unlearned_updates})
+    if using_supabase and hasattr(db, "mark_training_samples_unlearned"):
+        db.mark_training_samples_unlearned(sample_ids)
+
+    try:
+        unlearning_ledger_col.insert_one({
+            "sample_id": ",".join(sample_ids)[:64],
+            "news_id": news_ids[0] if news_ids else None,
+            "title": f"Batch Purge of {len(sample_ids)} Articles",
+            "strategy": strategy,
+            "results": benchmark_report.get("results", []),
+            "residual_influence": round(float(exec_row.get("weight_l2_parity", 0.0)), 8),
+            "residual_influence_pct": res_inf,
+            "retain_accuracy_pct": retain_pct,
+            "execution_time_ms": float(exec_row.get("execution_time_ms", 1.0)),
+            "proof_hash": proof_hash,
+            "status": "BATCH_PURGED",
+            "created_at": now(),
+        })
+    except Exception as e:
+        logger.warning("Batch ledger notice: %s", e)
+
+    return {
+        "status": "BATCH_UNLEARNING_COMPLETE",
+        "batch_count": len(sample_ids),
+        "sample_ids": sample_ids,
+        "strategy": strategy,
+        "proof_hash": proof_hash,
+        "sisa_batch_sequence": batch_telemetry,
+        "benchmark": benchmark_report,
     }
 
 
 @app.get("/api/v1/unlearning/benchmark/all")
-def get_all_unlearning_benchmark():
-    """Runs a quick live comparative evaluation across all 4 unlearning models on a standard reference sample."""
-    benchmark = multi_model_suite.run_all_benchmark(
-        sample_id="SYN_BENCH_CALIB",
-        sample_title="Smriti Shuddhi Benchmark Calibration Baseline",
-        sample_text="Demonstration dispatch evaluating exact unlearning performance across all three structural families."
+def get_all_unlearning_benchmark(forget_count: int = 1):
+    """Runs live comparative evaluation across all 5 unlearning models on 1 or multiple real samples."""
+    train_path = config.PROCESSED_DIR / "train.csv"
+    sample_ids = ["SYN_BENCH_CALIB"]
+    sample_title = "Smriti Shuddhi Multi-Model Unlearning Calibration"
+    sample_text = "Evaluation across 5 exact unlearning strategies."
+    if train_path.exists() and not multi_model_suite.svm_engine.sample_ids:
+        multi_model_suite._lazy_init()
+    if multi_model_suite.svm_engine.sample_ids:
+        n = max(1, min(int(forget_count), 10, len(multi_model_suite.svm_engine.sample_ids)))
+        sample_ids = list(multi_model_suite.svm_engine.sample_ids[:n])
+    return multi_model_suite.run_all_benchmark(
+        sample_id=sample_ids[0],
+        sample_title=sample_title,
+        sample_text=sample_text,
+        executed_strategy=multi_model_suite.active_strategy,
+        sample_ids=sample_ids,
     )
-    return benchmark
 
 
 @app.get("/api/v1/admin/unlearning-ledger")
 @app.get("/api/v1/admin/ledger")
 def get_unlearning_ledger():
-    """Returns persistent audit ledger of all exact machine unlearning operations."""
-    items = list(unlearning_ledger_col.find({}).limit(50))
+    items = list(unlearning_ledger_col.find({}).sort("created_at", -1).limit(50))
     for it in items:
         if "_id" in it:
             it["_id"] = str(it["_id"])
@@ -1356,35 +1772,73 @@ def get_unlearning_ledger():
 
 @app.post("/api/v1/admin/model-probe")
 def probe_model_memory(payload: ModelProbeRequest):
-    """Admin interactive probe to verify mathematical zero residual memorization in unlearned models."""
+    """Admin probe measuring real residual memorization across SVM weights, SISA shards, Vector Index & Ledger."""
     import numpy as np
     text = payload.query_text.strip()
     if not text:
         raise HTTPException(status_code=400, detail="Query text cannot be empty")
 
     svm_engine = multi_model_suite.svm_engine
-    vec = getattr(svm_engine, 'vectorizer', None)
-    weights = getattr(svm_engine, 'weights', None)
-    if vec is not None and weights is not None:
+    margin = 0.0
+    if svm_engine.is_trained and svm_engine.vectorizer is not None and svm_engine.weights is not None:
         try:
-            X = vec.transform([text]).toarray()[0]
-            margin = float(np.dot(weights, X))
+            X = svm_engine.vectorizer.transform([text]).toarray()[0]
+            margin = float(np.dot(svm_engine.weights, X))
         except Exception:
             margin = 0.0
-    else:
-        margin = 0.0
+
+    # Check if text or identifier exists inside active SISA partitions
+    present_in_shards = []
+    manifest = unlearning_engine.get_manifest()
+    text_low = text.lower()
+    for sid_str in manifest.get("shards", {}).keys():
+        if text in manifest["shards"][sid_str].get("sample_ids", []):
+            present_in_shards.append(int(sid_str))
+        else:
+            p_csv = unlearning_engine._shard_csv_path(int(sid_str))
+            if p_csv.exists():
+                try:
+                    raw_chunk = p_csv.read_text(encoding="utf-8", errors="ignore").lower()
+                    if len(text_low) >= 8 and text_low[:45] in raw_chunk:
+                        present_in_shards.append(int(sid_str))
+                except Exception:
+                    pass
 
     style_res = lora_sisa_engine.predict_style("Probe", text)
+    shard_scores = style_res.get("shard_scores", [0.5])
+    dispersion = float(np.std(shard_scores))
+    vec_hits = vector_store.search_evidence(text, top_k=2, score_threshold=0.72)
+    top_sim = float(vec_hits["matches"][0]["similarity_score"]) if vec_hits.get("matches") else 0.0
+
+    # Empirical residual score: 0 when purged from shards, high if found in training shard CSV
+    if present_in_shards:
+        mem_status = "ACTIVE_IN_TRAINING_SHARD"
+        res_score = round(min(1.0, 0.65 + 0.1 * len(present_in_shards)), 4)
+        pred_state = "MEMORIZED_IN_ACTIVE_PARTITION"
+        detail = f"Record fragment found inside SISA Shard(s) {present_in_shards}. Trigger Unlearning to purge."
+    elif top_sim >= 0.85:
+        mem_status = "EVIDENCE_CORPUS_ANCHOR_ONLY"
+        res_score = 0.0
+        pred_state = "FOUND_IN_PUBLIC_EVIDENCE_CORPUS"
+        detail = f"Not present in training shards; matched verified fact-check corpus ({top_sim:.2f} cosine)."
+    else:
+        mem_status = "ZERO_RESIDUAL_MEMORIZATION"
+        res_score = 0.0
+        pred_state = "OUT_OF_DISTRIBUTION_UNSEEN"
+        detail = f"0 active shard matches, LoRA shard std={dispersion:.4f}, evaluated strictly out-of-distribution."
 
     return {
         "query": text,
-        "memorization_status": "ZERO_RESIDUAL_MEMORIZATION",
-        "residual_influence_score": 0.0000,
+        "memorization_status": mem_status,
+        "residual_influence_score": res_score,
+        "present_in_shards": present_in_shards,
         "svm_margin": round(margin, 4),
         "style_risk": style_res.get("s_style", 0.5),
-        "empirical_prediction": "OUT_OF_DISTRIBUTION_UNSEEN",
-        "mathematical_guarantee": "The query has zero influence on active parameters. Evaluated as unseen out-of-distribution.",
-        "status_detail": "Mathematical verification confirmed: 0.0000% presence in Gram matrix, Hessian inverse, and active LoRA adapters."
+        "lora_shard_dispersion": round(dispersion, 4),
+        "top_vector_similarity": round(top_sim, 4),
+        "empirical_prediction": pred_state,
+        "mathematical_guarantee": "Computed directly against active SISA partition CSVs, LoRA adapter dispersion, SVM weights, and HNSW vector index.",
+        "status_detail": detail,
     }
 
 
@@ -1414,28 +1868,41 @@ def query_admin_copilot(payload: CopilotQueryRequest, background_tasks: Backgrou
             }
         sid = top_fake.get("sample_id") or top_fake.get("news_id")
         nid = top_fake.get("news_id")
-        res = multi_model_suite.run_all_benchmark(sid, top_fake.get("title", ""), top_fake.get("text", ""), executed_strategy="algorithm_2_svm")
+        active_strat = multi_model_suite.active_strategy or "algorithm_4_hybrid"
+        res = multi_model_suite.run_all_benchmark(sid, top_fake.get("title", ""), top_fake.get("text", ""), executed_strategy=active_strat)
         unlearning_engine.execute_unlearning_sequence(sample_id=sid, sample_text=top_fake.get("title", ""))
+
+        exec_row = next((r for r in res.get("results", []) if r["algorithm_id"] == active_strat), res["results"][-1])
+        res_inf = float(exec_row.get("forget_influence_remaining_pct", 0.0))
+        retain_pct = round(float(exec_row.get("retain_accuracy_after", 0.90)) * 100.0, 2)
+        exec_ms = float(exec_row.get("execution_time_ms", 1.0))
+        proof_hash = _next_chained_proof_hash(sid, active_strat, res_inf)
 
         news_col.update_many({"$or": [{"news_id": nid}, {"sample_id": sid}]}, {"$set": {
             "status": "REVOKED_AND_UNLEARNED",
             "tag": "UNLEARNED",
-            "tag_display": "UNLEARNED & REVOKED (0.00% INFLUENCE)",
-            "unlearned_strategy": "algorithm_2_svm",
+            "tag_display": f"UNLEARNED & REVOKED ({res_inf:.4f}% INFLUENCE)",
+            "unlearned_strategy": active_strat,
             "unlearned_at": now(),
-            "residual_influence_pct": 0.0
+            "residual_influence_pct": res_inf,
+            "retain_accuracy_pct": retain_pct,
         }})
         cache_controller.evict_signature(sid)
         unlearning_ledger_col.insert_one({
             "sample_id": sid,
             "news_id": nid,
             "title": top_fake.get("title", ""),
-            "strategy": "algorithm_2_svm",
-            "residual_influence_pct": 0.0,
-            "retain_accuracy_pct": 100.0,
+            "strategy": active_strat,
+            "results": res.get("results", []),
+            "residual_influence": round(float(exec_row.get("weight_l2_parity", 0.0)), 8),
+            "residual_influence_pct": res_inf,
+            "retain_accuracy_pct": retain_pct,
+            "execution_time_ms": exec_ms,
+            "proof_hash": proof_hash,
+            "status": "PURGED",
             "created_at": now()
         })
-        resp_text = f"⚡ Executed exact unlearning on top fake story: **'{top_fake.get('title')}'** ({sid}) using **Algorithm 2: Decremental Closed-Form SVM** in **0.24ms**. The mathematical contribution has been subtracted from the inverse Hessian, and the story is revoked from all public wires with 0.0000% residual influence."
+        resp_text = f"Executed unlearning on **'{top_fake.get('title')}'** ({sid}) via **{active_strat}** in **{exec_ms:.2f}ms** (Retain={retain_pct:.2f}%, L2 parity={exec_row.get('weight_l2_parity', 0.0):.2e}, Proof `{proof_hash[:14]}...`)."
         return {
             "success": True,
             "response": resp_text,
@@ -1446,25 +1913,25 @@ def query_admin_copilot(payload: CopilotQueryRequest, background_tasks: Backgrou
         }
 
     elif action == "recommend_model" or "recommend" in q or "best model" in q or "best algorithm" in q:
-        resp_text = ("⭐ **Chief Fact-Checker Recommendation: Algorithm 2 (Decremental Closed-Form SVM)**\n\n"
-                     "• **Why it's #1**: It applies an exact closed-form Sherman-Morrison-Woodbury downdate to the inverse Hessian $H^{-1}$.\n"
-                     "• **Speed**: Executes in **0.24ms** (>1,800x faster than full retraining).\n"
-                     "• **Retention**: Exactly **100.0% retain utility** (accuracy before = after).\n"
-                     "• **Mathematical Guarantee**: The resulting weight vector is strictly identical to training on $D \\setminus \\{x^*\\}$ without gradient optimization noise.\n"
-                     "• **Residual Influence**: **0.0000%** across all active parameters.")
+        resp_text = (f"**Active Recommended Strategy: `{multi_model_suite.active_strategy}`**\n\n"
+                     "• **Algorithm 4 (`algorithm_4_hybrid`)**: Full-stack unlearning (SISA LoRA Shard Retrain + Sherman-Morrison $H^{-1}$ Downdate + Vector/Cache Purge + Chained SHA-256 Proof).\n"
+                     "• **Algorithm 2 (`algorithm_2_svm`)**: Instant $O(d^2)$ algebraic downdate with closed-form Gold Retrain L2 parity.\n"
+                     "• You can switch the active strategy anytime in the Unlearning Benchmark selector.")
         return {
             "success": True,
             "response": resp_text,
             "reply": resp_text,
             "action_executed": "recommend_model",
-            "recommended_algorithm": "algorithm_2_svm"
+            "recommended_algorithm": multi_model_suite.active_strategy
         }
 
     elif action == "analyze_mia" or "mia" in q or "membership" in q or "inference attack" in q:
-        resp_text = ("🛡️ **MIA (Membership Inference Attack) Audit Report**:\n\n"
-                     "• **Evaluation Metric**: Likelihood ratio test on unlearned sample features.\n"
-                     "• **Empirical Finding**: Unlearned samples register an empirical margin indistinguishable from unseen out-of-distribution instances (MIA accuracy: **50.1%**, random guess baseline).\n"
-                     "• **Conclusion**: Active models exhibit zero differential memorization. Attackers cannot reconstruct whether the unlearned fake story ever existed in the training distribution.")
+        bench = multi_model_suite.run_all_benchmark("SYN_MIA_AUDIT", "Audit Sample", "Membership inference calibration check", executed_strategy=multi_model_suite.active_strategy)
+        hybrid_row = bench["results"][-1]
+        resp_text = (f"**Empirical MIA Audit Report ({hybrid_row['algorithm_name']})**:\n\n"
+                     f"• **Measured MIA ROC-AUC**: **{hybrid_row.get('mia_auc', 0.5):.4f}** (0.5000 = indistinguishable random baseline).\n"
+                     f"• **Weight L2 Parity vs Gold Retrain**: **{hybrid_row.get('weight_l2_parity', 0.0):.2e}**.\n"
+                     f"• **Retain Test Accuracy / F1**: **{hybrid_row['retain_accuracy_after']*100:.2f}% / {hybrid_row['f1_after']*100:.2f}%**.")
         return {
             "success": True,
             "response": resp_text,
@@ -1494,12 +1961,18 @@ def query_admin_copilot(payload: CopilotQueryRequest, background_tasks: Backgrou
             db_type = "MongoDB Cluster (Port 27017)"
         else:
             db_type = "LocalFallbackDB (data/local_store.json)"
+        try:
+            qdrant_cnt = vector_store.client.count(collection_name=config.QDRANT_COLLECTION).count
+        except Exception:
+            qdrant_cnt = len(INITIAL_OFFICIAL_CORPUS)
+        pgvec_cnt = db.get_truth_vector_count() if (using_supabase and hasattr(db, "get_truth_vector_count")) else 0
+        train_cnt = training_col.count_documents({})
         resp_text = (f"🔍 **Live Telemetry & Database Diagnostics**:\n\n"
                      f"• **Database Engine**: `{db_type}`\n"
-                     f"• **Total News Documents**: `{news_col.count_documents({})}`\n"
+                     f"• **News & Training Records**: `{news_col.count_documents({})}` news dispatches | `{train_cnt}` indexed training rows\n"
                      f"• **Redis Cache**: `{'Active (Port 6379)' if cache_controller.using_redis else 'Local In-Memory Cache Grid'}` ({cache_controller.get_stats().get('cached_keys_count', 0)} keys cached, TTL: 24h)\n"
-                     f"• **Qdrant Vector Store**: `7` official truth anchor embeddings (384-dim HNSW index)\n"
-                     f"• **SISA Shards**: `5` partitions, each with active compressed LoRA cards (~0.03 MB each).\n"
+                     f"• **Vector Knowledge Store**: `{qdrant_cnt}` Qdrant embeddings | `{pgvec_cnt}` Supabase pgvector anchors (384-dim Cosine HNSW)\n"
+                     f"• **SISA Shards**: `{config.SISA_SHARDS}` disjoint LoRA partitions synced on disk.\n"
                      f"All databases and telemetry pipelines are healthy and synchronizing in real time.")
         return {
             "success": True,
@@ -1524,25 +1997,36 @@ def get_db_explorer():
     """Returns comprehensive real-time database and system telemetry for the admin explorer panel."""
     redis_stats = cache_controller.get_stats()
 
+    blocked_n = news_col.count_documents({"status": "BLOCKED_HIGH_RISK_FAKE"})
+    ledger_n = unlearning_ledger_col.count_documents({})
     col_counts = {
         "news": news_col.count_documents({}),
         "published_news": news_col.count_documents({"status": "PUBLISHED"}),
-        "blocked_fake_news": news_col.count_documents({"status": "BLOCKED_HIGH_RISK_FAKE"}),
+        "blocked_fake_news": blocked_n,
+        "quarantined_fake_news": blocked_n,
         "pending_review": news_col.count_documents({"status": "PENDING_ADMIN_REVIEW"}),
         "unlearned_revoked": news_col.count_documents({"status": "REVOKED_AND_UNLEARNED"}),
+        "training_samples": training_col.count_documents({}),
         "removal_requests": requests_col.count_documents({}),
         "users": users_col.count_documents({}),
-        "unlearning_ledger": unlearning_ledger_col.count_documents({}),
+        "unlearning_ledger": ledger_n,
+        "unlearning_ledger_records": ledger_n,
         "audit_logs": audit_col.count_documents({})
     }
 
     manifest = unlearning_engine.get_manifest()
     shards_info = []
-    for sid in range(5):
+    for sid in range(config.SISA_SHARDS):
         s_data = manifest.get("shards", {}).get(str(sid), {})
         adapter = lora_sisa_engine.adapters[sid]
+        pt_path = adapter.shard_dir / "adapter_model.pt"
         npz_path = adapter.shard_dir / "adapter_model.npz"
-        size_kb = round(os.path.getsize(npz_path) / 1024, 2) if npz_path.exists() else 0.0
+        if pt_path.exists():
+            size_kb = round(os.path.getsize(pt_path) / 1024, 2)
+        elif npz_path.exists():
+            size_kb = round(os.path.getsize(npz_path) / 1024, 2)
+        else:
+            size_kb = 0.0
         shards_info.append({
             "shard_id": sid,
             "sample_count": s_data.get("sample_count", 0),
@@ -1552,7 +2036,14 @@ def get_db_explorer():
             "size_kb": size_kb
         })
 
+    try:
+        qdrant_cnt = int(vector_store.client.count(collection_name=config.QDRANT_COLLECTION).count)
+    except Exception:
+        qdrant_cnt = len(INITIAL_OFFICIAL_CORPUS)
+    pgvec_cnt = db.get_truth_vector_count() if (using_supabase and hasattr(db, "get_truth_vector_count")) else 0
+
     telemetry = {
+        "database_collections": col_counts,
         "mongodb_collections": col_counts,
         "redis_cache": {
             "cached_keys_count": redis_stats.get("cached_keys_count", 0),
@@ -1561,7 +2052,8 @@ def get_db_explorer():
             "backend": "Redis Engine" if cache_controller.using_redis else "LocalMemoryCache Grid"
         },
         "qdrant_vector_store": {
-            "total_vectors": len(INITIAL_OFFICIAL_CORPUS),
+            "total_vectors": qdrant_cnt,
+            "supabase_pgvector_vectors": pgvec_cnt,
             "dimensions": regional_encoder.vector_dim,
             "metric": "Cosine (HNSW)"
         },
@@ -1595,7 +2087,8 @@ def get_db_explorer():
             "collection": config.QDRANT_COLLECTION,
             "vector_dimension": regional_encoder.vector_dim,
             "storage_path": str(config.QDRANT_STORAGE_DIR),
-            "official_anchors_count": len(INITIAL_OFFICIAL_CORPUS)
+            "official_anchors_count": qdrant_cnt,
+            "supabase_pgvector_count": pgvec_cnt
         },
         "shards": shards_info
     }
@@ -1614,14 +2107,16 @@ def get_system_stats():
     shards_summary = []
     for sid, info in manifest.get("shards", {}).items():
         adapter = lora_sisa_engine.adapters[int(sid)]
+        pt_p = adapter.shard_dir / "adapter_model.pt"
+        npz_p = adapter.shard_dir / "adapter_model.npz"
+        size_bytes = os.path.getsize(pt_p) if pt_p.exists() else (os.path.getsize(npz_p) if npz_p.exists() else 0)
         shards_summary.append({
             "shard_id": int(sid),
             "sample_count": info.get("sample_count", 0),
             "is_trained": adapter.is_trained,
             "lora_rank": adapter.rank,
             "lora_scaling": adapter.scaling,
-            "adapter_size_mb": round(os.path.getsize(adapter.shard_dir / "adapter_model.npz") / (1024 * 1024), 2)
-            if (adapter.shard_dir / "adapter_model.npz").exists() else 0.0
+            "adapter_size_mb": round(size_bytes / (1024 * 1024), 4),
         })
 
     return {
@@ -1629,12 +2124,16 @@ def get_system_stats():
         "timestamp": time.time(),
         "cache": redis_stats,
         "shards": shards_summary,
+        "active_unlearning_strategy": multi_model_suite.active_strategy,
+        "encoder_backend": regional_encoder.active_backend_label,
+        "lora_backbone": lora_sisa_engine.backbone.backend_name,
         "published_news_count": news_col.count_documents({"status": "PUBLISHED"}),
         "pending_review_count": news_col.count_documents({"status": "PENDING_ADMIN_REVIEW"}),
         "blocked_fake_count": news_col.count_documents({"status": "BLOCKED_HIGH_RISK_FAKE"}),
         "vector_corpus": {
             "collection": config.QDRANT_COLLECTION,
-            "vector_dim": regional_encoder.vector_dim
+            "vector_dim": regional_encoder.vector_dim,
+            "supabase_pgvector_count": db.get_truth_vector_count() if hasattr(db, "get_truth_vector_count") else 0,
         },
         "graph_engine": {
             "backend": "neo4j_cluster" if graph_engine.using_neo4j else "embedded_networkx_graph"

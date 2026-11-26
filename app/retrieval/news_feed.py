@@ -28,6 +28,7 @@ TOPIC_IMAGE_MAP = {
     "Economy": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
     "Technology & AI": "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80",
     "Governance & Policy": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=800&q=80",
+    "Sports": "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=800&q=80",
     "World News": "https://images.unsplash.com/photo-1526470608268-f674ce90ebd4?auto=format&fit=crop&w=800&q=80",
     "General": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=800&q=80"
 }
@@ -133,7 +134,42 @@ INDIAN_NEWS_FEEDS = [
         "language": "English",
         "region": "World Affairs",
         "author_default": "BBC Global Correspondent"
-    }
+    },
+    {
+        "name": "NDTV India",
+        "url": "https://feeds.feedburner.com/ndtvnews-india-news",
+        "language": "English",
+        "region": "India National",
+        "author_default": "NDTV News Desk"
+    },
+    {
+        "name": "TechCrunch",
+        "url": "https://techcrunch.com/feed/",
+        "language": "English",
+        "region": "Tech & AI Bureau",
+        "author_default": "TechCrunch Editorial"
+    },
+    {
+        "name": "The Hindu Sport",
+        "url": "https://www.thehindu.com/sport/feeder/default.rss",
+        "language": "English",
+        "region": "Sports Desk",
+        "author_default": "The Hindu Sports Bureau"
+    },
+    {
+        "name": "Google News Sports India",
+        "url": "https://news.google.com/rss/headlines/section/topic/SPORTS?hl=en-IN&gl=IN&ceid=IN:en",
+        "language": "English",
+        "region": "Sports Desk",
+        "author_default": "National Sports Wire"
+    },
+    {
+        "name": "The Hindu Business",
+        "url": "https://www.thehindu.com/business/feeder/default.rss",
+        "language": "English",
+        "region": "Financial & Markets",
+        "author_default": "The Hindu Business Bureau"
+    },
 ]
 
 
@@ -170,6 +206,8 @@ def categorize_headline(title: str, text: str) -> str:
         return "Technology & AI"
     if any(k in content for k in ['court', 'minister', 'government', 'scheme', 'pib', 'election', 'parliament', 'law', 'supreme', 'सरकार', 'सुप्रीम कोर्ट', 'योजना', 'ప్రభుత్వం', 'తీర్పు']):
         return "Governance & Policy"
+    if any(k in content for k in ['cricket', 'ipl', 'bcci', 'match', 'tournament', 'fifa', 'olympic', 'badminton', 'hockey', 'sport', 'wicket', 'runs']):
+        return "Sports"
     if any(k in content for k in ['us', 'china', 'un', 'europe', 'iran', 'diplomatic', 'global', 'summit', 'treaty', 'border', 'विदेश', 'चीन', 'అమెరికా']):
         return "World News"
     return "General"
@@ -305,21 +343,21 @@ def fetch_live_gnews(api_key: str, max_items: int = 25) -> List[Dict[str, Any]]:
 # -----------------------------------------------------------------------------
 
 def fetch_live_rss_feed(feed_url: str = None, max_items: int = 40) -> List[Dict[str, Any]]:
-    """Fetches real-time headlines across top Indian and multilingual news feeds."""
+    """Fetches real-time headlines concurrently across top Indian and multilingual news feeds."""
+    from concurrent.futures import ThreadPoolExecutor
     feeds_to_query = [f for f in INDIAN_NEWS_FEEDS if feed_url is None or f["url"] == feed_url]
     if not feeds_to_query and feed_url:
         feeds_to_query = [{"name": "Live Wire", "url": feed_url, "language": "English", "region": "National", "author_default": "Bureau"}]
 
-    all_parsed = []
-    items_per_source = max(3, max_items // max(1, len(feeds_to_query)))
+    items_per_source = max(2, max_items // max(1, len(feeds_to_query)))
     ssl_ctx = _get_ssl_context()
 
-    for feed_info in feeds_to_query:
+    def _fetch_one(feed_info):
         target_url = feed_info["url"]
         source_name = feed_info["name"]
         lang = feed_info.get("language", "English")
         region = feed_info.get("region", "India National")
-
+        parsed = []
         try:
             req = urllib.request.Request(
                 target_url,
@@ -330,9 +368,8 @@ def fetch_live_rss_feed(feed_url: str = None, max_items: int = 40) -> List[Dict[
                     "Accept-Encoding": "gzip, deflate"
                 }
             )
-            with urllib.request.urlopen(req, timeout=6.0, context=ssl_ctx) as response:
+            with urllib.request.urlopen(req, timeout=4.0, context=ssl_ctx) as response:
                 raw_bytes = response.read()
-                # Handle gzip if server returned compressed payload
                 if response.info().get('Content-Encoding') == 'gzip' or (len(raw_bytes) > 2 and raw_bytes[:2] == b'\x1f\x8b'):
                     try:
                         raw_bytes = gzip.decompress(raw_bytes)
@@ -347,10 +384,8 @@ def fetch_live_rss_feed(feed_url: str = None, max_items: int = 40) -> List[Dict[
                 raw_link = it.find('link').text if it.find('link') is not None else ""
                 raw_desc = it.find('description').text if it.find('description') is not None else ""
                 pub_date = it.find('pubDate').text if it.find('pubDate') is not None else now()
-
                 if not raw_title:
                     continue
-
                 title = clean_html(raw_title)
                 source = source_name
                 if " - " in title and not source_name.startswith("The Hindu"):
@@ -358,18 +393,12 @@ def fetch_live_rss_feed(feed_url: str = None, max_items: int = 40) -> List[Dict[
                     title = parts[0].strip()
                     if len(parts[1].strip()) < 30:
                         source = parts[1].strip()
-
                 clean_text = clean_html(raw_desc)
                 if len(clean_text) < 30:
                     clean_text = f"{title}. Verified dispatch reported by {source} on the Indian National Wire."
-
                 cat = categorize_headline(title, clean_text)
-                
-                # Check RSS feed for real photo enclosure or thumbnail
-                extracted_img = extract_rss_image(it)
-                img = extracted_img or TOPIC_IMAGE_MAP.get(cat, FALLBACK_IMAGE)
-
-                all_parsed.append({
+                img = extract_rss_image(it) or TOPIC_IMAGE_MAP.get(cat, FALLBACK_IMAGE)
+                parsed.append({
                     "title": title,
                     "text": clean_text,
                     "source": source,
@@ -384,7 +413,12 @@ def fetch_live_rss_feed(feed_url: str = None, max_items: int = 40) -> List[Dict[
                 })
         except Exception as e:
             logger.debug("RSS feed check for %s: %s", source_name, e)
+        return parsed
 
+    all_parsed = []
+    with ThreadPoolExecutor(max_workers=10) as pool:
+        for res in pool.map(_fetch_one, feeds_to_query):
+            all_parsed.extend(res)
     return all_parsed[:max_items * 2]
 
 
@@ -570,54 +604,236 @@ def generate_dynamic_realtime_stories() -> List[Dict[str, Any]]:
 # 4. MASTER REAL-TIME NEWS AGGREGATOR
 # -----------------------------------------------------------------------------
 
+_TOPIC_SEARCH_CACHE: Dict[str, Any] = {}
+
+
+def fetch_live_guardian(api_key: str, max_items: int = 12) -> List[Dict[str, Any]]:
+    """Fetches full-text + high-res thumbnail articles from The Guardian Open Platform."""
+    if not api_key:
+        return []
+    url = (
+        "https://content.guardianapis.com/search"
+        f"?q=India%20OR%20technology%20OR%20economy%20OR%20sport&show-fields=bodyText,thumbnail,trailText,byline"
+        f"&order-by=newest&page-size={int(max_items)}&api-key={urllib.parse.quote(api_key)}"
+    )
+    req = urllib.request.Request(url, headers={"User-Agent": "SmritiShuddhi-NewsEngine/2.0"})
+    parsed = []
+    try:
+        with urllib.request.urlopen(req, timeout=8.0, context=_get_ssl_context()) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        for art in (data.get("response") or {}).get("results", []):
+            title = clean_html(art.get("webTitle", ""))
+            fields = art.get("fields") or {}
+            body = clean_html(fields.get("bodyText") or fields.get("trailText") or title)
+            if not title or len(body) < 40:
+                continue
+            section = str(art.get("sectionName") or "")
+            cat = "Sports" if "sport" in section.lower() else categorize_headline(title, body[:500])
+            parsed.append({
+                "title": title,
+                "text": body[:2400],
+                "source": "The Guardian",
+                "author": fields.get("byline") or "Guardian Correspondent",
+                "category": cat,
+                "language": "English",
+                "region": f"Global Wire ({section or 'News'})",
+                "image_url": fields.get("thumbnail") or TOPIC_IMAGE_MAP.get(cat, FALLBACK_IMAGE),
+                "reading_time": f"{max(2, len(body.split()) // 45)} min read",
+                "url": art.get("webUrl") or "",
+                "published_at": art.get("webPublicationDate") or datetime.now(timezone.utc).isoformat(),
+            })
+    except Exception as e:
+        logger.debug("Guardian Open Platform fetch notice: %s", e)
+    return parsed
+
+
+def fetch_live_thenewsapi(api_token: str, max_items: int = 10) -> List[Dict[str, Any]]:
+    """Fetches real-time curated stories from TheNewsAPI.com."""
+    if not api_token:
+        return []
+    url = (
+        "https://api.thenewsapi.com/v1/news/top"
+        f"?api_token={urllib.parse.quote(api_token)}&locale=in&language=en&limit={min(int(max_items), 10)}"
+    )
+    req = urllib.request.Request(url, headers={"User-Agent": "SmritiShuddhi-NewsEngine/2.0"})
+    parsed = []
+    try:
+        with urllib.request.urlopen(req, timeout=8.0, context=_get_ssl_context()) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        for art in data.get("data", []):
+            title = clean_html(art.get("title") or "")
+            desc = clean_html(art.get("description") or art.get("snippet") or "")
+            if not title or "[Removed]" in title:
+                continue
+            body = desc if len(desc) >= 40 else f"{title}. Reported via TheNewsAPI live wire."
+            cat_raw = ", ".join(art.get("categories") or [])
+            cat = "Sports" if "sport" in cat_raw.lower() else categorize_headline(title, body)
+            parsed.append({
+                "title": title,
+                "text": body,
+                "source": art.get("source") or "TheNewsAPI Wire",
+                "author": art.get("source") or "Wire Desk",
+                "category": cat,
+                "language": "English",
+                "region": "India National",
+                "image_url": art.get("image_url") or TOPIC_IMAGE_MAP.get(cat, FALLBACK_IMAGE),
+                "reading_time": f"{max(2, len(body.split()) // 45)} min read",
+                "url": art.get("url") or "",
+                "published_at": art.get("published_at") or datetime.now(timezone.utc).isoformat(),
+            })
+    except Exception as e:
+        logger.debug("TheNewsAPI fetch notice: %s", e)
+    return parsed
+
+
+def fetch_topic_search(topic_query: str, max_items: int = 12) -> Dict[str, Any]:
+    """Dynamic zero-key Google News RSS search with 180s in-memory caching for topics like AI News, Hyderabad, Cricket."""
+    q_clean = re.sub(r"\s+", " ", (topic_query or "").strip())
+    if not q_clean:
+        return {"topic": "", "stories": [], "cached": False}
+
+    cache_k = f"{q_clean.lower()}:{max_items}"
+    cached = _TOPIC_SEARCH_CACHE.get(cache_k)
+    if cached and (time.time() - cached["ts"]) < 180:
+        return {"topic": q_clean, "stories": cached["stories"], "cached": True}
+
+    encoded = urllib.parse.quote_plus(q_clean)
+    url = f"https://news.google.com/rss/search?q={encoded}&hl=en-IN&gl=IN&ceid=IN:en"
+    req = urllib.request.Request(url, headers={"User-Agent": "SmritiShuddhi-TopicSearch/2.0"})
+    stories = []
+    try:
+        with urllib.request.urlopen(req, timeout=6.0, context=_get_ssl_context()) as resp:
+            root = ET.fromstring(resp.read())
+        for idx, it in enumerate(root.findall("./channel/item")[:max_items]):
+            raw_t = it.findtext("title") or ""
+            raw_l = it.findtext("link") or ""
+            raw_d = it.findtext("description") or ""
+            pub = it.findtext("pubDate") or datetime.now(timezone.utc).isoformat()
+            src_el = it.find("source")
+            src_name = src_el.text.strip() if src_el is not None and src_el.text else "Google News Wire"
+            title = clean_html(raw_t)
+            if " - " in title:
+                title = title.rsplit(" - ", 1)[0].strip()
+            desc = clean_html(raw_d)
+            if len(desc) < 35:
+                desc = f"{title}. Live topic dispatch covered by {src_name} matching '{q_clean}'."
+            cat = "Sports" if any(k in q_clean.lower() for k in ("cricket", "ipl", "sport", "football")) else categorize_headline(title, desc)
+            stories.append({
+                "news_id": f"TOPIC_{abs(hash(title)) % 1000000:06d}",
+                "title": title,
+                "text": desc,
+                "source": src_name,
+                "author": f"{src_name} Desk",
+                "category": cat,
+                "language": "English",
+                "region": f"Topic: {q_clean}",
+                "image_url": extract_rss_image(it) or TOPIC_IMAGE_MAP.get(cat, FALLBACK_IMAGE),
+                "reading_time": f"{max(2, len(desc.split()) // 45)} min read",
+                "url": raw_l,
+                "published_at": pub,
+                "status": "LIVE_TOPIC_WIRE",
+                "real_probability": 0.88,
+                "fake_probability": 0.12,
+            })
+        _TOPIC_SEARCH_CACHE[cache_k] = {"ts": time.time(), "stories": stories}
+    except Exception as e:
+        logger.warning("Topic search error for '%s': %s", q_clean, e)
+    return {"topic": q_clean, "stories": stories, "cached": False}
+
+
+def extract_article_from_url(url: str) -> Dict[str, Any]:
+    """Fetches and extracts clean headline, publisher domain, and body text from a live news URL."""
+    target = (url or "").strip()
+    if not target.startswith(("http://", "https://")):
+        raise ValueError("URL must start with http:// or https://")
+    req = urllib.request.Request(
+        target,
+        headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Accept": "text/html,application/xhtml+xml",
+        },
+    )
+    with urllib.request.urlopen(req, timeout=8.0, context=_get_ssl_context()) as resp:
+        raw_bytes = resp.read(500_000)
+    html_str = raw_bytes.decode("utf-8", errors="replace")
+    parsed_host = urllib.parse.urlparse(target).netloc.replace("www.", "")
+
+    try:
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(html_str, "html.parser")
+        for tag in soup(["script", "style", "nav", "footer", "header", "aside"]):
+            tag.decompose()
+        og_title = soup.find("meta", property="og:title")
+        h1 = soup.find("h1")
+        title = clean_html(
+            (og_title.get("content") if og_title else None)
+            or (h1.get_text(" ", strip=True) if h1 else None)
+            or (soup.title.string if soup.title else "")
+        )
+        article_node = soup.find("article") or soup
+        paras = [clean_html(p.get_text(" ", strip=True)) for p in article_node.find_all("p")]
+        paras = [p for p in paras if len(p) > 35]
+        body = " ".join(paras[:14])[:2800]
+    except Exception:
+        title_m = re.search(r"<title[^>]*>(.*?)</title>", html_str, re.IGNORECASE | re.DOTALL)
+        title = clean_html(title_m.group(1) if title_m else parsed_host)
+        body = clean_html(re.sub(r"<[^>]+>", " ", html_str))[:2000]
+
+    return {
+        "title": title[:240],
+        "text": body,
+        "source": parsed_host or "External Web URL",
+        "url": target,
+    }
+
+
 def fetch_realtime_news(max_items: int = 50) -> Dict[str, Any]:
-    """Master dispatch method that coordinates NewsAPI, GNews, Public RSS, and Dynamic Fallback.
-    Returns:
-        {
-            "stories": list of parsed articles,
-            "sources_used": list of services queried,
-            "api_linked": bool indicating whether NewsAPI or GNews was utilized
-        }
-    """
+    """Master dispatch coordinating The Guardian, TheNewsAPI, Indian/Global Category RSS, and Offline Backup concurrently."""
+    from concurrent.futures import ThreadPoolExecutor
     all_stories = []
     sources_used = []
     api_linked = False
 
-    # Priority 1: Official NewsAPI.org if configured in config or environment
-    if config.NEWS_API_KEY:
-        try:
-            api_items = fetch_live_newsapi(config.NEWS_API_KEY, max_items=25)
-            if api_items:
-                all_stories.extend(api_items)
-                sources_used.append("NewsAPI.org")
-                api_linked = True
-        except Exception as e:
-            logger.warning("NewsAPI ingestion error: %s", e)
+    def _run_guardian():
+        if getattr(config, "GUARDIAN_API_KEY", ""):
+            return ("The Guardian Open Platform", True, fetch_live_guardian(config.GUARDIAN_API_KEY, max_items=10))
+        return None
 
-    # Priority 2: GNews.io if configured
-    if config.GNEWS_API_KEY:
-        try:
-            gnews_items = fetch_live_gnews(config.GNEWS_API_KEY, max_items=25)
-            if gnews_items:
-                all_stories.extend(gnews_items)
-                sources_used.append("GNews.io")
-                api_linked = True
-        except Exception as e:
-            logger.warning("GNews ingestion error: %s", e)
+    def _run_thenewsapi():
+        if getattr(config, "THE_NEWS_API_TOKEN", ""):
+            return ("TheNewsAPI Live Wire", True, fetch_live_thenewsapi(config.THE_NEWS_API_TOKEN, max_items=10))
+        return None
 
-    # Priority 3: Public Google News & BBC RSS feeds
-    rss_items = fetch_live_rss_feed(max_items=max_items)
-    if rss_items:
-        all_stories.extend(rss_items)
-        sources_used.append("Google News & Public RSS Wire")
+    def _run_newsapi():
+        if config.NEWS_API_KEY:
+            return ("NewsAPI.org", True, fetch_live_newsapi(config.NEWS_API_KEY, max_items=12))
+        return None
 
-    # Priority 4: Dynamic breaking news generator if offline or all feeds empty
+    def _run_gnews():
+        if config.GNEWS_API_KEY:
+            return ("GNews.io", True, fetch_live_gnews(config.GNEWS_API_KEY, max_items=12))
+        return None
+
+    def _run_rss():
+        return ("The Hindu / TOI / Express / NDTV / BBC / TechCrunch / Google News RSS", False, fetch_live_rss_feed(max_items=max_items))
+
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        futs = [pool.submit(fn) for fn in (_run_guardian, _run_thenewsapi, _run_newsapi, _run_gnews, _run_rss)]
+        for fut in futs:
+            try:
+                res = fut.result(timeout=12)
+                if res and res[2]:
+                    sources_used.append(res[0])
+                    api_linked = api_linked or res[1]
+                    all_stories.extend(res[2])
+            except Exception as e:
+                logger.debug("Concurrent feed notice: %s", e)
+
     if not all_stories:
         fallback_items = generate_dynamic_realtime_stories()
         all_stories.extend(fallback_items)
-        sources_used.append("Smriti Shuddhi Real-Time Live Dispatch Engine")
+        sources_used.append("Smriti Shuddhi Offline Fallback Templates")
 
-    # Deduplicate stories by normalized title
     seen_titles = set()
     unique_stories = []
     for s in all_stories:

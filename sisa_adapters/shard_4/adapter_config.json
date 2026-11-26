@@ -1,10 +1,12 @@
 {
   "shard_id": 4,
+  "architecture": "PyTorch LoRA (W_0 frozen + alpha/r * B * A)",
   "rank": 8,
   "alpha": 16,
   "scaling": 2.0,
   "input_dim": 512,
-  "sample_count": 0,
-  "bias": 0.0,
-  "updated_at": "2026-11-22 22:04:01"
+  "sample_count": 1541,
+  "bias": -0.51868,
+  "last_bce_loss": 0.1336,
+  "updated_at": "2026-11-26 10:44:32"
 }

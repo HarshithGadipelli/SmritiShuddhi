@@ -1,0 +1,1712 @@
+[
+  {
+    "doc_id": "CORP_RBI_500_2026",
+    "title": "RBI Official Notification on Currency Notes Validity",
+    "text": "The Reserve Bank of India confirms Rs 500 denomination Mahatma Gandhi New Series banknotes remain legal tender nationwide with no ban or cancellation circular.",
+    "source": "RBI",
+    "url": "https://pib.gov.in",
+    "published_date": "2025-01-15",
+    "truth_status": "VERIFIED_FACT",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_ISRO_CH3_2023",
+    "title": "ISRO Chandrayaan-3 Historic South Pole Soft Landing",
+    "text": "ISRO successfully landed Chandrayaan-3 Vikram lander near the Moon South Polar region on August 23, 2023, deployed Pragyan rover, and executed in-situ elemental analysis.",
+    "source": "ISRO",
+    "url": "https://pib.gov.in",
+    "published_date": "2025-01-15",
+    "truth_status": "VERIFIED_FACT",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_ISRO_ADITYA_L1",
+    "title": "ISRO Aditya-L1 Solar Observatory Positioned at L1",
+    "text": "ISRO inserted Aditya-L1 into a halo orbit around the Sun-Earth Lagrange Point L1 in January 2024 to monitor coronal mass ejections and solar wind.",
+    "source": "ISRO",
+    "url": "https://pib.gov.in",
+    "published_date": "2025-01-15",
+    "truth_status": "VERIFIED_FACT",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_UPI_FREE_P2P",
+    "title": "NPCI Confirms Zero Merchant Fee on Standard P2P UPI Payments",
+    "text": "NPCI and RBI reiterated that bank-to-bank person-to-person UPI transfers remain free for everyday citizens and PPI interchange applies only above Rs 2,000 wallets.",
+    "source": "NPCI / RBI",
+    "url": "https://pib.gov.in",
+    "published_date": "2025-01-15",
+    "truth_status": "VERIFIED_FACT",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_UIDAI_AADHAAR",
+    "title": "UIDAI Clarification on Masked Aadhaar & Biometric Locks",
+    "text": "UIDAI clarifies citizens can lock biometrics via mAadhaar app at zero fee and no automated citizenship revocation or SIM deactivation occurs via SMS links.",
+    "source": "UIDAI",
+    "url": "https://pib.gov.in",
+    "published_date": "2025-01-15",
+    "truth_status": "VERIFIED_FACT",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_ECI_VVPAT",
+    "title": "Election Commission of India Mandatory 5% VVPAT Verification",
+    "text": "Supreme Court and Election Commission of India mandates randomized physical counting of VVPAT paper slips across five polling stations per Assembly constituency alongside EVMs.",
+    "source": "ECI",
+    "url": "https://pib.gov.in",
+    "published_date": "2025-01-15",
+    "truth_status": "VERIFIED_FACT",
+    "category": "Politics"
+  },
+  {
+    "doc_id": "CORP_IMD_FORECAST",
+    "title": "India Meteorological Department Official Severe Weather Bulletins",
+    "text": "IMD issues color-coded monsoon, cyclone, and heatwave alerts directly on mausam.imd.gov.in without attributing rain events to satellite bans or secret HAARP tests.",
+    "source": "IMD",
+    "url": "https://pib.gov.in",
+    "published_date": "2025-01-15",
+    "truth_status": "VERIFIED_FACT",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_PIB_FREE_PHONE",
+    "title": "PIB Fact Check Debunk on Free Government Laptop and Phone Links",
+    "text": "Viral WhatsApp messages promising free smartphones, cash doles, or 5G recharge under spurious Pradhan Mantri links are phishing scams not backed by any Ministry.",
+    "source": "PIB Fact Check",
+    "url": "https://pib.gov.in",
+    "published_date": "2025-01-15",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Politics"
+  },
+  {
+    "doc_id": "CORP_PIB_0000",
+    "title": "PIB Fact Check Unit Dismisses Viral Video Claiming India Withdrew Funds From UK",
+    "text": "Official PIB / News Fact-Check Reference: PIB Fact Check Unit Dismisses Viral Video Claiming India Withdrew Funds From UK. PIB Fact Check Unit Dismisses Viral Video Claiming India Withdrew Funds From UK News On AIR",
+    "source": "News On AIR",
+    "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQSGJRa284MC1HQm93ckdPT1F0RlB1aFlQUXFyUzZoS21RTWEwQWdQN3I4X0xBNnAzZzFjRGZwbXFuVHdUTERUVTVhLVJXMEpiYmJrUjBabkpmT1hNX2taM19YV1FWcWFaZnVZWjlZXzJKaFEtbTB3MHYwVTRQUkZjRVI1SkpoMFBId1dnNl9kcGN5LUd0Z0Nvb1BfczBoY0FnX1RCMEJTSDA?oc=5",
+    "published_date": "Sat, 23 May 2026 22:15:59 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0001",
+    "title": "New Rs 1,000 note with temple design? PIB Fact Check debunks viral claim",
+    "text": "Official PIB / News Fact-Check Reference: New Rs 1,000 note with temple design? PIB Fact Check debunks viral claim. New Rs 1,000 note with temple design? PIB Fact Check debunks viral claim The Times of India",
+    "source": "The Times of India",
+    "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxPUXFqb0c0cm45UzdrV2wxT1l4N1I0STFVVnNSMEJfSW5PbHo1RnBnLWNkMzZMM0J6Tm1FMnAtNzgzeHRSZGxKSWs4MFdoOUJjRjlpc0tOUzg1U0VSOUNIZWdHUS1lRy1NTmNJNDJfLU9nZElKN1lCMmpBR2R3TlB6VUNnSl9YYnVTM21TenZUQk9feHBFa3pQVWFzRlFWVktvUTQ4OS1VRV9QRDl5Z3JNcWtaUFBSUGlOMm1nbUh0ejVhS3RWMGxEbUVkbmRBdkxMbmJoaNIB2gFBVV95cUxQR0d4YmpFdURkMmo2OFBsMy1pc3VpX19pRWk3NVRrUUhjbkxBeFZQVFhmMV91MzI4S09QOVdhY2Vkbkt2a05aYWJnNnYyNXdyRVVuNmhsdFl1UGZUczVfZ3B6bHZseDdWbG5SSWZNbU91cTR3ZWxWU0tFbFpEMnZKMzdtYkJ0ampYbzNUSkstdzJNUy1SSncyYTdDX0JoZTJDakd5YjBDdkp2UE9XSmZlVVBPcnRTbkRER2VieTNYdkVzNnJ6YlhUYmxzWEl0c3NxZmtVNUZ4YW9iUQ?oc=5",
+    "published_date": "Tue, 27 Oct 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0002",
+    "title": "New ₹1,000 note with temple image? PIB Fact Check debunks viral claim",
+    "text": "Official PIB / News Fact-Check Reference: New ₹1,000 note with temple image? PIB Fact Check debunks viral claim. New ₹1,000 note with temple image? PIB Fact Check debunks viral claim CNBC TV18",
+    "source": "CNBC TV18",
+    "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQeUp4QWc2NW9JQ0oyS3hyZFg2QjR6cjdVeVRWMGh3M09nZzE1dXVxTFBrb09mdjJTcG03Y2VRNGVuLUU2YnJ6WDlRQTBzUjhTSmdqVDVVMW0xQWNISGw4ZG9YQjlQNDRYUE1UYWZlanJwSTF1VmNBeTVkdHl0TjMzTFhSX2thUWpaY2pvaTIyRVFTRXFZbHZ2RUNLNFV0ZTllWFZPeV9MMkJibmw1N0xBbXBTTXk3dGdaRHJpU0JDenRhZ9IBxwFBVV95cUxPaVRzU0Q0VlhDczNIZ3Q3eHBKZW5mOGV5STYyZC1pQkkwNHFCVzkzVTI5QnNLSzY4Wmwwa2s5VWl3aV9NWXRYUzVoWmhSYm1HdDB0VFdVcG96bnNEUWQySjd1Yzl1LXJHbGw2eFZpVFJPY0poSk9mUVNwUHJGeG9VSUJYQXBKUHNMWnlnSzRJZ2cyYVlUSDNaWFRXYjFvdjFTZGZKSFdXRGxwQUxxMTZDRms2NGZCMi1STmhIVU8wdTJtMW5HQkhn?oc=5",
+    "published_date": "Tue, 27 Oct 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0003",
+    "title": "Re-NEET paper leak rumour goes viral; PIB Fact Check declares claim false",
+    "text": "Official PIB / News Fact-Check Reference: Re-NEET paper leak rumour goes viral; PIB Fact Check declares claim false. Re-NEET paper leak rumour goes viral; PIB Fact Check declares claim false The Times of India",
+    "source": "The Times of India",
+    "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxOZzM4MGlvUUhCa0ZSSFQtc0tTQXpwSkF0em92WnZMeXBPQjVpblo1MjFwNG4wNnJjaVl3SnBCVzR5TVY0dzhNTjg4dDlvZG1pQnBjZ05WRURqRmFaRG1KV3c3MW5JQTRSOXRVTU1zOGlXd05YUmpFMENELXhYbGtwVlNwa0NPRWg4RUZkaGxNeTg4a1MwZDVidlc2a05NS3U4MEYzb2dLenNmQkpTem1RaDJ4VGRkVl9ldndsRDlOaEFnZ3dKMkRXSFJUdnhIYW9waHkwS0xMWk4ydEs4d19v0gHkAUFVX3lxTE94eUJJczdoN19FRnRpUl9hUURKc3lOd0VwSFVwLWtHdWlhclpLTlR2TjVXNmhpaWFUd3N0LVQ5UURZMDBBZWJyV19qR3BEV2U3eEk0MkgtcmhFb1V2YTFhWXNiWjVFZDRQUDBqZmdmLTRHSkFqMndoUlQzR3FCSmZxdUVrcW1keVlfYWl3V3J6dXgxc0Y2UU5SdnpKZkRSVnJQZ2hoQ1NRWVQ2LWNQSnhtMVY5aWR5N0p6UEtKenJxcDFxbWZPdHppcWFueXc3V0lDMGk2ZXphVkpuRmd0ZUZQcW9mTw?oc=5",
+    "published_date": "Sat, 13 Jun 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0004",
+    "title": "PIB Fact Check Warns of Scam Using Fake RBI Message",
+    "text": "Official PIB / News Fact-Check Reference: PIB Fact Check Warns of Scam Using Fake RBI Message. PIB Fact Check Warns of Scam Using Fake RBI Message News On AIR",
+    "source": "News On AIR",
+    "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQY1VPYTZkVi1VNnZSaHNyYzViRVZ1eF9WaDJQVTBsTGdGamp2ek9TMVBpN1duUHNEcmNCUUh0YUpEdDlxakxXSTV0Z0hTdHNLQU5kUlI4THBDMDNrWEZGXzdtaHVKa3VVZ0VkYkJGem10Q1ppT0tVdmI0SzRZQUhRaG9Ldw?oc=5",
+    "published_date": "Sun, 24 May 2026 23:29:52 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0005",
+    "title": "Viral claim on plastic currency from June 30, 2026 is fake",
+    "text": "Official PIB / News Fact-Check Reference: Viral claim on plastic currency from June 30, 2026 is fake. Fact check: Viral claim on plastic currency from June 30, 2026 is fake Upstox",
+    "source": "Upstox",
+    "url": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxPM25Rb254dXAtNERRYWVFMzBFdkJyb0Z1eEdLOENOMFYta3NqSlNLTTdZT2pWTVhBWVVuNlhMTW9UbmlJLWVudzc5WmNYVWtZZkNEd21hX0ZTZGVvYVFCbWFpamx3UnhiRmE1X182RHE3NXd6UUFwNWZvWVJHTENrZlktbElSUV8xckpIUVB0eTgyeFVxOEluTElmbjFkUWh0U0ZfaVZkeVVIckFWVmhZb0hqTlI4T3piN21veW5PNzF5QS0zb2YxLTlISFhjMnZwTG10dGJObDVtdw?oc=5",
+    "published_date": "Wed, 10 Jun 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0006",
+    "title": "Cable and DTH charges to rise 4-6 times? PIB Fact Check reveals the truth",
+    "text": "Official PIB / News Fact-Check Reference: Cable and DTH charges to rise 4-6 times? PIB Fact Check reveals the truth. Cable and DTH charges to rise 4-6 times? PIB Fact Check reveals the truth Livemint",
+    "source": "Livemint",
+    "url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxPUV9kS2hPU0FiREtiT0dZTFlJNFdIdGNTOEpUQjJHdVROSlY0djNJTG9KRXpKcm1SdU4yUWxIc2NEREhDMzA1R2phQTFZRGtHbDlKSnFXYnd2ZDFPanRyLXo2UHQtMUl0TThjMEdDcmhQM1V4dXREQ2Iya0NLbjNmdjlheW5yVlZoSGF4eERQaklGN1JNTnpidDNZNzBWd283M2l2ZHBFTFZqaWxveXQ5dHFITmxvNF85VjBldG5YdHJFY2ZJaUlrdnR4VWtoWXdrdVdvRVJRZ9IB3AFBVV95cUxQUDloMk1DVF9EQ1dKNHdWTndIcHJHLVFzN0ZBUW5ha3BBcTZQdGNEYzBtN3B5ckU5OEd4NEVLNXpkZGVNaGRLRy1PUDhzblpyTEpzcGNKZi1KTDNCa2labU5iY2E1bTZ1Q3oxUndiTldqa0F6Vk5KRXQyZDN1WXdHUFQ1VnM2eFZ6bVk1QUpTZEt2YmxKVDJaSHVkWWFRNjQtQ3pWUExoUUxveDE2UGFoVy1SS0RTLXI1SlpYV0xyVG92LWpCR2ZBbjVQbzlqdWxjRktERkNDMWZUMlVO?oc=5",
+    "published_date": "Tue, 21 Jul 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_PIB_0007",
+    "title": "MIB debunks viral claims over draft broadcasting rules",
+    "text": "Official PIB / News Fact-Check Reference: MIB debunks viral claims over draft broadcasting rules. MIB debunks viral claims over draft broadcasting rules Indian Television Dot Com",
+    "source": "Indian Television Dot Com",
+    "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNVUttTmZ3TzQyVUhLSDJvTmhZMm1WRUFPX2llWURpYWtzOXdHYWl3WXVDVTkydDZJTElxT3V1VnJMWkJDUmhtNjhlMUVqNzluUmwwWWJCM084TGNuQjRoR0REYjZydmRjckR0Y2loYWJIMk1KeTFDVlNSbVl6ZzRWWTNrbjZqYWV5dDQ2Wm9XbU8wOUJIa1BQOTVVdw?oc=5",
+    "published_date": "Tue, 21 Jul 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0008",
+    "title": "PIB Fact Check debunks viral ITCC claim",
+    "text": "Official PIB / News Fact-Check Reference: PIB Fact Check debunks viral ITCC claim. PIB Fact Check debunks viral ITCC claim ET BrandEquity",
+    "source": "ET BrandEquity",
+    "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOMVdSUUFWMVNNcE5tcDNVSVFvSmdnWDF0Z29NRkh3N21ldW5pejRlUGRONC1femdtZFlIWThUcjRuMFprNjdDUng3OUtQczctcE5tenpETWhvcnd4czJfS1BIemxLNkd5cUl4Skdnak5vUm9td2J0WHVycjVNdGtFUU9xSEdLRWRkeFNOc1pxM0hGN2pfSXlvVER1dDFLb2RobUlLUjktdXdXSnpDZG5HQjQ4LXhiN3hYRjBWOWJIM3NzZ9IBxwFBVV95cUxQSzdzX2ZoNUhCaGMxRTZkM3BGOTBaZDZzS05lSzA5RFpXMVc0TERCbkJGTUczNW5iekk0U1YzWHROMHcxejNfaVpHSFBxSEJ4bEJwQjNRWHVObE5acHVCSktFMGdwTm5fT0VRQ2dFbGw1cTFuOUZad2FqN2Qyd2wxa1YyeFMzcVIyM24tWjJRMmRUYTBOTXhyOEkwQVhQTTJiZU9LTFpSMnBrZjlRaElWbDR5d0tYY2owM0pmLWozb2c0RGxIaTBN?oc=5",
+    "published_date": "Fri, 24 Apr 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0009",
+    "title": "PIB Fact-Check debunks fake claims about IAF Rafale pilot’s last rites",
+    "text": "Official PIB / News Fact-Check Reference: PIB Fact-Check debunks fake claims about IAF Rafale pilot’s last rites. PIB Fact-Check debunks fake claims about IAF Rafale pilot’s last rites DD News",
+    "source": "DD News",
+    "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNWjVwbjFlUk5ZQmtBdXkzS3BHdXBPZGRab3R5TTZza2pVRFgxMVJwdHYzQkhwYkkxWGU5NURoX3laVEs4LWJ2MlJuMU0wWjZyVTN0XzdmcDdSS25aaFlWRUhUSmVlV0R1WXdicXNLclpSNWZ6VWhNTmtMRThuYWs5WkoyMk9McWZkWkRtc1RVa1BFWllzZGlhaW9yZw?oc=5",
+    "published_date": "Thu, 15 May 2025 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0010",
+    "title": "Viral YouTube claim about ₹500 note ban in 2026 is false, confirms PIB - CNBC TV18",
+    "text": "Official PIB / News Fact-Check Reference: Viral YouTube claim about ₹500 note ban in 2026 is false, confirms PIB - CNBC TV18. Fact check: Viral YouTube claim about ₹500 note ban in 2026 is false, confirms PIB - CNBC TV18 LinkedIn",
+    "source": "LinkedIn",
+    "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOLW42ajdEUTlxX3JtS05QYVA5LVJxY0FNQ2lEN2owWkpmQTBlZEluLXZFbGZTTXY4NWQxU0VvOFZnVXpDSHlKQ1RSTi1wQ1I4WnpVa00zM3I0aXNSYndrXzVQWVllZS02NnZVVTc4ZDNVRXBaWGNBY3lyS1A4ZkpHOEROUEJtNllfSFg1Q0tNYVlqMjNtUFBuQUlDNWpPYkNtSGtUZWROSmR4MHdHV0ZnLW5zUlhaZw?oc=5",
+    "published_date": "Wed, 04 Jun 2025 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0011",
+    "title": "Govt Dismisses Viral Claim of 5–10 Day Oil Reserves in India",
+    "text": "Official PIB / News Fact-Check Reference: Govt Dismisses Viral Claim of 5–10 Day Oil Reserves in India. Govt Dismisses Viral Claim of 5–10 Day Oil Reserves in India News On AIR",
+    "source": "News On AIR",
+    "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOR1J0dUIxVXFqZzNEUmxTZ3ByNUVPZDNXR3NPOU9VQ0FsUzNtMllpdm50OVVBcW9SUFhlRHJIV3R3UzhZQXI5SG9zb0dZMnBCRHV2Wk9rREpIRlppcXpVdy1HSVVsbURyU1VHYmtBYmVRb1U0Z2FUV3lMSi16dzY1d01KemN0LWtLUzNKdWQ2Yw?oc=5",
+    "published_date": "Sun, 24 May 2026 19:48:44 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0012",
+    "title": "National Student Laptop Scheme 2026 is fake: PIB Fact Check reiterates warning against viral WhatsApp message",
+    "text": "Official PIB / News Fact-Check Reference: National Student Laptop Scheme 2026 is fake: PIB Fact Check reiterates warning against viral WhatsApp message. National Student Laptop Scheme 2026 is fake: PIB Fact Check reiterates warning against viral WhatsApp message Livemint",
+    "source": "Livemint",
+    "url": "https://news.google.com/rss/articles/CBMihwJBVV95cUxOSjU0ZG1hS29FUnFYa1gtS2VXQlZxaWUtT2l4RThWTHJ1Y05sX1dQa1BYdW5MOERmNDVCSHNha3dVQTRZOHg2cDA4NHNOQW5kcV9NakE3LVlpREZEcGw4VEhVd0NNMktlOGxiYjhzVmlNZjB5WlE5Rk0xa1JDRGl4VGM0T2pmb2hwaVp6RU5Od3YwNHdxYnItVGlUOGllajJodGJ4aFg3aDhTR1JlbGRGb1paVkpONWVQRnZWczhWZkdCNk4tMnJwTzBiWmZqa211bS16cGU1eWhaV0hRS2RDdUtmM3VjeWxhMTBnalNFUlpkY2tJRHEycFhQdEdoZXhFNTBtVmpETdIBjAJBVV95cUxNZFhOZGRKdnJ3VVBoaDlRdFZ5VTRLZ0hHOGdYZXVtNHF5aU9qd2VWNFR0LXg2TkNaOGZCWThiejZqSFJqWURaM0NYYUdzX0d5LUliVEd4ZTlFOWRidTd6Zm5LdjJhMUdRb3JCZTRzOTdyUm5QMTJicDRYLTUzVWQwY29LeXJEMk1MWmoxN3VidUtWeENQRmpMaXJzaU1sWkltQk81cnQyNnZNdUhmejVIM1hRdDBielhtRjd1U25JejgwTjVReHdRQUJWbFJDNWV5T0hkeVQyU24ySTRoa1F6SExHeDJUM1UycnFzb3J4NHMxbXBBMFZlZ1lKeHBqYnBYbGgyS1V6Wkd5bExN?oc=5",
+    "published_date": "Mon, 20 Jul 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0013",
+    "title": "Viral Message Claiming ‘Blood on Call’ Scheme by GOI Is False and Misleading",
+    "text": "Official PIB / News Fact-Check Reference: Viral Message Claiming ‘Blood on Call’ Scheme by GOI Is False and Misleading. Fact Check: Viral Message Claiming ‘Blood on Call’ Scheme by GOI Is False and Misleading Medical Dialogues",
+    "source": "Medical Dialogues",
+    "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxQLTZKQ2NRdmpwd1RJaFIwV2Fpc2Y3TzhzZTBxZGVxSlVYMVpwYTRZZ0ttZkFLd3Z1YzJGOVV5blo3RGF0aHgxT0ZISUljR0JXMXppbk42ZjQ1QWRnTV8wSUFZcmdqNnhQc3N5OFJPeTd1a1ZQNVdXV0xmMUMtcHpGOG5weVlQcGlyZDJmS2FPXzlXQjlmaVk5bTllTGlQeGtJMnNKNkRJOXp6ZzlkbGxLYkNFSkxVNktuOS0tNG9GTFFENjlRVjNrb294d9IB0AFBVV95cUxPa0NWRVRRWkdtOG9VVklyYjZTY1lhSDJlZGI1RGdseWNCTHBOd3NERW90UXVobUtuS2JvVmJiR2dfMmxpOW1LN1ItUTNsOEE2UjA4TjQzYk9TbWVERXlWREF2bDM4XzFnWndhdVdwekFwUk1jSC1KQm9tdnBOZzV0YVFLeTUteXRuMy00UDFuMmJHNVNWbVl1Z2VQREo1SDg3LTlCVzJ6X2pCRUhyd0pJWGxnbkhWZmdwdkVUU2tfWkl5MVdBWWRhTElpSUp6MHhU?oc=5",
+    "published_date": "Wed, 21 May 2025 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0014",
+    "title": "This viral claim that India has pulled £500 billion from the UK economy over PM Keir Starmer’s alleged remarks against India is fake",
+    "text": "Official PIB / News Fact-Check Reference: This viral claim that India has pulled £500 billion from the UK economy over PM Keir Starmer’s alleged remarks against India is fake. This viral claim that India has pulled £500 billion from the UK economy over PM Keir Starmer’s alleged remarks against India is fake FACTLY",
+    "source": "FACTLY",
+    "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxPcURnU2FPbTdueV9GaC1jdGYxdnluQ3EzcHhIS3Roek5oMVUtZGtwMXRERnJZQmJ4Q2JYZ2p5UzNGMG16NVBoS2M1OFJoc2xwVmZCY3lJQV83Q084U0twNUNQVEFyZFo3VGV2TF92S1MwNmhid0VQRmtWQUpBbDJKaEYyUG9UOGdDVDB1dkhiU0pHR0xpZlV4ODlrM09HOGM3d0xCOEVPdVpJSE4zZlhESGg3TFh1R21RSEdYTTJVeklOQnc0eVpvQnpGV0ZRSmItaDVfMS16dldVYWhUQi11MEhB?oc=5",
+    "published_date": "Fri, 31 Oct 2025 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0015",
+    "title": "Fake news on WhatsApp claims Government giving Rs 1000 under Corona Sahayata Yojana",
+    "text": "Official PIB / News Fact-Check Reference: Fake news on WhatsApp claims Government giving Rs 1000 under Corona Sahayata Yojana. Fake news on WhatsApp claims Government giving Rs 1000 under Corona Sahayata Yojana पीआईबी",
+    "source": "पीआईबी",
+    "url": "https://news.google.com/rss/articles/CBMibkFVX3lxTE02WXVfNVRPYlJNQzBiMlBIaFJSUWJoNWZrODQ2SzI3dTVraUtHOGNWTWtTODFlb2JxTHdQdjZodElvOWVYYlNlamlRVWdTQVZvbFZtZ25zMEthblpvNXhrYk1EeGFHcEhFLWtfdkV3?oc=5",
+    "published_date": "Sat, 25 Apr 2020 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0016",
+    "title": "Viral claims about India Post’s online questionnaire is fake",
+    "text": "Official PIB / News Fact-Check Reference: Viral claims about India Post’s online questionnaire is fake. Fact Check: Viral claims about India Post’s online questionnaire is fake Telugu Post",
+    "source": "Telugu Post",
+    "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNbUJmbjRJLXgzZy1Lam51bVNDTUhkLW9WNnBKWG03YldwZ1NJbEl5d2NzOF96LW93M1BXdEVvQmFCc1hJRlFMTzR5d2dNUDBleUJGczd5SExkM0xvaGxIeVhXcDYxMWJpMldYbEJKcFQ4Ti1qak1Ea0tGVDNrbWR6VDUyMmVlazZORkp6YnotSmQ3Vy1yU3ExR19lMXNQc3llMUVCcEg5OG1PUE1PSTVNLW130gG3AUFVX3lxTE1tLUJQaHVDcGZOenhvMkpCekF5d1Y1WHRsWXVvYmwwU0l2TENQajRRa3RZTmZIbGdybDB5cjd3QjNMOFVvQXNJekNQVFlRWElDQzlHeTByTEtWeV95bXdtMWFIOWpONE1VcFVXbVFadjNFbVhyVDVzMkVtb1ZxVnVSZXBDRnZkUnIzV3N2Z2g1Rmxkb2xNYWhvcWlkQTNKb1Z0UVZWWDJKUEFJdXNkRXlzNWp1NEpGNA?oc=5",
+    "published_date": "Mon, 04 Mar 2024 08:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0017",
+    "title": "Government debunks viral claim on India–US trade deal harming farmers",
+    "text": "Official PIB / News Fact-Check Reference: Government debunks viral claim on India–US trade deal harming farmers. Government debunks viral claim on India–US trade deal harming farmers News On AIR",
+    "source": "News On AIR",
+    "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQYzZ2ZW9ZbmxLWUlqeElKcTQ1ZTludFV2enpOQXpweERlRldRZVplTFNWVmhhTHpldFlFUEdKWEdwLUN1SXNxVVJrME10R1hTaWVnNlAyYjhjYUxMZkdCMXU3UWxlUmU1dGNkOTV5MUh5OFBuN2Q0VFVYMW1VMFRiSUVVYURGanRqLVVuOXFJY1dLSkhxbjl3Zk16RQ?oc=5",
+    "published_date": "Sun, 08 Feb 2026 08:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0018",
+    "title": "Bust Fake News With Bangalore Mirror: PIB Fact Check dismisses viral claim about IAF helicopter capture",
+    "text": "Official PIB / News Fact-Check Reference: Bust Fake News With Bangalore Mirror: PIB Fact Check dismisses viral claim about IAF helicopter capture. Bust Fake News With Bangalore Mirror: PIB Fact Check dismisses viral claim about IAF helicopter capture Bangalore Mirror",
+    "source": "Bangalore Mirror",
+    "url": "https://news.google.com/rss/articles/CBMioAJBVV95cUxQOVdIbU1rYmJ1RkNSbW80OVNfV1p3MUc2RXFXdk9QVENCSE1jM0o3RXdHaGd0Mm9fN1lWV2lySzZjaDVadGQ2VzJmQXZiNlhTSklBXzJBakdQTmlGc0JuaVJoM3YtRFVlSnRsX2pDRWpyVDZjdVpsTS1XR2FleGNpZFhRb081T3RzU0lXMU9UaXNlVkRweDFvOGx3SjB2ODFVcDAxR0wxampuYWJoSGdLMXVER3dqV29BZjVZVENEUGRjUjFmeGtGS3h6V29LRzRWOXdySnZ0enFURnRJWi1lWEVVaG9kVEFEbURLNURLTlJka09oZmpJUW04MUh6NVVWV3VienByTkd3aS0xX1IxaXpxS0t5WHYwQjZvaTUtNVjSAaYCQVVfeXFMTUJFUTdaM0swcEUtcXBwdUpCTllWUjVhS0lvRVZyaW9ZNF85empKV041dEpHMk85TmNydHluSkthWFVUZUYzUlZKSjh0Qk1EaWtZeFJtMTBrcVRLeUZWSFFwaDJPYzBJbXp0Z0J3OXVPUjRVX2txbmJOY3hNMHVzTFdfV1NtQy1CQVBaQUZ3aEFFalRPTENMeWRnLWVPd0xJR1Rvb2hzX2NWb0Y5eUs0S25IZWhsR0tYQ1NkMHpRUUtTVDZPdXJwd2RJT0F3ZHRGYUpQeWc0cnFzM1Zab3FIakZKU0Vtb1M4c2FENHVIbDI5M2pxUWNQUHl5bEZOY0pOemRWUlByUUs5UlBoZWdiR2xhTjFSN013T3NpX3phNjBqNzVzRlBB?oc=5",
+    "published_date": "Sat, 21 Feb 2026 08:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0019",
+    "title": "Drone attack in Jalandhar? PIB fact checks viral claim",
+    "text": "Official PIB / News Fact-Check Reference: Drone attack in Jalandhar? PIB fact checks viral claim. Drone attack in Jalandhar? PIB fact checks viral claim The Times of India",
+    "source": "The Times of India",
+    "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxQR2h3c2ZkMDRmSERmRzBZenR4aUdCZmVGbER2SEJKU2VpcjU0Rk1yWGpSOTU5MGtXOWFFMEZmcjc1TDFGelNNaXVUSUFUS21oX3kxdDJlVUVDN3RwRWx4T1dHMTRuejJwXzNPaTN6N1lybzdlRVN2WmJxVW1SV0pZUW9TbXFlRGVlX0hKYVNJQmRaUm9BYmw3SWJDTS01MVVkaENzNVpheHUwVjVYZjdpMkJ2aDZ1WVV0clJUU9IBwgFBVV95cUxQck9lZzFrcFVyMHBsQzlUcGc1X3ZSUGJialRKelR3NlJtc0cyeU9HY29tOGpHSlZwLTBNSXVIT1lOUDBOWHFKVWxWR2FfWTJpSVVLZnp2WlFoRUdHeXFkYVJfQUY3Z0ZjU2swZFQwZWppdWRJTHZQVFVqdE8wWFVwanBLcHZzczhiUzB6dnduS0R1ZUowZ21BZTV2ZXNQTHA1dm5hTUNqNzhhY3A0TzhTY0dfVFVjSlJJazV4akxGZEE1QQ?oc=5",
+    "published_date": "Fri, 09 May 2025 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0020",
+    "title": "Op Sindoor: As Indian media made false, outrageous claims, PIB looked the other way",
+    "text": "Official PIB / News Fact-Check Reference: Op Sindoor: As Indian media made false, outrageous claims, PIB looked the other way. Op Sindoor: As Indian media made false, outrageous claims, PIB looked the other way Alt News",
+    "source": "Alt News",
+    "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPeXhVdXk1NDhVWFFINXhQNEoyeS1JWWJlWFNkRk5rUFcxMzlYNEFkMUtpRy0zaWZKZWs0cDF4VkxneFpXbERoZDFwWUpPSlJtY0hQVWxCRzQtT2JYaGItVERIWUkwYkMxWkRDb0lWd2NuTkxnOTk2eGxJNVBIUXBteVFFZ1o3WERURTVlNDZrWTVmSGpKeU93VWdSUVBQczhLNjJrVVppcw?oc=5",
+    "published_date": "Sat, 31 May 2025 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0021",
+    "title": "Viral Claim On NASA Selecting Ayurvedic Doctor For Space Travel Is Fake | BOOM",
+    "text": "Official PIB / News Fact-Check Reference: Viral Claim On NASA Selecting Ayurvedic Doctor For Space Travel Is Fake | BOOM. Viral Claim On NASA Selecting Ayurvedic Doctor For Space Travel Is Fake | BOOM BOOM Fact Check",
+    "source": "BOOM Fact Check",
+    "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOR1p6anpmVU1KR2pRTTA3NlBneGN5d1Z5czdibHNnTlhLOHgwNnVWNXJMVXpPSlJVd0dLOVBEUWhBQzlvbndKUkRzb0xTa3dRMU9hSmRIYTd1LVhqRF9Xay14UFlCYVVWZ2E3X3UyNDdpb3RCR01Bdjl2bmlOQkhIRk5BeGlQSFFpaFZXUXl5YXo4cGNtUUxVdE1xNC1qQ0JhZXN6cUhtYXI0ZnQ0Z0lmU2dYb29DX3p2OHZrRm930gHDAUFVX3lxTE9ERk1mZ1hWOVAwRVpDNEk4UmRtMVdKOVVUejU0RWVjNU9zbm5SYURqcXZobWlXUEtEQmZVX0oyS0tLTkpvbnF2eWhsaXFBS2VuVXItLTl6NXdXaHJ3dmN3bjZiTEh5YTZ5eW9FT3VJaUZqb2V4eXE3UGI5WmVQVlFIZzYwZVdfanB2ZzFhSnczVmVwRjQtbThMN3VVTm51LVRYUjFOX2diMGM5UmEtdldnUVNGQXFETkIySjBqVHMwMkcwSQ?oc=5",
+    "published_date": "Mon, 19 May 2025 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0022",
+    "title": "PIB Fact Check debunks viral claims of new Rs 1,000 note, says RBI has made no announcement",
+    "text": "Official PIB / News Fact-Check Reference: PIB Fact Check debunks viral claims of new Rs 1,000 note, says RBI has made no announcement. PIB Fact Check debunks viral claims of new Rs 1,000 note, says RBI has made no announcement The Hans India",
+    "source": "The Hans India",
+    "url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxOZmp1UlVGczV6OWtZRUFtdUR3SThiN2ZMampUcElWWE9aV0kwS1ZFbDYzZTdxVGN3YWJ1M0c3ZnNBMHlXd2xHTDhabWp4QnBLLTZVclRpaU5DYkJIU0xmOVM3ZUZxSnpVQVZQc0VvZjRadkd2VXg5LXJPVjJxM2FBUzI0SXdqZEJMMDNwbTBCQ1FnWXg1RzlkOUI0aDdOMm8ta1pJcjZqVVlJM2NiSFp5b1Vpc2tCbTdHRzQ1MEY5eDRwZThzN19qblc5S3FLY3NB?oc=5",
+    "published_date": "Tue, 27 Oct 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0023",
+    "title": "PIB fact check debunks viral claims of new Rs 1,000 note in India",
+    "text": "Official PIB / News Fact-Check Reference: PIB fact check debunks viral claims of new Rs 1,000 note in India. PIB fact check debunks viral claims of new Rs 1,000 note in India The Financial Express",
+    "source": "The Financial Express",
+    "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOMlFFNDBFN0I4cHhlSnNZbEdYNzdlQlJScXAtQWJXRS1sZWxxaThXY0pSZWMxYjl0TGVVR3hTNjRxQ05PakpyM3RqUEw4ME9Gcl9fRWkzTzFYTTgwU0NrX1FFMWV4LU56V28yczRvWmRiVXhIS0hpZF8tcmJSb2t2bzFGN1ZKY3dxdUN1SFdsY3hENzF4YnNsVm85YkhsRURXMkcyUVlRaUtXU1RkeGNXUnVKTUMyZWt50gG_AUFVX3lxTE42TTNjZXNYMjhyaGVHblBVOFRmTmNLUkgzb0ZNY2p0TVVJYmQ3NXBiMFM4b2xxeTcwbHc2VTE4Zk9hTVFxaXR6cUp3Y2xnLUJiV2tXTktGZGVGRGZwMm5waVpOUDZHWm9jZjBocTlaQ3ZLemFIS1NobldkQV90OGMzazhTV1FVZy1Ta3BrRS1GeUVIMnI0YThwRHNtT0FjZGVfbm5pVEtjYTRVU2lrSGpONHpqZl80RVVwYzFXSHRN?oc=5",
+    "published_date": "Tue, 27 Oct 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0024",
+    "title": "₹1,000 note returns? PIB Fact Check dismisses viral social media claim",
+    "text": "Official PIB / News Fact-Check Reference: ₹1,000 note returns? PIB Fact Check dismisses viral social media claim. ₹1,000 note returns? PIB Fact Check dismisses viral social media claim Business Today",
+    "source": "Business Today",
+    "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxQVnZsQVVqZWFQazRzVjBabkNwZUxmc3dTWWUzbF9yTG9QTnd3cW9sb0JMdmxYcXl3X3UxbV84ZGZ5ZkJQVk4xc3VSUnloaFV2cjdva1FMOUZKMzNNYWJ4MDZHbHBrM0dEY1VXSmp6cVVDSUVxMVpWbF94b0JqblJjWE1rbGp0NjdDSEJ0MkhCSlpwbnlMVkI0RWlLWTg0RTlXRHJ5Y0RlNnJJMjN4SExLUXB0RmktNTRtZ29oQ3kwdXZGWFFnWmJr0gHMAUFVX3lxTFBaRlNBYXZoem43WEZrMFdaVTRseE5jRHk1YUM4VXdxSXpSc3AzZ0owTUluQlFTNFdJYy1YZ3BmRE15cVBrSEt2eGszSkhET0dNX1FPSENGNzNiaEtiN3NnLTlESEtLQlpQejdEMmlMWlk5MUtMdVJpalBocGZndWhYaVZOY184azkwRlY5bm5iTXgwd2FLZ3czaXlHX1gzWU9ubUZoSlJHUG1kNFRidHA2SzdsY2VRTlg4R29vMm9OdWNnQmN2UElsbUhGeQ?oc=5",
+    "published_date": "Tue, 27 Oct 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0025",
+    "title": "Public Sector Banks amalgamation: Govt fact-checks viral claim on SBI, PNB, BoB. Here's what it says",
+    "text": "Official PIB / News Fact-Check Reference: Public Sector Banks amalgamation: Govt fact-checks viral claim on SBI, PNB, BoB. Here's what it says. Public Sector Banks amalgamation: Govt fact-checks viral claim on SBI, PNB, BoB. Here's what it says Livemint",
+    "source": "Livemint",
+    "url": "https://news.google.com/rss/articles/CBMi7gFBVV95cUxQaER6Ql9XTEh3TTR4NmhoZmNYb0s0QzlhQnFNSC1WMzdJLVl6OHpoSWtTVVRjWUNSMHJQY1l5WWd5LTd3bmFtdUxEdS1wQ0VVWENxSzdhMnk4UkN3SG90ZGl5cVNrMzRNX0RORXhIMmZ3T0JObXVlUXJMQzdPQXFTdk4zUGp5Y0NBTzRWaXU2MElmZ2Nsd1l1RDFMdkcyTml4Nk44RVJiSHZldmxydDV2eFlsTk1PaXRpeTY2eUlzcllfdXdXUEVFZnpjSjZ0eXQyNXR2TXdkVW1KNzFYUkF1SG9JT00xdUFFMTJObGhB0gHzAUFVX3lxTE5CQWpWUzRtdGtyUGxweDFDazNYcGM3c0VJN2d6RlhOVEdXN0pJdVg3ODVkODJ2bjRaazF5VnA3N1Nfd0MxNFd3ZTBDdE84ZmlZejdXaWJOR05tYlB5azBoZHdTS21mUThPNFVaZTFJX1ROc2xrQUlFZWEzWFczY3pMaC0zZVdmSXJBaU50cTYtWmcxeEh5czU4TklWN0RHcC1jTDFaM01ZdU8yME01b19sQjgyZlhJemVLT3hoZFNWR0lQaXBuWnlJeVlvZ0xXRmtGRVQ5d0MtZUw5c1lIem5MQTNuWGlPMkI2cHlCMXBFQjA3VQ?oc=5",
+    "published_date": "Thu, 17 Sep 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0026",
+    "title": "No hike in petrol, diesel prices: PIB fact-check unit debunks viral claim, calls circulating order ‘fake’",
+    "text": "Official PIB / News Fact-Check Reference: No hike in petrol, diesel prices: PIB fact-check unit debunks viral claim, calls circulating order ‘fake’. No hike in petrol, diesel prices: PIB fact-check unit debunks viral claim, calls circulating order ‘fake’ The Statesman",
+    "source": "The Statesman",
+    "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxNeHBZZXliQXhWWkQ3SXBhN1VGeDBtdDJpTld5U2Fzejg3b29NUWYtRzUyNTRYNC1kMk1keXpqcjV3SnRqN1lCNWZVa0hBR05aVzB6Y3R2dVZvRzViU2luaFhPR0dwUDYxTFNra1FqZXU2djY1RzdmTGliN18xT092RzBvNXR3aGFaYWdoTHh1TXFxdlMwWUpuUVhjemViZVZKSUdpa0tKS3EteTh00gGyAUFVX3lxTE5RVUxJMTdwOG4xeDRrRmlXaWI0WG9FUlpLOW9fYzBBZkVHZEVVVkNGZkVnSXdEeXFOODU4LVpxUUxBbXY0bUpuOUU4eEhfbzZkQVNLbXhrSzk5QnR6dlYzYjJnT3h3WWdxUnZYYkFzWUREc29pNkx0di16a3gtTmkzakFRTmhKRktpZm9nRTZ1bmY0c3pILVhjNjctbmhjb0tQcjVDTlFpMzZVZ3ROZVVEYkE?oc=5",
+    "published_date": "Wed, 29 Apr 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0027",
+    "title": "PNB, Canara Bank and SBI merger? PIB Fact Check clarifies viral claim",
+    "text": "Official PIB / News Fact-Check Reference: PNB, Canara Bank and SBI merger? PIB Fact Check clarifies viral claim. PNB, Canara Bank and SBI merger? PIB Fact Check clarifies viral claim Business Today",
+    "source": "Business Today",
+    "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPQ3I3MDZKRHRUZ0ZTWWs4ZkN2WkRSZzNqdGFWbjNjTk02cTRXWEM1ZXc0THY5X2Z2QThuRzZxaTZobGk2NkdadEVERnkxemtaZTUwbVhneFc5Z2Z0WmJjRjR1SThwY25mNEpjc3Y4OXhQN21TVWF5VkxvMGpUTEJwaHh6dFQzS3B0b003WGxOVDZEWktpdVAyUUJLZ2IwcTZ4c0VjRmh3b2FjME1nZnBxZFVjYWhTN2l4U2FhUEdzRXV4TGlIR0NXUWpMeHJPN1U?oc=5",
+    "published_date": "Mon, 29 Jun 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0028",
+    "title": "PIB Fact Check: Viral Claim That Government Will Monitor Social Media & Phone Calls Under ‘New Communication",
+    "text": "Official PIB / News Fact-Check Reference: PIB Fact Check: Viral Claim That Government Will Monitor Social Media & Phone Calls Under ‘New Communication. PIB Fact Check: Viral Claim That Government Will Monitor Social Media & Phone Calls Under ‘New Communication Free Press Journal",
+    "source": "Free Press Journal",
+    "url": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxOUjJjRkZndjZ0ZWJUeS14TW1jcmNvclJXM1EtX3U0Q0xPbW5BVlNFNkgtSnlPRUJpYUZMREVJdEo3SzVTc0JZT0RKNkRNZTViaDEwdWhFdmx3MlBwWjc2UHMxeHdmU0NyUjJFYnpXWDJseGRPdTZ1enZYMW9KVHRoUEx6RU12N205NVlPYUdYMjJTMnM1QW9oa3pHcldZLWI3VkIwb2RHY2ZENkh0Z25hMWlwTkVpa0M4YzItY0xaZU5sdnRTbnJEaEJSWjJtQjhoZlB2ZnNqc3dqNmo3Qmh0b1hjUmp2S19wM3RlbtIB8gFBVV95cUxOUFhsbUhWejlWMUVFVnp0cDcyMy1vbUNFRzdBWkZPMlFPcVBCbU5YcWstVmk2YTJkOWlBOHBOdFpuVGtyWXdYTklONmFYTDhXc2RFQ2NvOFJTazJ4YlBZN0IyRFN6X19kS2F6akFOZDFFY2J0MFNXQ21hRVdIWmRSZmVQX25MQTBnT1dVaF9FMEZSVnkyd2UzSDd0RTV5VXN0YnZwb1k2X09jLXJYcTJuUXJ5ZWZPeERycnNCdUo1LVUycXViNW81aXp3eHZOWmxwQWhUVXVBZTU5TjlKbXhhaGZIUU56cnBycGJybTkzdWRlQQ?oc=5",
+    "published_date": "Sun, 19 Oct 2025 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0029",
+    "title": "RBI Not Replacing Paper Currency With Plastic Notes, Government Clarifies",
+    "text": "Official PIB / News Fact-Check Reference: RBI Not Replacing Paper Currency With Plastic Notes, Government Clarifies. RBI Not Replacing Paper Currency With Plastic Notes, Government Clarifies PGurus",
+    "source": "PGurus",
+    "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxOeXp3TllLUENMYnJUUFo1YVluLXJhQnVSdnVuaDdQM1NadDNzNEtxZWo4bVVKeXV1aTd1cEFPY2tJTVZrMGE3ZzJKMEowbzVnRE12LWJ3Skl5TXpmbmJ0QVZiT1hCVlY3a0xKd1F1ZUJIZWc3WExZd3ZVd1RUUUlCSGxFemlSZ2VWWlVlZlpqaUNtYVdXMkZKcGRn?oc=5",
+    "published_date": "Wed, 10 Jun 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0030",
+    "title": "RBI did not send account suspension notices via APK files on WhatsApp, PIB Fact Check warns",
+    "text": "Official PIB / News Fact-Check Reference: RBI did not send account suspension notices via APK files on WhatsApp, PIB Fact Check warns. RBI did not send account suspension notices via APK files on WhatsApp, PIB Fact Check warns ANI News",
+    "source": "ANI News",
+    "url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxQZDBHLTZuaWZNMWNVOHFqbGg4X0tpYnpWOHNCRVNaXzdnaVk5N05ydkM2UENPcDZfZ2N6RXFoWWh4OGUxM3hJMDN0bXBxVHBuTFVJSTFNbWE1ZVVpX1FTMW9sZml1UTQ4dWVrcG11QVFuN1N0cHIyRXlkWUc1SFp3V3g5bk1mRmw0aHFWNFBQUEtaRFNQRGtRc01vTXhnZVhuNk5LMHQ4QmgxZ3N0Z09peG43TGdCR1RqSVFibXRfS0Q4VXJfQ25Kc1BRcXE3MjR6QWFiN2VMX1o?oc=5",
+    "published_date": "Thu, 11 Jun 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0031",
+    "title": "Govt Debunks Viral Claim on Paper Currency Withdrawal, Calls It ‘Fake’",
+    "text": "Official PIB / News Fact-Check Reference: Govt Debunks Viral Claim on Paper Currency Withdrawal, Calls It ‘Fake’. Govt Debunks Viral Claim on Paper Currency Withdrawal, Calls It ‘Fake’ Open Magazine",
+    "source": "Open Magazine",
+    "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNazRHM2ZuVjZVaU44d1U0T1p3RnBYbFBLS2E3MWNRclQ0ZEM4ZlpMX09DZjQyb3VZU00zTVlvOTdGd0hOYzZjRnJqQXN5SkMwNkZMcTd5WmRmcFVSM0JxUDB1XzM1MzdNVkZGb1ZjbGJGd1plZUNodi1ZMEdwSW0xNkpuVW1UWjRla0FzMGZMY09aVUZ6RVRsTHVudkFfY2lqX283aC1Hbw?oc=5",
+    "published_date": "Wed, 10 Jun 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0032",
+    "title": "PIB Fact Check Warns of Scam Using Fake RBI Message",
+    "text": "Official PIB / News Fact-Check Reference: PIB Fact Check Warns of Scam Using Fake RBI Message. PIB Fact Check Warns of Scam Using Fake RBI Message News On AIR",
+    "source": "News On AIR",
+    "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQY1VPYTZkVi1VNnZSaHNyYzViRVZ1eF9WaDJQVTBsTGdGamp2ek9TMVBpN1duUHNEcmNCUUh0YUpEdDlxakxXSTV0Z0hTdHNLQU5kUlI4THBDMDNrWEZGXzdtaHVKa3VVZ0VkYkJGem10Q1ppT0tVdmI0SzRZQUhRaG9Ldw?oc=5",
+    "published_date": "Sun, 24 May 2026 23:29:52 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0033",
+    "title": "Bust Fake News with Bangalore Mirror: Is RBI running any donation or lottery compensation scheme? Check",
+    "text": "Official PIB / News Fact-Check Reference: Bust Fake News with Bangalore Mirror: Is RBI running any donation or lottery compensation scheme? Check. Bust Fake News with Bangalore Mirror: Is RBI running any donation or lottery compensation scheme? Check Bangalore Mirror",
+    "source": "Bangalore Mirror",
+    "url": "https://news.google.com/rss/articles/CBMimwJBVV95cUxOV2xiWGJvdFp5R3VoYVU2Q2JreTJDaENIMFZMbmZDTGozVTF3RWtSTEx1Z21iSnZLX3VVQW9vOEpNT3ZvbFhUZVpuLUlaczQ0RVRIOEZ5MnEzYmVFRlFCTDhQZGJKYWFueWhLcElydDZRNmN0Y2M4RXdOSDJXWDVXOHZhR3VTeUhwN2JUR2lpSVI1M2gzM1JweHNJRzZYNmMyT2N2blZ1bWU5aS01U2h6Mkh6ZVZFZWZQZW1WMTlVSGFFSDZINzhwYTROc3BPcHBkN1ktTUxwOVdfeE9wSmowbG9oazVVelNrVksyQjdMSldQbjFkbW5PenM0M0dhYzFyckg4bjItNHVNNEVHcHQtdjV6a1g5WGE1NWZj0gGgAkFVX3lxTE5Za1RuQ0t0MDRwZ0NSZEdXSHdGellweXQ1bjRHVTl6S251emNWRVlsZ1l4ZUZLemsyR2liMzRpMGxvVHdRSFJsNFlYOXYwb0I1UEZqQi1Fd0VvYTBteDBWMjU0YkpUVnBQajlRVUdkUjgyTmo5N2xPd1RKNVhCd0J0U1RYVUxpRGpZUVViZk44M0x4Y0FWX0lPR2tISzVzMENma3JOeTlzRTg5c1pJdV9HOHBLd2tBRzdpZ0w3OWhmUHdoRi0tRDhEa3U5UWdMMUdNZ2wtRUJNX1pjdEZ2bmFKWU9OODM5Y25IQXZyUVNhWkptSTV6OHRuT1RvNm9NMXVsX2ZNU1lldVJoUmwtaHUyQVVnWlhTUkVYMVFsU3pzMw?oc=5",
+    "published_date": "Sat, 30 May 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0034",
+    "title": "PIB fact-check unit debunks fake claims on RBI currency exchange guidelines",
+    "text": "Official PIB / News Fact-Check Reference: PIB fact-check unit debunks fake claims on RBI currency exchange guidelines. PIB fact-check unit debunks fake claims on RBI currency exchange guidelines Telangana Today",
+    "source": "Telangana Today",
+    "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNY0Npa3JOMU9fTmZuSzJrYW1HWjhrUm9JY3l5TXV1T1A0bDJJUVJHS2pjNlFmUTNCN0pyR3R3XzJNeHZlQnRGc3RUV0lLUE9sUG1RZkx1cHp4ek1QdGVKQVR3S0VXbGVVcElMVzh2aVhYbE5ldmlJSm5USU9jSmtPMzk2TnNIek1sVE1EZzdEWmZoMGYzNHZwc0IyZ215R1pIOFg5SQ?oc=5",
+    "published_date": "Sat, 18 Apr 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0035",
+    "title": "Did you get an RBI lottery or inheritance email? It's a scam, warns PIB",
+    "text": "Official PIB / News Fact-Check Reference: Did you get an RBI lottery or inheritance email? It's a scam, warns PIB. Did you get an RBI lottery or inheritance email? It's a scam, warns PIB Business Standard",
+    "source": "Business Standard",
+    "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxPZkxOb2szZHJmWUE5aFBYcGVZNVUxQ0VmY3diejBfek15bVJkR2k5WGhfVHd1LVlWVVVOeEhrOFY0bmswUWFJR2RSZWw5OXFEZ21KR19zQnR5eWpLOW1zWDMybXMyNWlNZmZ4dmpaT2F3dnNGT2ZpOU5Sd0xtNW5reXNvczNXVGFndGxMbkQzU3FPb3NFTG56YVNocFF0cHVzWnBKSXNlQnFMV0tnN2thM1V0b0JkODVqb2l5MHBranJwbkFHenlEUHI2SE5ZTFZRTHZWTXVMUHBSc1B3NjJyTNIB5gFBVV95cUxNYk90VnlmTDlBTHFERmNPbXZGdk9YeWVHckFkU1haU2FXWWpZR3NmdnFqQjVoQjFLcEs4TGhWMG9ZY0ZfNG5VSEVab0FWRFF1and5MDE1WEFRVEI0Yml4U2Rva0FTcnFwamwtWW9HMkY0TEpua2VPMXRMU3hjZXBBVzlyZGtqXzFDM1Fnb2dxOHhDZ3RxYjhmWnV0aXhSQVRMVnFpMEJDRldteVhiRnN4SVA2ZUZVa0V4c2FvMGhYa09qdXZZeHBtWDlYdnk0eUVhSTNCXzFHSDBpNGVLRVZXY3pQUUtudw?oc=5",
+    "published_date": "Wed, 27 May 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0036",
+    "title": "Did RBI make 'new rules' for exchanging old Rs 500, Rs 1000 notes?",
+    "text": "Official PIB / News Fact-Check Reference: Did RBI make 'new rules' for exchanging old Rs 500, Rs 1000 notes?. FACT CHECK: Did RBI make 'new rules' for exchanging old Rs 500, Rs 1000 notes? The Week",
+    "source": "The Week",
+    "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQWmY0SHdBRTFLSW54M0NaM1AzVlFiWWJNVjVtQ3NJSXNnSWc1Sk4yRlVOanNXcXNPN3hOM2RIWDh5Mmh5LTAydmlKZmtCdEh4c2hiVnhrdUtFRktTYlQ4TmNZMEVvUGo4QlV3anY2Z1dEYnY1eVN4ZmR4TllQMEx1c3NwVXVzeVpJU3dYQjN0YXp3Mnh2cTNyVDduaGNCQk9iZEQ4U0tQNWhqWWNRc2hPSURKdDhKZXlDOTNIczBNT1d2QjJx0gHKAUFVX3lxTE9yNlpvRmtYSUM4SGdtTDRuMzJ2Wk9yVEV4Ry1QWEZTbm5kakpodGVrcGcxLXZJWmNLajdkdzc0T2xLTzFmMnpKUnpRLXduZ0FlTnVBaklWdHNpSzhWbFpHSTl1R2pmdHN0U281VTFUNUphOTd1dHpUOXVEOU9IYUktbjRjMnZOdXMyb2xnU2RhZGF4eWo5cll2SUljaEhzZl9HdWxSNWJNLTRuX3ZZbEdEWktaN1RUZVJQUDJ2aEV3SkNHb3Y0TUtDSHc?oc=5",
+    "published_date": "Sat, 18 Apr 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0037",
+    "title": "Govt busts fake claim on RBI withdrawing Rs 500 notes from ATMs by March 2026",
+    "text": "Official PIB / News Fact-Check Reference: Govt busts fake claim on RBI withdrawing Rs 500 notes from ATMs by March 2026. Govt busts fake claim on RBI withdrawing Rs 500 notes from ATMs by March 2026 bfsi.economictimes.indiatimes.com",
+    "source": "bfsi.economictimes.indiatimes.com",
+    "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNUHg4MEVBQmh2c0FvMEtmeTRTSlBwTGRwUG42Ny1XelpfRXRXTWE0RGRuN2hGTXJ2SmVNR2N1N29LdU1EaXA0TjBBM0tpWU5YanF6RUlyblE4N0RRb0pfTWI5U3hlRk40RW5lTEN6ZkV2REktQ3VmT3ctV21HVHpoVVBrQkVObi1FaU9kcVNmS2RWQ2VPVTEtLVJvalMwSFRycE5wci1wY2VITjV1bEMyaEt3Mm9kM1lWNE5heG9DLVNjeVpCWHVpR2hSWlJNbVdyd21VVdIB2gFBVV95cUxPbVRWcTBwZVBaS0hEYjMwS1dKU2tXbTBadzAyX3ZneTlDQlF2MHJKRWJuUFR0cE0yOTlINnlVUjBxelZ6eWkyYkgzOTNvVHdOV0R5aDBvV0pDVnNnZHBpeUhHSGVGRFE1aUlCeDlUYXNSbjFucFZhVFFmYS1iZnVNeUxFeE1rTllXT3F1dFNzTDBHS1k3SF9yQ0VBWmIxVW1TM1RDcGRXT1JOZVJCbm8xR2RlMXd5TkR4UDZ2YWhvcmpwZkVKb21UNE1wTXo3YVpDYVVhR1BsUlk0UQ?oc=5",
+    "published_date": "Sat, 03 Jan 2026 08:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0038",
+    "title": "RBI Launching Rs 5000 Note? PIB Fact Check Clarifies Message Circulating On Social Media",
+    "text": "Official PIB / News Fact-Check Reference: RBI Launching Rs 5000 Note? PIB Fact Check Clarifies Message Circulating On Social Media. RBI Launching Rs 5000 Note? PIB Fact Check Clarifies Message Circulating On Social Media Outlook Money",
+    "source": "Outlook Money",
+    "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPbDZLYm9SWXFURzFzVDJORFozV1d5V2FYSGhENVFMRGVUZG1VZUZFLUJaaGR4cGZUZnl4cmp0RDNBYnBteEdDcGxCbE1hM0E5VVdyei1rX0lLWnZWbTdvXzJhREVjZDlYVW5ZWThNcnBYWTNwTnRmdm9CLTZNdlEyRkVBX2dEQy1sallzSHBEWkg0aFo5RDkteENJcUdsdjRiU3hhcHBTOFhvRFh5ZjRDLVFFbHRteDNBY0dpV0tRN29JQdIBzwFBVV95cUxPRzEzUnA1dDlBOGFOU29JamQxd0NnV3hRaHZha0lCdGtJdTR3akFJWGM3NDFrTXd1a2tfSzgyczg2bWJXalc4bXpXTS1uZUdpZm1DUmRKWDNUWDVlLWNqNWFWQmpUcjRUOVo0VWVaZjU5bXN4NFlGN1NyTnVMTXF5REtKRUsycHN3Nm1tSXJPbFZ1UnN2Q2JZUGNWMWxqckpDdzFWZEEtR2QzeEQtRDZlSXVzM255Y1hsbFVCVG9GMHQ0cXNzYTVPMmgtRzFHYzg?oc=5",
+    "published_date": "Mon, 06 Jan 2025 08:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0039",
+    "title": "Fake RBI voicemail seeks people's bank details in new scam, warns govt",
+    "text": "Official PIB / News Fact-Check Reference: Fake RBI voicemail seeks people's bank details in new scam, warns govt. Fake RBI voicemail seeks people's bank details in new scam, warns govt Business Standard",
+    "source": "Business Standard",
+    "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxOWF8zV215SXE4dmJrX1FLY0xtSDBJd0QwTGxxTTlsM3NsOWFzbmNZWU43cDZUbzdBUV8zMVhjV1hzVmJKM29ReGpvcVZqel91U2swYXZMZjVoMlpvTGJIUlBhS1pFY3JUc1ZJT09Va3ZsbWRwZlo0NG5veEx5b01aUTh2cUU2WUZhUnpiZV90UDRqTVFMRzNQZHl5REtwazB1cm1mSndNYUF1TGN0Tk01dUdiZUJYNWNscWNQbFkxcjVGbUZ1Nm9PeEswTkJ6RnBnLUFkUjR4Vk9RS0ppWGkzeENn0gHnAUFVX3lxTE5aSGNsRHVaRy1INEcwMVljV3A4TVZyYm5nZ1l2cHFrYzN0eGhJY1pscktPSUdtdjh1dDBQc1l2WkUwSjN6NkFCUUtBMVhSMmZJZnY2dkZxdXFmTTdqSFpQRnNvSTlEdlFlT1FIaFJYX2prSzRQa25PemxuMF9UOVpzU1hLZUpkd19HcmVDMHFnTW5iU2NhMGFjbkNTOHpRcTU3a2tWMmc0RVF2WllhcWhCYjlDcFFtaU5NU0xURkNQNmNaQ2dabHJvS1g4djNWeXBvV051cmd6cUJqZ2ZqenlTaTFfVkVSRQ?oc=5",
+    "published_date": "Fri, 21 Nov 2025 08:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0040",
+    "title": "RBI 'set to' exchange old Rs 500, Rs 2,000 notes is false information",
+    "text": "Official PIB / News Fact-Check Reference: RBI 'set to' exchange old Rs 500, Rs 2,000 notes is false information. RBI 'set to' exchange old Rs 500, Rs 2,000 notes is false information Business Standard",
+    "source": "Business Standard",
+    "url": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNVXE1LU9LRC1WRlYyZ3NtdGUwdy1LeGM0N2ZBQnVXdjlOdzdzYWdOSGl6WEQ4NzJRVHhtNElUc3Q4V0MzbU83YWpRMzBZNEl0ZlV3NVl4VjJUN1FrVXhsOUNVTHg5SWdPeE5CeVFzU0U2bFVFSjVNcVZzei04M2JWUWpYRnFPdDRwTGZUOGxHRTVaQ1Vvc3RiaGkxcEpoNGxBVHd5MnFrSjhqZlZrMHRkcGxaTENIRWw1TE9DWTdybE5FbmZ3bXV1WTJqVXZrbTF5ejdpTTF0U3dKeFkyUkHSAeMBQVVfeXFMUGRVMk1uQkl5dGFuX3h3dEtmdjdURm1reVZMT29DRElTWnAyd19xcXBFdmF3QVVPbTlmdUVQcEE4UzhRQk9GVG45VlRJSC1qYlFQZ205VjZiX29iakR4N25lby0ydmtyeWpxRGhqNGYzLTNhUldDOGFWNVVhcDZrVGRZbjVyaTNDZVdyODFxYk9OLW9pOXpwdnpQYjhUX0ZmMUJpUjNCOF94Y1ZHRTFvZHA1MHVFWWhrd2xHb29GVjVKeHU3OU0xdExzYTBCVURzRTZOV1F4NGh4bEUyazhveFJ1QWc?oc=5",
+    "published_date": "Fri, 31 Oct 2025 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_PIB_0041",
+    "title": "Is the centre 'accepting applications for free laptops under National Student Laptop Scheme 2026’? PIB fact-checks claim",
+    "text": "Official PIB / News Fact-Check Reference: Is the centre 'accepting applications for free laptops under National Student Laptop Scheme 2026’? PIB fact-checks claim. Is the centre 'accepting applications for free laptops under National Student Laptop Scheme 2026’? PIB fact-checks claim Livemint",
+    "source": "Livemint",
+    "url": "https://news.google.com/rss/articles/CBMigwJBVV95cUxQNlRmYWpsdWp0NloyLVRyVTFfd3FtSlFHV2NGcDh1MEptMEhPVm50TEVnc3ZiMFBqbkswallOUHlVOGpaUnJPS1ozS0VvbVJpbU9NMFU0QVhaZ2lNcnduY0Mzb0JCa2FUQmlRdGxaRjNYT3IxSXBOSHN3Wk0xeDJGVXpYM0o0QmFIRlJ0Y1p3c2Uwcm5PNDhfWVFXemVqN0dIVVJKUTdjYmNXdEZhU3ZndTNjLWlGS3dZbnByVEp1SnFIclMzX3FkT3Z4OE9yYncwTkRrU3c4TlJFXzM0SkJPXzZLOVF2ZUw0SjZzUGtZN0EtNTFjVWExeVVYXzZYYjBkbTdv0gGIAkFVX3lxTE9RTlNyQ2dwZE5rUFNWN3VIVXpRX2pCcnFYaEF2R1FreUpJSmxSbWZsWml2TTVMa0tPb1BLaUhNRlFHM1VteU1XRnJneEpPNjJvRFBFNzN4SzV3Z01uOHdSWkZLMDQ2ajFCdUUyWDFxREFaeWFpUXJqZ1VqZmk3U3RHSXU2bXA5ZU85MDQ5LXlOM2U4eXprQWJBUndHTXZ0MTQtY3ZZUXRiSFNOWlo2Mnd4b1g1ZVhvMFhfMWhKemxIZ3p1ZUVtMi1uZFNtTlRHb3VrR1Y0ZFlxbHZkUlh2WkZudmlrTnJrR1ZlQThvSThfX0pYMndjZHdhcnBwTUdQYVkyVnkzWHhWQQ?oc=5",
+    "published_date": "Sun, 14 Jun 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_PIB_0042",
+    "title": "RBI announced ‘new rules’ for exchanging old ₹500 & ₹1000 notes? PIB Factcheck says…",
+    "text": "Official PIB / News Fact-Check Reference: RBI announced ‘new rules’ for exchanging old ₹500 & ₹1000 notes? PIB Factcheck says…. RBI announced ‘new rules’ for exchanging old ₹500 & ₹1000 notes? PIB Factcheck says… Livemint",
+    "source": "Livemint",
+    "url": "https://news.google.com/rss/articles/CBMizAFBVV95cUxNb3EwV3o5ZzhSWkcyZFY2NkJIdXV6X25EaVJONVJZNDN2eDJQaTZERkJaMDVnSWo3d08zWFlSUHBrRjk0eFVWbUtqZFFhUHUzOHhPTm0zSEROWHlyYThlcTdVSXhqeFJkbUhjQkRBeGJTWE5qZjA5ekJVZ1l3cGMxTmM4WlVuLXhzLU04VlBOMWpqY1FrNkJwdFpmV2ptancyOUhSYnBVM1hERnRSU1dOMUF0NmJDRjlHYVJXVklteFQxY1FtUUlkejRpazPSAdIBQVVfeXFMTVpvY2E4LThrZW1oUjlkVnpjcDZPa3c5ZlVNN0RGYU1Gd3dfZ1p4Z3p4d2Jqb1BzcGRIZGM2YWNkWU9OY3lRaGNXUVJOZkMwNFBkeEg1Y1p4NFpyczJTUXNORlhxSnlyNXdHMXE0WDFfU1dBeWNlNlc2VVZSekFPSWE4Mm1RR1U4c2pFWjZNTlNMQUNLUW5uRWM5QnhpWFFQOXV4VDl2Snc2ZlZtTVJUYWpoR2N3akIzYWhyQXVHMnRIckxHUFF0QWtySk1aZTFCU3Jn?oc=5",
+    "published_date": "Sat, 18 Apr 2026 07:00:00 GMT",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_BFK_03027",
+    "title": "Old Video Showing Giant Waves Lashing at Gateway of...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video Showing Giant Waves Lashing at Gateway of.... As Mumbai witnessed heavy rainfall in the past few weeks leading to flooding in several parts of the city, a video of giant waves spilling into the streets is being shared on Society media, claiming that it is the view of Taj Mahal Hotel at the Gateway of India during recent rains.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/29/fact-check-old-video-giant-waves-lashing-at-gateway-of-india-viral-as-recent-mumbai-rains/",
+    "published_date": "2022-07-29 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03028",
+    "title": "Image from Thailand Falsely Shared as Indian Roads with...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Image from Thailand Falsely Shared as Indian Roads with.... After Prime Minister Narendra Modi inaugurated the Bundelkhand Expressway on July 16, news reports erupted, claiming that the recently-constructed road witnessed significant potholes due to heavy rainfall.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/29/fact-check-image-from-thailand-falsely-shared-as-terrible-condition-of-indian-roads/",
+    "published_date": "2022-07-29 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03029",
+    "title": "Staged Video Of Child Kidnapping Shared As Real Incident",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Staged Video Of Child Kidnapping Shared As Real Incident. A video, showing a burqa-clad man posing as a woman and kidnapping children, is widely shared on Society media. The man can be seen chased by a car and is later caught. Sharing this video, users claim it to be a real incident.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/28/fact-check-staged-video-of-child-kidnapping-shared-as-real-incident/",
+    "published_date": "2022-07-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03030",
+    "title": "Does This Video Show Maulana Giving Arms Training In...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Does This Video Show Maulana Giving Arms Training In.... A video in which a group of children can be seen firing a rifle is widely being shared on Society media. In the video, an elderly man can be seen helping the children and teaching them how to load the rifle.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/28/fact-check-does-this-video-show-maulana-giving-arms-training-in-uttar-pradeshs-madrasa-heres-the-truth/",
+    "published_date": "2022-07-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03031",
+    "title": "Old Image Shared As Hindus Being Attacked In South-west...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Image Shared As Hindus Being Attacked In South-west.... Recently in south-western Bangladesh, some unidentified people vandalised a Hindu community temple, shops and several houses over a Facebook post, allegedly, belittling Islam.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/28/fact-check-old-image-shared-as-hindus-being-attacked-in-south-west-bangladesh/",
+    "published_date": "2022-07-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03032",
+    "title": "Viral Post Is Old, NOT Associated With The Recent...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Viral Post Is Old, NOT Associated With The Recent.... On July 20, 2022, a barrage of artillery shells struck the Barakh tourist resort, wounding 23 people and killing nine. The Iraqi government has blamed Turkey for the attack in Zakho, and there have been protests across the country and repeated calls for Turkish forces.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/28/fact-check-viral-post-is-old-not-associated-with-the-recent-attack-on-turkish-consulate/",
+    "published_date": "2022-07-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03033",
+    "title": "Truth Behind The Viral Image Of Zoish Irani’s Silly...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Truth Behind The Viral Image Of Zoish Irani’s Silly.... A controversy erupted recently, when the opposition claimed that Zoish Irani, daughter of Union Minister Smriti Irani, owns a bar named Silly Soul Cafe in Goa. However, she has refuted the claim.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/28/fact-check-truth-behind-the-viral-image-of-zoish-iranis-silly-soul-cafe-menu-in-goa/",
+    "published_date": "2022-07-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03034",
+    "title": "Does This Video Show Damaged Portion Of Bundelkhand Expressway?...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Does This Video Show Damaged Portion Of Bundelkhand Expressway?.... A video in which a portion of the road appears to have collapsed is being widely shared on Society media with a claim that these are the visuals of the recently inaugurated Bundelkhand Expressway in Uttar Pradesh.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/28/fact-check-does-this-video-show-damaged-portion-of-bundelkhand-expressway-heres-the-truth/",
+    "published_date": "2022-07-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03035",
+    "title": "Kovind-Murmu’s 2020 Deoghar Image Viral With Misleading Claims",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Kovind-Murmu’s 2020 Deoghar Image Viral With Misleading Claims. Droupadi Murmu recently scripted history by becoming the first-ever woman tribal President of India and the second woman President in the history of the nation.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/28/fact-check-kovind-murmus-2020-deoghar-image-viral-with-misleading-claims/",
+    "published_date": "2022-07-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03036",
+    "title": "Does The Viral Image Show President Droupadi Murmu? Here’s...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Does The Viral Image Show President Droupadi Murmu? Here’s.... Droupadi Murmu took oath as the 15th President of India on July 25, 2022. In this backdrop, image of a lady sitting on a kitchen floor is being widely shared on Society media with a claim that the lady is Droupadi Murmu.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/28/fact-check-does-the-viral-image-show-president-droupadi-murmu-heres-the-truth/",
+    "published_date": "2022-07-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03037",
+    "title": "No, The Viral Advisory On Monkeypox Outbreak Has Not...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): No, The Viral Advisory On Monkeypox Outbreak Has Not.... Soon after WHO has declared monkeypox a Global Health Emergency, an advisory purportedly issued by World Health Organization (WHO) has gone viral on Society media.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/27/fact-check-no-the-viral-advisory-on-monkeypox-outbreak-has-not-been-issued-by-who/",
+    "published_date": "2022-07-27 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03038",
+    "title": "Year-Old Video Falsely Shared As Recent Protest Against UP...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Year-Old Video Falsely Shared As Recent Protest Against UP.... A video purportedly showing members of the minority community in Jaipur hoisting a flag of UP priest Yati Narsinghanand Saraswati and openly threatening to kill him is being shared on Society media.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/27/fact-check-year-old-video-falsely-shared-as-recent-protest-against-up-priests-controversial-comments-in-jaipur/",
+    "published_date": "2022-07-27 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03039",
+    "title": "Spoof Video Viral To Suggest UK Police Interrogating Boris...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Spoof Video Viral To Suggest UK Police Interrogating Boris.... Following a string of resignations by over 50 members (including 5 cabinet ministers) of the Conservative Party in the UK, Prime Minister Boris Johnson was also forced to step down on July 7, 2022.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/27/fact-check-spoof-video-viral-to-suggest-uk-police-interrogating-boris-johnson/",
+    "published_date": "2022-07-27 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03040",
+    "title": "Video Of Newborn Infant Goes Viral With False Claims",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video Of Newborn Infant Goes Viral With False Claims. A video of a newborn infant has surfaced on the internet in which the baby looks pale in a sensitive situation and all the veins on the body are clearly visible. Several claims have been made about the child and the location.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/26/fact-check-video-of-newborn-infant-goes-viral-with-false-claims/",
+    "published_date": "2022-07-26 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03041",
+    "title": "Does This Video Show PM Modi Ignoring Kovind At...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Does This Video Show PM Modi Ignoring Kovind At.... A farewell ceremony in honour of outgoing President Ram Nath Kovind was organised on July 23, 2022, at the Central Hall of the Parliament.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/25/fact-check-does-this-video-show-pm-modi-ignoring-kovind-at-his-farewell-ceremony-heres-the-truth/",
+    "published_date": "2022-07-25 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Politics"
+  },
+  {
+    "doc_id": "CORP_BFK_03042",
+    "title": "Viral Video Of The Waterfall Is From Maharashtra, NOT...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Viral Video Of The Waterfall Is From Maharashtra, NOT.... A video showing a couple being chased by the police personnel near a gushing waterfall is widely shared on Society media, claiming that police is beating tourists in Anakkampoyil and Thusharagiri, Kerala.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/25/fact-check-viral-video-of-the-waterfall-is-from-maharashtra-not-kerala/",
+    "published_date": "2022-07-25 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03043",
+    "title": "2018 Picture Of Bhagwant Mann Resurfaces As Recent One",
+    "text": "IFCN Verified Debunk (Newsmobile.in): 2018 Picture Of Bhagwant Mann Resurfaces As Recent One. After drinking a glass of water directly from Kali Bein — a holy rivulet in Sultanpur Lodhi — Punjab Chief Minister Bhagwant Mann was admitted to Delhi’s Indraprastha Apollo Hospital with a stomach pain on July 19, 2022.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/25/fact-check-2018-picture-of-bhagwant-mann-resurfaces-as-recent-one/",
+    "published_date": "2022-07-25 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03044",
+    "title": "Old Video of a Jawan’s funeral Procession Is Viral...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video of a Jawan’s funeral Procession Is Viral.... On July 17, two Army personnel identified as Captain Anand and Naib Subedar Bhagwan Singh were killed in an accidental grenade blast along the Line of Control (LoC) in Poonch district of Jammu and Kashmir.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/23/fact-check-old-video-of-crowd-at-jawans-funeral-viral-as-recent-one/",
+    "published_date": "2022-07-23 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03045",
+    "title": "Doctored Image Falsely Shared As Putin Watching Imran’s Victory...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Doctored Image Falsely Shared As Putin Watching Imran’s Victory.... On July 18, 2022, former Pakistan Prime Minister Imran Khan’s Pakistan Tehreek-e-Insaf (PTI) won 15 of 20 seats in the by-election held in Punjab — most populous province in Pakistan.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/23/fact-check-altered-image-falsely-shared-as-putin-watching-pakistans-pti-victory-in-recent-by-election/",
+    "published_date": "2022-07-23 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03046",
+    "title": "The Viral Video of Government Liquor Promotion Is from...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): The Viral Video of Government Liquor Promotion Is from.... A video is extensively shared on Society media, in which an appeal is made to buy liquor from government contracts through a loudspeaker from an e-rickshaw.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/23/fact-check-viral-video-of-government-liquor-promotion-is-from-haryana-not-punjab/",
+    "published_date": "2022-07-23 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03047",
+    "title": "Are Only Mayors Invited to the World Cities Summit...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Are Only Mayors Invited to the World Cities Summit.... Delhi Chief Minister Arvind Kejriwal has been invited to attend the four-day World Cities Summit 2022 in Singapore (July 31-Aug 3, 2022).",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/23/fact-check-are-only-mayors-invited-to-the-world-cities-summit-2022-heres-the-truth/",
+    "published_date": "2022-07-23 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03048",
+    "title": "Viral Claim On ISRO’s Web Portal ‘Radio Garden’ Is...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Viral Claim On ISRO’s Web Portal ‘Radio Garden’ Is.... A post has gone viral on Society media claiming that ISRO has developed a web portal called “Radio Garden”, where you can access live radio stations across the globe and listen to any frequency for free.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/23/fact-check-viral-claim-on-isros-web-portal-radio-garden-is-misleading/",
+    "published_date": "2022-07-23 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03049",
+    "title": "What Is The Reality Behind Indira Gandhi’s ‘Time Capsule’?",
+    "text": "IFCN Verified Debunk (Newsmobile.in): What Is The Reality Behind Indira Gandhi’s ‘Time Capsule’?. An image of late Prime Minister Indira Gandhi burying a metal capsule has gone viral on Society media. The image is being shared with a caption asking the government to dig out the ‘time capsule’ and make the contents public.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/22/fact-check-what-is-the-reality-behind-indira-gandhis-time-capsule/",
+    "published_date": "2022-07-22 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03050",
+    "title": "Government Is Not Providing Unemployment Allowance of ₹6,000",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Government Is Not Providing Unemployment Allowance of ₹6,000. A post with a link to a website is widely circulated on Society media, claiming that the Union Government will provide a monthly allowance of ₹6,000 to unemployed youth.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/21/fact-check-government-is-not-providing-unemployment-allowance-of-%e2%82%b96000/",
+    "published_date": "2022-07-21 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03051",
+    "title": "Old Video of Nupur Sharma’s Speech in Maharashtra Viral...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video of Nupur Sharma’s Speech in Maharashtra Viral.... Following Nupur Sharma’s alleged controversial comments against Prophet Muhammad, a video has surfaced on Society media platforms claiming that it is her most recent speech.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/21/fact-check-old-video-of-nupur-sharmas-speech-in-maharashtra-viral-as-recent-one/",
+    "published_date": "2022-07-21 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03052",
+    "title": "No Caste Related Changes In Army Recruitment Specifically For...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): No Caste Related Changes In Army Recruitment Specifically For.... Following an uproar across the country over the government’s Agniveer scheme for recruitment in the armed forces, a claim has surfaced on the internet informing that the applicants have been asked their caste for recruitment in Army.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/21/fact-check-no-caste-related-changes-in-army-recruitment-specifically-for-agnipath-scheme/",
+    "published_date": "2022-07-21 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Defense"
+  },
+  {
+    "doc_id": "CORP_BFK_03053",
+    "title": "Video Of Kolkata-Deoghar Flight Viral With Misleading Claims",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video Of Kolkata-Deoghar Flight Viral With Misleading Claims. On July 17, A Hyderabad-bound Indigo flight from Sharjah had to be diverted to Karachi in Pakistan for emergency landing after the pilot reported a Technicalnical snag in the engine.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/20/fact-check-video-of-kolkata-deoghar-flight-viral-with-misleading-claims/",
+    "published_date": "2022-07-20 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03054",
+    "title": "Old Video From The US Shared As Cloudburst In...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video From The US Shared As Cloudburst In.... As rains batter several parts of Pakistan, leaving over 180 people dead already, a video of a cloud burst is being widely shared on Society media with a claim that the visuals are from Pakistan’s Karachi.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/20/fact-check-old-video-from-the-us-shared-as-cloudburst-in-karachi/",
+    "published_date": "2022-07-20 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03055",
+    "title": "Viral Video Of Woman Smashing Idols Of Hindu Gods...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Viral Video Of Woman Smashing Idols Of Hindu Gods.... A viral video of a burqa-clad woman breaking idols of Hindu gods in a store is doing rounds on Society media. Several users are claiming that the video is from Kerala.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/20/fact-check-viral-video-of-woman-smashing-idols-of-hindu-gods-is-from-bahrain-not-kerala/",
+    "published_date": "2022-07-20 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03056",
+    "title": "Video Of Massive Landslide Is NOT From Goa",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video Of Massive Landslide Is NOT From Goa. A video showing a massive landslide is being shared on Society media with a claim that it shows the landslide that took place at Anmod Ghat in Goa (Karnataka-Goa border).",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/19/fact-check-video-of-massive-landslide-is-not-from-goa/",
+    "published_date": "2022-07-19 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03057",
+    "title": "Old Video Of Bridge Collapsing In Jammu Falsely Shared...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video Of Bridge Collapsing In Jammu Falsely Shared.... Gujarat has been witnessing heavy rain for a couple of weeks, leading to flooding and damage to various structures and roads.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/19/fact-check-old-video-of-bridge-collapsing-in-jammu-falsely-shared-as-incident-from-gujarat/",
+    "published_date": "2022-07-19 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03058",
+    "title": "Video Clip Of Army Personnel Helping People During Heavy...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video Clip Of Army Personnel Helping People During Heavy.... A video is circulated on Society media at a fast pace, showing some Army personnel helping people during heavy rain.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/19/fact-check-video-clip-of-army-personnel-helping-people-during-heavy-rain-is-not-from-rajasthan/",
+    "published_date": "2022-07-19 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Defense"
+  },
+  {
+    "doc_id": "CORP_BFK_03059",
+    "title": "Old Video from Himachal Viral as Recent Anmod Ghat...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video from Himachal Viral as Recent Anmod Ghat.... A video of a landslide is being circulated on Society media, claiming that it shows a recent landslide at Anmod Ghat at the Karnataka-Goa border.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/19/fact-check-old-video-of-himachal-landslide-viral-as-recent-at-karnataka-goa-border/",
+    "published_date": "2022-07-19 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03060",
+    "title": "Afghan Video Deceptively Linked to Recent Pak Power Plant...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Afghan Video Deceptively Linked to Recent Pak Power Plant.... A video of a huge explosion is widely shared on Society media. Many Society media users claim that it is the recent explosion at a Pakistan power plant.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/18/fact-check-old-afghanistan-explosion-video-falsely-linked-to-recent-fire-incident-in-pakistan/",
+    "published_date": "2022-07-18 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03061",
+    "title": "2020 Video Of A Plane On A Flooded Runway...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): 2020 Video Of A Plane On A Flooded Runway.... With the onset of monsoon in several parts of Pakistan, many cities have been put on high alert with a forecast of heavy rains. Rains have battered Pakistan’s financial capital Karachi as well.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/18/fact-check-2020-video-of-a-plane-on-a-flooded-runway-in-karachi-shared-as-recent/",
+    "published_date": "2022-07-18 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03062",
+    "title": "2011 Croatian Image Falsely Linked To The Ongoing Farmers’...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): 2011 Croatian Image Falsely Linked To The Ongoing Farmers’.... The ongoing tussle between farmers of Holland and the state is intensifying with each passing day. Over 40,000 farmers are protesting against the government’s proposal to reduce emissions of various harmful pollutants produced by their livestock.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/18/fact-check-2011-croatian-image-falsely-linked-to-the-ongoing-farmers-protest-in-holland/",
+    "published_date": "2022-07-18 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03063",
+    "title": "Viral Video Of Haryana Flood Fury Erroneously Shared As...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Viral Video Of Haryana Flood Fury Erroneously Shared As.... A video is reaching the wider audience on Society media, showing people pushing a car on the flooded road. It is claimed that this is from Sri Ganganagar in Rajasthan.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/18/fact-check-viral-video-of-haryana-flood-fury-erroneously-shared-as-from-rajasthan/",
+    "published_date": "2022-07-18 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03064",
+    "title": "Viral Video Of Jeep Swept Away In Floods Is...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Viral Video Of Jeep Swept Away In Floods Is.... A high alert has been sounded in multiple states across South India along with Maharashtra and Gujarat in view of heavy rainfall.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/18/fact-check-viral-video-of-jeep-swept-away-in-floods-is-from-pakistan-not-maharashtra-or-tgana/",
+    "published_date": "2022-07-18 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03065",
+    "title": "Old Video From Andhra Falsely Linked To Recent Telangana...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video From Andhra Falsely Linked To Recent Telangana.... The flood situation remains grim in many parts of Telangana. Against this backdrop, a video showing people being evacuated from a flooded river is widely shared on Society media claiming that a special chopper is rescuing people stuck amid the Telangana floods.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/18/fact-check-old-video-from-andhra-falsely-linked-to-recent-telangana-floods/",
+    "published_date": "2022-07-18 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03066",
+    "title": "This Video Of Auto Rickshaw Driver’s ‘Rain Dance’ Is...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): This Video Of Auto Rickshaw Driver’s ‘Rain Dance’ Is.... A video of an auto rickshaw driver dancing on a flooded road is being shared on Society media with a claim that it is from Sri Ganganagar in Rajasthan.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/18/fact-check-this-video-of-auto-rickshaw-drivers-rain-dance-is-not-from-rajasthan/",
+    "published_date": "2022-07-18 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03067",
+    "title": "This Viral Video Of Overflowing River Is NOT From...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): This Viral Video Of Overflowing River Is NOT From.... A video is widely shared on Society media, in which a muddy river is seen raging. The viral video claims that the scene is of Balochistan after eight dams burst.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/18/fact-check-this-viral-video-of-overflowing-river-is-not-from-balochistan/",
+    "published_date": "2022-07-18 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03068",
+    "title": "Did Dubai King’s Wife Visit Chennai’s Golden Temple? Here’s...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Did Dubai King’s Wife Visit Chennai’s Golden Temple? Here’s.... A video is extensively shared on Society media, showing a woman visiting the temple. The video is shared with a caption claiming that it is of Dubai King’s wife at the Golden Temple in Chennai.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/18/fact-check-viral-video-shows-dubai-kings-wife-visiting-chennais-golden-temple-heres-the-truth/",
+    "published_date": "2022-07-18 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03069",
+    "title": "Image Of Mass Grave In Ukraine Falsely Linked To...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Image Of Mass Grave In Ukraine Falsely Linked To.... An aerial photograph of purported mass graves is being widely shared on Society media with a claim that this is in Morocco.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/16/fact-check-image-of-mass-grave-in-ukraine-falsely-linked-to-morocco/",
+    "published_date": "2022-07-16 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03070",
+    "title": "Did Sanjay Raut Explain How To Produce ‘Vegetarian’ Eggs...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Did Sanjay Raut Explain How To Produce ‘Vegetarian’ Eggs.... A video of Shiv Sena MP Sanjay Raut has gone viral on Society media in which he can be heard explaining the method of producing vegetarian eggs in Parliament.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/16/fact-check-did-sanjay-raut-explain-how-to-produce-vegetarian-eggs-in-parliament/",
+    "published_date": "2022-07-16 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03071",
+    "title": "Rishi Sunak Has Not Yet Become British Prime Minister,...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Rishi Sunak Has Not Yet Become British Prime Minister,.... Days after Boris Johnson announced his resignation as British Prime Minister, Society media claims have surfaced on the internet suggesting that Rishi Sunak has become the Prime Minister of the United Kingdom.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/16/fact-check-rishi-sunak-has-not-yet-become-british-prime-minister-dont-fall-for-fake-news/",
+    "published_date": "2022-07-16 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Politics"
+  },
+  {
+    "doc_id": "CORP_BFK_03072",
+    "title": "Aldi Is NOT Giving Away Special Gift Bags, Don’t...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Aldi Is NOT Giving Away Special Gift Bags, Don’t.... A post is doing rounds on Society media according to which global superstore chain, Aldi – a German supermarket chain, is giving ‘special gift bags’ to mark its 51st anniversary",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/16/fact-check-aldi-is-not-giving-away-special-gift-bags-dont-fall-for-fake-claim/",
+    "published_date": "2022-07-16 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Politics"
+  },
+  {
+    "doc_id": "CORP_BFK_03073",
+    "title": "Video of Ice Skaters Performing on Bollywood Songs Viral...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video of Ice Skaters Performing on Bollywood Songs Viral.... A video of an ice skating performance is widely circulated online. One can see them dancing to the tunes of Radhe Krishna in the video.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/15/fact-check-video-of-ice-skaters-performing-on-bollywood-songs-viral-with-misleading-claim/",
+    "published_date": "2022-07-15 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03074",
+    "title": "Fake Statement On Gas Price Attributed To Sambit Patra...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Fake Statement On Gas Price Attributed To Sambit Patra.... A graphic is extensively circulated on Society media claiming that BJP National spokesperson Sambit Patra said only the gas price has increased, not the cylinder.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/15/fact-check-fake-statement-on-gas-price-attributed-to-sambit-patra-goes-viral/",
+    "published_date": "2022-07-15 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03075",
+    "title": "Video from Oman Falsely Shared As Mumbai’s Bandra Incident",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video from Oman Falsely Shared As Mumbai’s Bandra Incident. A video — showing people enjoying on the beach before large waves swept away some of them — is widely shared on Society media, claiming that this incident occurred in Mumbai’s Bandra as rains continue to batter various parts of Maharashtra.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/15/fact-check-video-from-oman-falsely-shared-as-mumbais-bandra-incident/",
+    "published_date": "2022-07-15 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03076",
+    "title": "Tamil Actor Vikram Did NOT Suffer Heart Attack",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Tamil Actor Vikram Did NOT Suffer Heart Attack. A picture post is doing the rounds on Society media, claiming that Tamil actor Chiyaan Vikram has been admitted to a hospital suffering from heart attack.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/15/fact-check-tamil-actor-vikram-did-not-suffer-heart-attack/",
+    "published_date": "2022-07-15 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03077",
+    "title": "The Viral Video Showing Students Reciting Azaan Is from...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): The Viral Video Showing Students Reciting Azaan Is from.... A video is viral on Society media, showing a group of students reciting Azaan during an assembly. The video is shared with a caption claiming that it is of Jharkhand where Muslims are in majority, and students are being forced to recite Azaan.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/15/fact-check-the-viral-video-showing-students-reciting-azaan-is-from-assam-not-jharkhand/",
+    "published_date": "2022-07-15 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Politics"
+  },
+  {
+    "doc_id": "CORP_BFK_03078",
+    "title": "Did India Slip To 164th Rank In The List...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Did India Slip To 164th Rank In The List.... Many Society media users are sharing a post claiming that India slipped to the 164th position among the fastest-growing nations in the world in 2021, as compared to 2011 when it was the third fastest-growing nation in the world.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/14/fact-check-did-india-slip-to-164th-rank-in-the-list-of-fastest-growing-nations-in-2021/",
+    "published_date": "2022-07-14 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03079",
+    "title": "Viral Video of Dam Releasing Water Is NOT from...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Viral Video of Dam Releasing Water Is NOT from.... A video is widely circulated on Society media, claiming that water released from a dam in India is causing floods in Bangladesh.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/13/fact-check-viral-video-of-dam-releasing-water-is-not-from-india-but-japan/",
+    "published_date": "2022-07-13 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03080",
+    "title": "Government of India Has NOT Imposed GST on School...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Government of India Has NOT Imposed GST on School.... Many Society media posts claim that Central government of India has imposed GST on schoolbooks.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/13/fact-check-government-of-india-has-not-imposed-gst-on-school-books/",
+    "published_date": "2022-07-13 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Finance"
+  },
+  {
+    "doc_id": "CORP_BFK_03081",
+    "title": "Did Punjab CM Bhagwat Mann Ask For Three-Months Leave...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Did Punjab CM Bhagwat Mann Ask For Three-Months Leave.... A screenshot of a post, purportedly by a Punjabi media outlet Daily Post Punjabi, is widely circulated on Society media. The post claims that Punjab Chief Minister Bhagwat Mann had asked for three months leave after his wedding.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/13/fact-check-did-punjab-cm-bhagwat-mann-ask-for-three-months-leave-in-the-wake-of-his-wedding/",
+    "published_date": "2022-07-13 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Politics"
+  },
+  {
+    "doc_id": "CORP_BFK_03082",
+    "title": "PM Modi Performing Yoga In Front Of Kedarnath Temple?...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): PM Modi Performing Yoga In Front Of Kedarnath Temple?.... A video of a man circumambulating the Kedarnath temple on his hands is widely shared on Society media. The Society media users claim that the man seen in the clip is Prime Minister Narendra Modi when he was 26 years old.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/13/fact-check-pm-modi-performing-yoga-in-front-of-kedarnath-temple-heres-the-truth/",
+    "published_date": "2022-07-13 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Politics"
+  },
+  {
+    "doc_id": "CORP_BFK_03083",
+    "title": "Tweet Falsely Attributed to Bond Actor Daniel Craig",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Tweet Falsely Attributed to Bond Actor Daniel Craig. A screenshot of a tweet has surfaced on the internet, attributing to James Bond actor Daniel Craig.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/13/fact-check-tweet-falsely-attributed-to-bond-actor-daniel-craig/",
+    "published_date": "2022-07-13 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03084",
+    "title": "Video Of Buffalo Being Shot Is NOT From India",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video Of Buffalo Being Shot Is NOT From India. A video of a buffalo being shot is being widely shared on Society media. The video is being shared extensively in context of Eid-ul-Adha with a caption hinting that that the incident happened in India.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/12/fact-check-video-of-buffalo-being-shot-is-not-from-india/",
+    "published_date": "2022-07-12 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03085",
+    "title": "Old Image From Bihar Viral As That Of Flooded...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Image From Bihar Viral As That Of Flooded.... An image of a flooded garment showroom is being shared on Society media with a claim that the picture is from Mumbai.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/12/fact-check-old-image-from-bihar-viral-as-that-of-flooded-showroom-in-mumbai/",
+    "published_date": "2022-07-12 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03086",
+    "title": "Smriti Irani Did NOT Make Any Objectionable Comment on...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Smriti Irani Did NOT Make Any Objectionable Comment on.... A video has been doing the rounds on Society media, claiming that Union Minister Smriti Irani called goddess Durga a ‘sex worker’.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/11/fact-check-smriti-irani-did-not-make-any-objectionable-comment-on-goddess-durga/",
+    "published_date": "2022-07-11 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03087",
+    "title": "Did An Earthquake Destroy Georgia Guidestones In US? Here’s...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Did An Earthquake Destroy Georgia Guidestones In US? Here’s.... Sharing videos and images of broken Georgia Guidestones in Elbert County of Georgia, US, people claim that an earthquake destroyed the granite monument.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/11/fact-check-did-an-earthquake-destroy-georgia-guidestones-in-us-heres-the-truth/",
+    "published_date": "2022-07-11 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03088",
+    "title": "Altered Image Shared As Portrait of Ambedkar With Wife...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Altered Image Shared As Portrait of Ambedkar With Wife.... An image is widely shared on Society media, showing the portrait of Dr BR Ambedkar and his wife Savita Ambedkar on a bus. Sharing this image, Society media users claim that Dr Ambedkar was honoured by putting a picture on the city bus in Columbia, US.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/11/fact-check-altered-image-shared-as-portrait-of-ambedkar-with-wife-on-us-buses/",
+    "published_date": "2022-07-11 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03089",
+    "title": "This Picture of Delhi CM Kejriwal Is NOT from...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): This Picture of Delhi CM Kejriwal Is NOT from.... Punjab Chief Minister Bhagwant Mann tied the knot with Dr Gurpreet Kaur in a private ceremony on July 7, 2022.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/11/fact-check-this-picture-of-delhi-cm-kejriwal-is-not-from-bhagwant-manns-wedding/",
+    "published_date": "2022-07-11 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Politics"
+  },
+  {
+    "doc_id": "CORP_BFK_03090",
+    "title": "The Viral Post Does NOT Show SC Judges Surya...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): The Viral Post Does NOT Show SC Judges Surya.... A picture is being shared on Society media with a claim that Supreme Court Judges Surya Kant and J.B. Pardiwala are having lunch with NDTV Founders Prannoy Roy, Radhika Roy and Communist Party of India leader Brinda Karat.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/08/fact-check-this-picture-does-not-show-sc-judges-surya-kant-jb-pardiwala/",
+    "published_date": "2022-07-08 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03091",
+    "title": "Staged Video Of Child Abduction Is From Egypt, NOT...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Staged Video Of Child Abduction Is From Egypt, NOT.... A video is widely shared on Society media, showing the person in burqa abducting a child in broad daylight from a busy street.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/08/fact-check-staged-video-of-child-abduction-is-from-egypt-not-india/",
+    "published_date": "2022-07-08 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03092",
+    "title": "Teesta Setalvad Did Not Spit on Cops; Here’s the...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Teesta Setalvad Did Not Spit on Cops; Here’s the.... A video is swiftly shared on Society media, showing a woman spitting at police while taken into custody. And the video claims that the woman is Teesta Setalvad — a civil rights activist and journalist.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/08/fact-check-teesta-setalvad-did-not-spit-on-cops-heres-the-truth-behind-this-video/",
+    "published_date": "2022-07-08 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03093",
+    "title": "Video of Karnataka Dam Overflowing Falsely Linked To Bangladesh...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video of Karnataka Dam Overflowing Falsely Linked To Bangladesh.... A video is being widely shared on Society media, showing the Farakka dam in West Bengal is overflowing, and resulting in extensive flooding in neighbouring Bangladesh.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/08/fact-check-video-of-karnataka-dam-overflowing-falsely-linked-to-bangladesh-floods/",
+    "published_date": "2022-07-08 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03094",
+    "title": "Video of Cops Drinking Muddy Water Shared with Misleading...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video of Cops Drinking Muddy Water Shared with Misleading.... BJP’s national executive meet was held in Telangana’s capital Hyderabad on July 2-3, 2022. Against this backdrop, a video of police personnel drinking water from mud is being widely shared on Society media, claiming that fresh water could not be provided to the staff who arrived at the national executive meet.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/08/fact-check-video-of-cops-drinking-muddy-water-shared-with-misleading-claims/",
+    "published_date": "2022-07-08 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03095",
+    "title": "Old Image From Pakistan Viral As Despicable State Of...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Image From Pakistan Viral As Despicable State Of.... An image showing some school students sitting in the mud is being widely shared on Society media, claiming that this is the situation of government schools in India.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/07/fact-check-old-image-from-pakistan-viral-as-despicable-state-of-indian-government-schools/",
+    "published_date": "2022-07-07 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03096",
+    "title": "Morphed Picture of Draupadi Murmu with RSS Chief Bhagwat...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Morphed Picture of Draupadi Murmu with RSS Chief Bhagwat.... An image has gone viral on Society media, in which the National Democratic Alliance’s (NDA) presidential candidate, Draupadi Murmu, is seen along with the Rashtriya Swayamsevak Sangh (RSS) chief, Mohan Bhagwat.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/07/fact-check-morphed-picture-of-draupadi-murmu-with-rss-chief-mohan-bhagwat-goes-viral/",
+    "published_date": "2022-07-07 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03097",
+    "title": "‘Pak Zindabad’ Slogans Were Not Raised In MP’s Katni;...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): ‘Pak Zindabad’ Slogans Were Not Raised In MP’s Katni;.... A video has surfaced on the internet showing a crowd raising slogans. It has been claimed that the people in the video were raising slogans ‘Pakistan Zindabad’ (long live Pakistan) in Katni district of Madhya Pradesh, in support of the winning sarpanch candidate.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/07/fact-check-pak-zindabad-slogans-were-not-raised-in-mps-katni-dont-fall-for-the-fake-news/",
+    "published_date": "2022-07-07 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03098",
+    "title": "This Viral Video Doesn’t Have Any Link with PM...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): This Viral Video Doesn’t Have Any Link with PM.... Prime Minister Narendra Modi addressed a massive gathering in Hyderabad after a two-day National Executive Meeting of the Bharatiya Janata Party concluded on July 3, 2022.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/06/fact-check-this-viral-video-doesnt-have-any-link-with-pm-modis-rally-in-hyderabad/",
+    "published_date": "2022-07-06 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03099",
+    "title": "Old Video of Journalist Questioning Amit Shah Resurfaces As...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video of Journalist Questioning Amit Shah Resurfaces As.... A video of a journalist has surfaced on Society media, in which he can be seen questioning Union Home Minister Amit Shah: why the Centre did not help financially when there were floods in Telangana.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/06/fact-check-old-video-of-journalist-questioning-amit-shah-resurfaces-as-recent/",
+    "published_date": "2022-07-06 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03100",
+    "title": "Did PM Modi Refer Himself As ‘Child of a...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Did PM Modi Refer Himself As ‘Child of a.... A video of Prime Minister Narendra Modi is circulating on Society media, where he can be heard saying that ‘he is the child of a Pathan’.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/06/fact-check-did-pm-modi-refer-himself-as-child-of-a-pathan-heres-the-truth/",
+    "published_date": "2022-07-06 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Politics"
+  },
+  {
+    "doc_id": "CORP_BFK_03101",
+    "title": "Staged ‘Awareness’ Video On Child Kidnapping Viral As Real...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Staged ‘Awareness’ Video On Child Kidnapping Viral As Real.... A video showing abduction of kids is being circulated on Society media, claiming that a gang is involved in kidnapping children and selling their organs.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/06/fact-check-staged-awareness-video-on-child-kidnapping-viral-as-real-incident/",
+    "published_date": "2022-07-06 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03102",
+    "title": "Picture of Spilled Cash on Chinese Hospital Floor Resurfaces...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Picture of Spilled Cash on Chinese Hospital Floor Resurfaces.... A picture is widely being shared on Society media, showing huge cash on the floor with an empty bag and people around it.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/06/fact-check-picture-of-spilled-cash-on-chinese-hospital-floor-resurfaces-with-misleading-claims/",
+    "published_date": "2022-07-06 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03103",
+    "title": "Zee News Editor-in-Chief & CEO Sudhir Chaudhary Has Resigned,...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Zee News Editor-in-Chief & CEO Sudhir Chaudhary Has Resigned,.... A post has surfaced on the internet linking Indian journalist and anchor Sudhir Chaudhary, who was recently fired from Zee News channel.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/06/fact-check-zee-media-did-not-sack-sudhir-chaudhary-he-resigned/",
+    "published_date": "2022-07-06 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03104",
+    "title": "Image of Hanuman Jayanti Celebrations Falsely Linked to Udaipur...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Image of Hanuman Jayanti Celebrations Falsely Linked to Udaipur.... An image of a crowded street is being circulated online with a claim that it shows people in Rajasthan protesting against the murder of a tailor in Udaipur.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/05/fact-check-old-image-of-hanuman-jayanti-celebrations-falsely-linked-to-udaipur-murder/",
+    "published_date": "2022-07-05 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03105",
+    "title": "Old Video of Madurai's Chithirai Festival Viral as 2022 ...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video of Madurai's Chithirai Festival Viral as 2022 .... A video of a huge crowd is being shared on Society media with a claim that it was shot during the recent Jagannath Rath Yatra in Puri.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/05/fact-check-old-video-of-madurais-chithirai-festival-viral-as-2022-jagannath-rath-yatra/",
+    "published_date": "2022-07-05 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03106",
+    "title": "Old Video Of A Councillor Taken Hostage Shared With...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video Of A Councillor Taken Hostage Shared With.... A video — showing a man tied to a chair on a flooded street — is being circulated online, with a claim that this is how people treated a Municipal Councillor who never visited the locality after being elected.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/05/fact-check-old-video-of-a-councillor-taken-hostage-shared-with-misleading-claims/",
+    "published_date": "2022-07-05 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03107",
+    "title": "Viral Landslide Video Is NOT From Maharashtra’s Rajapur",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Viral Landslide Video Is NOT From Maharashtra’s Rajapur. A video is widely being shared on Society media, claiming that it is a landslide in Rajapur, Maharashtra.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/04/fact-check-viral-landslide-video-is-not-from-maharashtras-rajapur/",
+    "published_date": "2022-07-04 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03108",
+    "title": "PM Modi Presented With Gold Necklace In UAE Recently?...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): PM Modi Presented With Gold Necklace In UAE Recently?.... Following Prime Minister Narendra Modi’s brief stopover at Abu Dhabi on his return from Munich on June 28, 2022, a video has started making the rounds on Society media with a claim that the Sultan of Arab gifted PM Modi a gold necklace of 170 tolas (1.98kgs).",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/04/fact-check-pm-modi-presented-with-gold-necklace-in-uae-recently-heres-the-truth/",
+    "published_date": "2022-07-04 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Defense"
+  },
+  {
+    "doc_id": "CORP_BFK_03109",
+    "title": "Video of Flooded Roads In Haryana’s Rohtak Falsely Shared...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video of Flooded Roads In Haryana’s Rohtak Falsely Shared.... On the first day of the monsoon this year — June 30 — Delhi got more than half the amount of rain that it typically gets during the whole month of July. The IMD predicts that Delhi will get moderate rain throughout next week.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/04/fact-check-video-of-flooded-roads-in-haryanas-rohtak-falsely-shared-as-from-delhi/",
+    "published_date": "2022-07-04 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03110",
+    "title": "Goldy Brar Was Not Thrashed In Canada; Here’s The...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Goldy Brar Was Not Thrashed In Canada; Here’s The.... Punjabi singer Sidhu Moose Wala was assassinated on May 29, 2022. After his death, Goldy Brar, a Canada-based gangster, took responsibility for killing Moose Wala.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/04/fact-check-goldy-brar-was-not-thrashed-in-canada-heres-the-truth-behind-this-video/",
+    "published_date": "2022-07-04 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03111",
+    "title": "This ‘Sinkhole-in-a-Pond’ Video Is from Brazil, NOT Assam",
+    "text": "IFCN Verified Debunk (Newsmobile.in): This ‘Sinkhole-in-a-Pond’ Video Is from Brazil, NOT Assam. A video of a sinkhole in the middle of a huge pond is being circulated online with a claim that it is from Assam.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/04/fact-check-this-sinkhole-in-a-pond-video-is-from-brazil-not-assam/",
+    "published_date": "2022-07-04 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03112",
+    "title": "Rahul Gandhi’s Comment In Wayanad Falsely Linked To Udaipur...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Rahul Gandhi’s Comment In Wayanad Falsely Linked To Udaipur.... A report by Indian news channel Zee News is being shared on Society media with a claim that Congress leader Rahul Gandhi said that the accused in the Udaipur murder case were ‘kids’.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/03/fact-check-rahul-gandhis-comment-in-wayanad-falsely-linked-to-udaipur-incident/",
+    "published_date": "2022-07-03 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03113",
+    "title": "Viral Post On SC Justice Pardiwala Is Misleading",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Viral Post On SC Justice Pardiwala Is Misleading. The Supreme Court on July 1, 2022, refused to entertain former Bharatiya Janata Party (BJP) spokesperson Nupur Sharma’s petition to club multiple FIRs against her for controversial remarks against Prophet Mohammad.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/03/fact-check-viral-post-on-sc-justice-pardiwala-is-misleading/",
+    "published_date": "2022-07-03 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03114",
+    "title": "Quote About Reservation Erroneously Attributed to BR Ambedkar",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Quote About Reservation Erroneously Attributed to BR Ambedkar. As BJP-led NDA announced Draupadi Murmu its candidate for the upcoming presidential elections, a quote attributed to Dr BR Ambedkar has started making the rounds on Society media.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/03/fact-check-quote-about-reservation-falsely-attributed-to-dr-br-ambedkar/",
+    "published_date": "2022-07-03 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03115",
+    "title": "Are Kashmiris Enjoying Free Electricity Since Independence? Here’s The...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Are Kashmiris Enjoying Free Electricity Since Independence? Here’s The.... In Jammu and Kashmir, there were protests against the installation of smart meters. In that context, many Society media users are sharing a post, claiming that Kashmiris have been using free-of-cost electricity since India’s Independence.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/03/fact-check-are-kashmiris-enjoying-free-electricity-since-independence-heres-the-truth/",
+    "published_date": "2022-07-03 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03116",
+    "title": "Viral Video Of Man Saving Two Children From Flash...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Viral Video Of Man Saving Two Children From Flash.... A video showing a man rescuing two children from drowning in a flood is being widely shared on Society media with a claim that this is how a father rescued his two children who being were washed away by flood waters.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/02/fact-check-viral-video-of-man-saving-two-children-from-flash-floods-shared-with-misleading-claim/",
+    "published_date": "2022-07-02 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03117",
+    "title": "2019 Video Of Kashmiri Woman With Rahul Gandhi Shared...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): 2019 Video Of Kashmiri Woman With Rahul Gandhi Shared.... A video of a woman narrating her ordeal to Congress leader Rahul Gandhi on board a flight is being shared on Society media with a claim that Kashmiri Pandits living abroad were questing the Congress leader as to why he opposed the Modi government in matters concerning Kashmir.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/02/fact-check-2019-video-of-kashmiri-woman-with-rahul-gandhi-shared-with-misleading-claim/",
+    "published_date": "2022-07-02 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Politics"
+  },
+  {
+    "doc_id": "CORP_BFK_03118",
+    "title": "Old Video Viral To Suggest Arnab Goswami Danced Post...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video Viral To Suggest Arnab Goswami Danced Post.... A video of journalist Arnab Goswami dancing has gone viral on Society media with a claim he was dancing after Uddhav Thackeray’s resignation from the post of Maharashtra Chief Minister.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/02/fact-check-old-video-viral-to-suggest-arnab-goswami-danced-post-uddhav-thackerays-resignation/",
+    "published_date": "2022-07-02 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03119",
+    "title": "Old Video From Odisha Falsely Shared As ‘Agnipath’ Protest...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video From Odisha Falsely Shared As ‘Agnipath’ Protest.... A video has surfaced on Society media platforms showing a group of men attacking police personnel and their vehicle. The post claims that the video is from Bihar and is linked to recent protests against the ‘Agnipath’ scheme launched by the Centre.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/01/fact-check-old-video-from-odisha-falsely-shared-as-agnipath-protest-in-bihar/",
+    "published_date": "2022-07-01 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03120",
+    "title": "Old Video Of Bihar CM Nitish Kumar’s Remark Against...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video Of Bihar CM Nitish Kumar’s Remark Against.... A video of Bihar Chief Minister Nitish Kumar is being widely shared on Society media, in which he can be heard saying that BJP is a ‘bad liar party’. A large number of Society media users claim that this is a recent video.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/01/fact-check-old-video-of-bihar-cm-nitish-kumars-remark-against-bjp-viral-as-recent/",
+    "published_date": "2022-07-01 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03121",
+    "title": "Video Of Kanyaka Parameswari Temple Decorated With Notes Viral...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video Of Kanyaka Parameswari Temple Decorated With Notes Viral.... The video of a temple, decorated with currency notes, is being shared on Society media with a claim that it’s of Tirupati Balaji Temple in Andhra Pradesh.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/07/01/fact-check-video-of-kanyaka-parameswari-temple-decorated-with-notes-viral-as-tirupati-balaji-temple/",
+    "published_date": "2022-07-01 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03122",
+    "title": "The Man On The Ground Is NOT The Afghan...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): The Man On The Ground Is NOT The Afghan.... A picture of a few people is doing the rounds on Society media, where one of them can be seen squatting on the ground. It has been claimed that the man on the ground is Sirajuddin Haqqani, Home Minister of Afghanistan, serving his people.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/29/fact-check-the-man-on-the-ground-is-not-the-afghan-home-minister-heres-the-truth/",
+    "published_date": "2022-06-29 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03123",
+    "title": "Video Of People Moving In Neck-deep Water Falsley Linked...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video Of People Moving In Neck-deep Water Falsley Linked.... The unprecedented rainfall has led to severe flooding and waterlogging in several parts of Assam, affecting over 4.5 million people. Against this backdrop, a video showing people movement in neck-deep water is being shared on Society media, linking it to the present Assam floods.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/29/fact-check-video-of-people-moving-in-neck-dip-water-falsley-linked-to-assam-floods/",
+    "published_date": "2022-06-29 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03124",
+    "title": "Video of Rahul Gandhi Falsely Linked to Protest Against...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video of Rahul Gandhi Falsely Linked to Protest Against.... A video clip of Congress leader Rahul Gandhi is being shared on Society media with a claim that the protest, which took place following the announcement of the Agnipath scheme, was planned by the Congress.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/29/fact-check-video-of-rahul-gandhi-falsely-linked-to-protest-against-agnipath-scheme/",
+    "published_date": "2022-06-29 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03125",
+    "title": "Nana Patekar Did NOT Tweet on the Maharashtra Politics...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Nana Patekar Did NOT Tweet on the Maharashtra Politics.... Amid the ongoing Politics crisis in Maharashtra, screenshot of a tweet, purportedly done by Bollywood actor Nana Patekar, has gone viral on Society media.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/29/fact-check-nana-patekar-did-not-tweet-on-the-maharashtra-Politics-crisis/",
+    "published_date": "2022-06-29 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03126",
+    "title": "No, This Image Does NOT Show Balasaheb Thackeray Giving...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): No, This Image Does NOT Show Balasaheb Thackeray Giving.... Amid the ongoing Politics crisis in Maharashtra, a picture is being shared on Society media with a claim, showing Balasaheb Thackeray giving blessings to rebel Shiv Sena leader Eknath Shinde.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/29/fact-check-no-this-image-does-not-show-balasaheb-thackeray-giving-blessings-to-eknath-shinde/",
+    "published_date": "2022-06-29 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03127",
+    "title": "Image Of 2015 Post-Glastonbury Music Fest Erroneously Linked With...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Image Of 2015 Post-Glastonbury Music Fest Erroneously Linked With.... An image of a ground — littered with what seems like plastic bottles and bags — is being shared on Society media with a claim that it is the Pyramid stage at Glastonbury after the speech of Swedish climate activist Greta Thunberg.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/29/fact-check-image-of-2015-post-glastonbury-music-fest-erroneously-linked-with-greta-thunberg/",
+    "published_date": "2022-06-29 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03128",
+    "title": "Army Personnel Saving A Little Girl; It’s An Staged...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Army Personnel Saving A Little Girl; It’s An Staged.... A video showing a man in army uniform saving a small girl from being hit by a car, and then talking to a woman (who seems to be related to the girl) is widely circulated on Society media.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/29/fact-check-army-personnel-saving-a-little-girl-its-an-staged-video/",
+    "published_date": "2022-06-29 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Defense"
+  },
+  {
+    "doc_id": "CORP_BFK_03129",
+    "title": "Viral Clip Does Not Show Tunnel on Mumbai-Goa Highway;...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Viral Clip Does Not Show Tunnel on Mumbai-Goa Highway;.... A video with people cheering and entering a tunnel is being shared on Society media with a claim that it shows a newly-opened Kashedi tunnel on the Mumbai-Goa highway.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/29/fact-check-viral-clip-does-not-show-tunnel-on-mumbai-goa-highway-its-from-kerala/",
+    "published_date": "2022-06-29 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03130",
+    "title": "Anna Hazare Did Not Call For Hunger Strike Amid...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Anna Hazare Did Not Call For Hunger Strike Amid.... Amid the ongoing Politics crisis in , a screenshot of a tweet, purportedly done by newswire Press Trust of India (PTI), is doing the rounds on Society media.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/29/fact-check-anna-hazare-did-not-call-for-hunger-strike-amid-maharashtra-Politics-crisis/",
+    "published_date": "2022-06-29 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03131",
+    "title": "Viral Video Does Not Show Protest Against AAP Government...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Viral Video Does Not Show Protest Against AAP Government.... Shiromani Akali Dal leader Simranjit Singh Mann won in the Sangrur Lok Sabha constituency by-poll. This seat was vacant as the sitting MP Bhagwant Mann resigned to become the Chief Minister of Punjab.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/29/fact-check-no-the-viral-video-does-not-show-protest-against-aap-government-in-punjab/",
+    "published_date": "2022-06-29 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03132",
+    "title": "Was Shiv Sena’s Eknath Shinde Drunk In This Video?...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Was Shiv Sena’s Eknath Shinde Drunk In This Video?.... A video of rebel Shiv Sena leader Eknath Shinde has gone viral on Society media, claiming that Shinde was drunk.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/29/fact-check-was-shiv-senas-eknath-shinde-drunk-in-this-video-heres-the-truth/",
+    "published_date": "2022-06-29 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03133",
+    "title": "Video of A Swept-away Bike Is Falsely Linked To...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video of A Swept-away Bike Is Falsely Linked To.... Bangladesh’s Sylhet has witnessed the heaviest floods in 122 years, affecting millions of people and disrupting day-to-day life. Against this backdrop, a video — showing a motorbike being washed away in an inundated street — is widely shared on Society media, linking it to the Sylhet floods.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/28/fact-check-video-of-a-swept-away-bike-is-falsely-linked-to-recent-floods-in-bangladesh/",
+    "published_date": "2022-06-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03134",
+    "title": "This Video Clip On ‘FASTag Scam’ Is NOT True",
+    "text": "IFCN Verified Debunk (Newsmobile.in): This Video Clip On ‘FASTag Scam’ Is NOT True. FASTag is an electronic toll collection system, which employs radio frequency identification Technicalnology for making toll payments directly from the prepaid or savings account linked to it or directly to the toll owner.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/28/fact-check-this-video-clip-on-fastag-scam-is-not-true/",
+    "published_date": "2022-06-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03135",
+    "title": "2017 Video Of Nirahua Campaigning For SP Viral As...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): 2017 Video Of Nirahua Campaigning For SP Viral As.... A video is being shared on Society media where Dinesh Lal Yadav ‘Nirahua’ can be seen campaigning for the Samajwadi Party. The video is being shared in context with the recent by-polls for Rampur and Azamgarh Lok Sabha seats in Uttar Pradesh. Dinesh Lal Yadav ‘Nirahua’ was BJP’s candidate for Azamgarh seat by-polls.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/28/fact-check-2017-video-of-nirahua-campaigning-for-sp-viral-as-recent/",
+    "published_date": "2022-06-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03136",
+    "title": "Old Video Of Tripura Protest Falsely Linked To ‘Agnipath’...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video Of Tripura Protest Falsely Linked To ‘Agnipath’.... A video showing a man warning authorities and later being taken away by the police is circulating on Society media. The video is being linked to the protest against ‘Agnipath’ scheme.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/28/fact-check-old-video-of-tripura-protest-falsely-linked-to-agnipath-scheme/",
+    "published_date": "2022-06-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03137",
+    "title": "News Of Demise Of Poet & Comedian Surendra Sharma...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): News Of Demise Of Poet & Comedian Surendra Sharma.... Many Society media users are claiming that famous comedian and poet Surendra Sharma has passed away.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/28/fact-check-news-of-demise-of-poet-and-comedian-surendra-sharma-goes-viral/",
+    "published_date": "2022-06-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03138",
+    "title": "Video Showing The Flyover Bikes Mishap Is From Pakistan,...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video Showing The Flyover Bikes Mishap Is From Pakistan,.... A video showing bikes causing an accident on a flyover is being shared on Society media with a claim that the clip is from Hyderabad. Some users also claim that it is from Mumbai.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/28/fact-check-video-showing-the-flyover-bikes-mishap-is-from-pakistan-not-india/",
+    "published_date": "2022-06-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03139",
+    "title": "Picture Of Girl Holding ‘Plastic Pollution Near Taj Mahal’...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Picture Of Girl Holding ‘Plastic Pollution Near Taj Mahal’.... An image of a girl holding a placard in front of Taj Mahal is widely being shared on Society media. The text on the placard reads: “Behind the beauty of Taj Mahal is plastic pollution”",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/28/fact-check-picture-of-girl-holding-plastic-pollution-near-taj-mahal-placard-shared-with-misleading-claim/",
+    "published_date": "2022-06-28 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03140",
+    "title": "Does The Video Show Scuffle Between NCP & Shiv...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Does The Video Show Scuffle Between NCP & Shiv.... Politics has taken a curious turn in Maharashtra with some Shiv Sena MLAs rebelling against Chief Minister Uddhav Thackeray and moving to the rebel camp headed by Eknath Shinde.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/27/fact-check-does-the-video-show-scuffle-between-ncp-shiv-sena-amid-the-Politics-crisis-heres-the-truth/",
+    "published_date": "2022-06-27 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03141",
+    "title": "Old Video Of PM Modi Viral With Misleading Claim",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video Of PM Modi Viral With Misleading Claim. A video of Prime Minister Narendra Modi has gone viral on socialy media. In the video he says, \"Lal Bahadur Shastri's mantra was Jai Jawan-Jai Kisan, this government's mantra is dead (English Translation, \"Lal Bhadur Shastri said jaai jawan jaai kisan, this government says, let Farmers Die, Let Soldiers Die.\") The Caption Insinuates That The Current BJP Government is worrying and soul",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/27/fact-check-old-video-of-pm-modi-viral-with-misleading-claim/",
+    "published_date": "2022-06-27 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "Tech & Health"
+  },
+  {
+    "doc_id": "CORP_BFK_03142",
+    "title": "No, The Viral Image Does NOT Show Aftermath Of...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): No, The Viral Image Does NOT Show Aftermath Of.... Afghanistan was rocked by a strong earthquake on June 22 reducing hundreds of homes to rubble. The maximum devastation occurred in the remote, mountainous area of eastern Afghanistan, killing over 1,000 people, leaving over 1,500 wounded.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/27/fact-check-no-the-viral-image-does-not-show-aftermath-of-the-recent-earthquake-in-afghanistan/",
+    "published_date": "2022-06-27 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03143",
+    "title": "Mock Drill Video Goes Viral As Terrorist Being Nabbed...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Mock Drill Video Goes Viral As Terrorist Being Nabbed.... A video has surfaced on the internet, which is shot from inside a metro train. The video shows armed personnel nabbing a man. It claims that security forces are nabbing a terrorist at a metro station in Faridabad.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/27/fact-check-mock-drill-video-goes-viral-as-terrorist-being-nabbed-at-faridabad-metro-station/",
+    "published_date": "2022-06-27 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03144",
+    "title": "Video of Crocodile On Vadodara Street Flasely Linked To...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Video of Crocodile On Vadodara Street Flasely Linked To.... Unprecedented rainfall has led to severe flooding and waterlogging in several parts of Assam, affecting over 4.5 million people. Against this backdrop, a video is being shared on Society media showing some people as controlling a crocodile on a submerged road in a residential area, and claiming that it is from Assam.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/27/fact-check-video-of-crocodile-on-vadodara-street-flasely-linked-to-assam-floods/",
+    "published_date": "2022-06-27 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03145",
+    "title": "2019 Video Goes Viral As Naga Sadhus Backing Nupur...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): 2019 Video Goes Viral As Naga Sadhus Backing Nupur.... Following the row over the controversial remarks on Prophet Mohammad by now-suspended BJP spokesperson Nupur Sharma, a video is being widely shared on Society media, claiming that Naga Sadhus taking out a rally in support of Nupur Sharma.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/27/fact-check-2019-video-goes-viral-as-naga-sadhus-backing-nupur-sharma/",
+    "published_date": "2022-06-27 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  },
+  {
+    "doc_id": "CORP_BFK_03146",
+    "title": "Old Video of Mamata Banerjee Protesting Over Fuel Prices...",
+    "text": "IFCN Verified Debunk (Newsmobile.in): Old Video of Mamata Banerjee Protesting Over Fuel Prices.... A video of West Bengal Chief Minister Mamata Banerjee driving a scooter is being widely shared on Society media. Sharing this video, users claim that the entire road was closed to teach the Bengal CM how to drive a scooter and the entire administration was helping her.",
+    "source": "Newsmobile.in",
+    "url": "https://newsmobile.in/articles/2022/06/27/fact-check-old-video-of-mamata-banerjee-protesting-over-fuel-prices-viral-with-misleading-claims/",
+    "published_date": "2022-06-27 00:00:00",
+    "truth_status": "VERIFIED_DEBUNK",
+    "category": "General"
+  }
+]

@@ -33,7 +33,14 @@ class EnsembleFusionLayer:
         breaking_result: Optional[Dict[str, Any]] = None,
         subclaim_result: Optional[Dict[str, Any]] = None,
         zero_knowledge_result: Optional[Dict[str, Any]] = None,
-        multimodal_result: Optional[Dict[str, Any]] = None
+        multimodal_result: Optional[Dict[str, Any]] = None,
+        factcheck_result: Optional[Dict[str, Any]] = None,
+        weather_result: Optional[Dict[str, Any]] = None,
+        adversarial_result: Optional[Dict[str, Any]] = None,
+        stance_result: Optional[Dict[str, Any]] = None,
+        ner_spo_result: Optional[Dict[str, Any]] = None,
+        website_prop_result: Optional[Dict[str, Any]] = None,
+        gemini_summary: Optional[str] = None
     ) -> Dict[str, Any]:
         """5-Pillar Multi-Aspect Decoupled Ensemble Fusion:
         1. Content-Based: Stylometric Intention, Sensationalism & DeBERTa LoRA (s_content)
@@ -112,6 +119,26 @@ class EnsembleFusionLayer:
         else:
             s_fact_base = raw_s_fact
 
+        # Incorporate live Google Fact Check API / RSS results into Pillar 3 Knowledge Base
+        fc_res = factcheck_result or {"status": "SKIPPED", "matches": [], "factcheck_risk": None}
+        if fc_res.get("factcheck_risk") is not None:
+            fc_risk = float(fc_res["factcheck_risk"])
+            s_fact_base = max(s_fact_base, fc_risk) if fc_risk >= 0.70 else (min(s_fact_base, fc_risk) if fc_risk <= 0.25 else (s_fact_base + fc_risk) / 2.0)
+            top_fc = fc_res["matches"][0]
+            xai_factors.append(
+                f"Live Fact-Check Verification ({top_fc.get('publisher', 'IFCN')} - {top_fc.get('rating', 'Checked')}): {top_fc.get('claim_text', '')[:115]}"
+            )
+
+        # Incorporate Open-Meteo real-time meteorological grounding
+        wx_res = weather_result or {"triggered": False}
+        if wx_res.get("triggered"):
+            if wx_res.get("weather_risk") is not None:
+                w_risk = float(wx_res["weather_risk"])
+                if w_risk >= 0.75:
+                    s_quant = max(s_quant, w_risk)
+            for w_note in wx_res.get("weather_anomalies", []):
+                xai_factors.append(f"Open-Meteo Telemetry: {w_note}")
+
         # Quantitative anomaly escalation
         if quant_res.get("has_anomaly") and quant_res.get("anomalies"):
             top_anomaly = quant_res["anomalies"][0]
@@ -120,14 +147,23 @@ class EnsembleFusionLayer:
 
         s_knowledge = round(max(s_fact_base, s_quant), 4)
 
-        # Pillar 4: Propagation-Based Virality Pressure & Coercive Hooks
+        # Pillar 4: Propagation-Based (Coercive Hooks + Real Website Diffusion Velocity dM/dt)
         prop_res = propagation_result or {
             "s_propagation": 0.10, "s_source": 0.40,
             "source_verdict": "STANDARD_BROADCAST",
             "propagation_band": "ORGANIC_EDITORIAL_FRAMING",
             "detected_propagation_cues": []
         }
-        s_propagation = float(prop_res.get("s_propagation", prop_res.get("virality_pressure_score", 0.10)))
+        w_prop_res = website_prop_result or {"website_propagation_risk_delta": 0.0, "viral_burst_alert": False}
+        s_propagation = min(
+            0.96,
+            float(prop_res.get("s_propagation", prop_res.get("virality_pressure_score", 0.10)))
+            + float(w_prop_res.get("website_propagation_risk_delta", 0.0)),
+        )
+        if w_prop_res.get("viral_burst_alert"):
+            xai_factors.append(
+                f"Platform Diffusion Alert: Rapid re-submissions/flags ({w_prop_res.get('velocity_dm_dt_per_min', 0)} events/min across Smriti Shuddhi users)."
+            )
 
         # Pillar 5: Source-Based Publisher Credibility
         s_source = float(prop_res.get("s_source", prop_res.get("source_risk", 0.40)))
@@ -211,6 +247,24 @@ class EnsembleFusionLayer:
             spec_res.get("vagueness_penalty", 0.0)
         )
 
+        # Adversarial Perturbation / Quote Lineage / Semantic Stance Checks
+        adv_res = adversarial_result or {"adversarial_risk_score": 0.0, "is_adversarial_attack": False, "attack_vectors_detected": []}
+        st_res = stance_result or {"consistency_score": 0.85, "stance_status": "ALIGNED", "divergence_risk": 0.15}
+        ns_res = ner_spo_result or {"entities": {}, "spo_triples": [], "quote_lineage": {}, "wikidata": []}
+
+        if adv_res.get("is_adversarial_attack"):
+            raw_fake_prob += 0.14
+            for vec in adv_res.get("attack_vectors_detected", []):
+                xai_factors.append(f"Adversarial ML Defense: {vec}")
+
+        if ns_res.get("quote_lineage", {}).get("unverified_quote_flag"):
+            raw_fake_prob += 0.09
+            xai_factors.append("Source Lineage Warning: Quotes/claims rely on anonymous or unattributed sources without verifiable named speakers.")
+
+        if st_res.get("stance_status") == "HEADLINE_BODY_DIVERGENCE_CLICKBAIT":
+            raw_fake_prob += 0.10
+            xai_factors.append(f"Semantic Stance Divergence: Headline diverges from body paragraph claims (alignment={st_res.get('consistency_score', 0.0)}).")
+
         # Apply Headline-Body Stance Discrepancy Penalty
         if just_res.get("hsdi", 0.0) >= 0.70:
             raw_fake_prob += 0.08
@@ -221,8 +275,11 @@ class EnsembleFusionLayer:
             xai_factors.append("Multimodal Misattribution Risk: Incongruent image detected relative to headline assertions.")
 
         # Critical Safety Overrides & Escalations
-        # If any single pillar exhibits extreme critical violation:
         if quant_res.get("has_anomaly") or (int_evid.get("has_match") and int_evid.get("top_match", {}).get("truth_status") == "VERIFIED_DEBUNK"):
+            raw_fake_prob = max(raw_fake_prob, 0.88)
+        elif fc_res.get("factcheck_risk") is not None and fc_res["factcheck_risk"] >= 0.85:
+            raw_fake_prob = max(raw_fake_prob, 0.88)
+        elif wx_res.get("weather_risk") is not None and wx_res["weather_risk"] >= 0.85:
             raw_fake_prob = max(raw_fake_prob, 0.88)
         elif zk_res.get("disposition") == "BLOCK_ZERO_DAY_PANIC_HOAX":
             raw_fake_prob = max(raw_fake_prob, 0.88)
@@ -236,8 +293,9 @@ class EnsembleFusionLayer:
             raw_fake_prob = max(raw_fake_prob, 0.85)
         elif brk_res.get("is_breaking") and brk_res.get("breaking_protocol_verdict") == "BREAKING_MULTI_SOURCE_CORROBORATED" and s_content < 0.35:
             raw_fake_prob = min(raw_fake_prob, 0.10)
-        elif source_verdict == "VERIFIED_INSTITUTIONAL_WIRE" and s_content < 0.30 and not quant_res.get("has_anomaly") and not contradictions:
-            # Verified institutional news without sensationalism or contradictions is anchored authentic
+        elif fc_res.get("factcheck_risk") is not None and fc_res["factcheck_risk"] <= 0.15 and s_content < 0.35 and not contradictions:
+            raw_fake_prob = min(raw_fake_prob, 0.16)
+        elif source_verdict == "VERIFIED_INSTITUTIONAL_WIRE" and s_content < 0.30 and not quant_res.get("has_anomaly") and not contradictions and not adv_res.get("is_adversarial_attack"):
             raw_fake_prob = min(raw_fake_prob, 0.08)
 
         fake_prob = round(float(np.clip(raw_fake_prob, 0.01, 0.99)), 4)
@@ -324,7 +382,15 @@ class EnsembleFusionLayer:
             "subclaim_analysis": sub_res,
             "zero_knowledge_analysis": zk_res,
             "multimodal_forensics": multi_res,
-            "epistemic_calibration": calibration_res
+            "epistemic_calibration": calibration_res,
+            "live_factcheck_api": fc_res,
+            "open_meteo_weather": wx_res,
+            "adversarial_defense": adv_res,
+            "headline_stance": st_res,
+            "ner_spo_lineage": ns_res,
+            "website_propagation": w_prop_res,
+            "gemini_analyst_note": gemini_summary,
+            "plain_english_summary": [f for f in xai_factors[:5]],
         }
 
         # Five-Pillar Explicit Breakdown for Explainability and UI

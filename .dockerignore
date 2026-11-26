@@ -1,0 +1,23 @@
+.venv/
+.git/
+.gitignore
+__pycache__/
+*.pyc
+*.pyo
+.env
+.env.local
+scratch/
+logs/*.log
+*.db
+data/raw/
+data/liar_plus/
+artifacts/models/*.joblib
+artifacts/sisa/*.joblib
+artifacts/evaluation/
+test_*.py
+training/
+scripts/
+node_modules/
+
+# Cloudflare Edge Worker frontend workspace
+cloudflare/

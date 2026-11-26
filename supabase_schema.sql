@@ -31,6 +31,13 @@ CREATE TABLE IF NOT EXISTS news (
     is_user_submission BOOLEAN DEFAULT FALSE,
     tag VARCHAR(32),
     tag_display VARCHAR(64),
+    url TEXT,
+    view_count INT DEFAULT 0,
+    share_count INT DEFAULT 0,
+    flag_count INT DEFAULT 0,
+    bookmark_count INT DEFAULT 0,
+    first_seen_at TIMESTAMPTZ DEFAULT NOW(),
+    last_interacted_at TIMESTAMPTZ DEFAULT NOW(),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -163,4 +170,17 @@ CREATE TABLE IF NOT EXISTS quantitative_knowledge_base (
 );
 
 CREATE INDEX IF NOT EXISTS idx_quant_kb_cat ON quantitative_knowledge_base(category);
+
+-- 10. Platform Runtime Settings (Active Unlearning Algorithm, Sync Preferences)
+CREATE TABLE IF NOT EXISTS app_settings (
+    setting_key VARCHAR(64) PRIMARY KEY,
+    setting_value TEXT NOT NULL,
+    updated_by VARCHAR(64) DEFAULT 'SYSTEM',
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+INSERT INTO app_settings (setting_key, setting_value, updated_by)
+VALUES ('active_unlearning_strategy', 'algorithm_4_hybrid', 'SYSTEM')
+ON CONFLICT (setting_key) DO NOTHING;
+
 

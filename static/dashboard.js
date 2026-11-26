@@ -16,8 +16,8 @@ const UI_TRANSLATIONS = {
     tabWire: "Front Page Wire",
     tabIngest: "Submit News & Scan",
     tabSubmissions: "My Submissions",
-    tabAdmin: "Admin Editorial & 3-Family Unlearning",
-    tabAudit: "Live WebSocket Stream",
+    tabAdmin: "Admin Research Lab & Unlearning",
+    tabAudit: "System Telemetry Stream",
     searchPlaceholder: "Search dispatches & topics...",
     sections: "Sections:",
     language: "Language:",
@@ -27,11 +27,11 @@ const UI_TRANSLATIONS = {
     catGovernance: "Governance & Policy",
     catTech: "Technology & AI",
     catWeather: "Weather & Safety",
-    anchorRole: "Lead Fact Verification Anchor",
-    anchorDialogue: `"Good day. I am Aria Vance, anchoring live from the Smriti Shuddhi Fact Verification Desk. All dispatches published here undergo rigorous <strong>Dual-Track Neural Verification</strong> (DeBERTa-v3 stylistic scrutiny + 1024-dim BGE-M3 fact cross-referencing). Should misinformation enter the system, our platform executes <strong>Exact Mathematical Unlearning</strong> across 3 structural families with 0.00% residual memorization."`,
-    anchorSubmit: "Submit Story for Fact-Check",
-    anchorSync: "Refresh Live Indian Wire Feeds",
-    anchorUnlearn: "Launch 3-Family Unlearning Workbench",
+    anchorRole: "Automated Multi-Source Newsroom",
+    anchorDialogue: `Independent headlines and citizen submissions are cross-verified in real time across trusted publisher RSS feeds, Google Fact Check records, live Open-Meteo climate telemetry, and semantic knowledge stores — with transparent plain-English explanations and full Right-to-be-Forgotten correction controls.`,
+    anchorSubmit: "Verify Headline, Text, or URL",
+    anchorSync: "Refresh Live News Feeds",
+    anchorUnlearn: "Open Admin Unlearning Lab",
     readAloud: "Read Aloud",
     stop: "Stop",
     audioReady: "Audio Dispatch Narration Ready",
@@ -68,11 +68,11 @@ const UI_TRANSLATIONS = {
     catGovernance: "शासन व नीति",
     catTech: "प्रौद्योगिकी व एआई",
     catWeather: "मौसम व सुरक्षा",
-    anchorRole: "मुख्य तथ्य सत्यापन एंकर",
-    anchorDialogue: `"नमस्ते। मैं आर्या वेंस, स्मृति शुद्धि तथ्य सत्यापन केंद्र से सीधा प्रसारण कर रही हूँ। यहाँ प्रकाशित प्रत्येक समाचार का गहन <strong>द्वि-मार्गी तंत्रिका सत्यापन</strong> (DeBERTa-v3 शैलीगत विश्लेषण + 1024-आयामी BGE-M3 तथ्य संदर्भ) किया जाता है। यदि कोई भ्रामक सूचना पाई जाती है, तो हमारा मंच 3 संरचनात्मक परिवारों के माध्यम से 0.00% अवशिष्ट स्मृति के साथ <strong>सटीक गणितीय अनलर्निंग</strong> निष्पादित करता है।"`,
-    anchorSubmit: "सत्यापन हेतु समाचार भेजें",
-    anchorSync: "भारतीय लाइव वायर रीफ़्रेश करें",
-    anchorUnlearn: "3-परिवार अनलर्निंग वर्कबेंच खोलें",
+    anchorRole: "स्वचालित बहु-स्रोत समाचार डेस्क",
+    anchorDialogue: `सभी समाचार और पाठक सबमिशन आधिकारिक समाचार वायर (The Hindu, Indian Express, Guardian, PIB), Google Fact Check अभिलेख और लाइव मौसम टेलीमेट्री के साथ रीयल-टाइम में सत्यापित किए जाते हैं।`,
+    anchorSubmit: "सत्यापन हेतु समाचार या URL भेजें",
+    anchorSync: "लाइव न्यूज़ फीड रीफ़्रेश करें",
+    anchorUnlearn: "एडमिन रिसर्च व अनलर्निंग लैब खोलें",
     readAloud: "ऑडियो सुनें",
     stop: "रोकें",
     audioReady: "ऑडियो वाचन तैयार है",
@@ -110,11 +110,11 @@ const UI_TRANSLATIONS = {
     catGovernance: "పాలన & విధానాలు",
     catTech: "టెక్నాలజీ & AI",
     catWeather: "వాతావరణం & భద్రత",
-    anchorRole: "ప్రధాన ఫాక్ట్ చెకింగ్ యాంకర్",
-    anchorDialogue: `"నమస్కారం. నేను ఆరియా వాన్స్, స్మృతి శుద్ధి ఫాక్ట్ వెరిఫికేషన్ డెస్క్ నుండి ప్రత్యక్ష ప్రసారం అందిస్తున్నాను. ఇక్కడ ప్రచురించబడే ప్రతి వార్తా కథనం <strong>డ్యూయల్-ట్రాక్ న్యూరల్ వెరిఫికేషన్</strong> (DeBERTa-v3 శైలీగత విశ్లేషణ + 1024-డైమెన్షన్ BGE-M3 వాస్తవ పరిశీలన) ద్వారా క్షుణ్ణంగా తనిఖీ చేయబడుతుంది. ఏదైనా తప్పుడు సమాచారం వ్యవస్థలోకి వస్తే, మా ప్లాట్‌ఫారమ్ 3 ఖచ్చితమైన నిర్మాణ కుటుంబాల ద్వారా 0.00% అవశేష ప్రభావంతో <strong>ఖచ్చితమైన గణిత అన్‌లెర్నింగ్‌ను</strong> అమలు చేస్తుంది."`,
-    anchorSubmit: "నిర్ధారణ కోసం వార్త పంపండి",
+    anchorRole: "ఆటోమేటెడ్ మల్టీ-సోర్స్ న్యూస్ డెస్క్",
+    anchorDialogue: `వార్తలు మరియు పాఠకుల సమర్పణలు ప్రధాన వార్తా సంస్థలు, Google Fact Check రికార్డులు మరియు లైవ్ వాతావరణ సమాచారంతో రియల్-టైమ్‌లో సరిపోల్చి నిర్ధారించబడతాయి.`,
+    anchorSubmit: "నిర్ధారణ కోసం వార్త లేదా URL పంపండి",
     anchorSync: "లైవ్ వార్తా ఫీడ్‌లను రీఫ్రెష్ చేయండి",
-    anchorUnlearn: "3-కుటుంబ అన్‌లెర్నింగ్ వర్క్‌బెంచ్ తెరవండి",
+    anchorUnlearn: "అడ్మిన్ అన్‌లెర్నింగ్ ల్యాబ్ తెరవండి",
     readAloud: "వార్త వినండి",
     stop: "ఆపండి",
     audioReady: "వాయిస్ పఠనం సిద్ధంగా ఉంది",
@@ -146,14 +146,8 @@ const state = {
   selectedCategory: 'All',
   selectedLanguage: 'All',
   allNews: [],
-  selectedTarget: {
-    sampleId: 'SYN_R_00445',
-    newsId: 'NEWS_FAKE_004',
-    title: 'VIRAL ALERT: RBI Invaliding All 500 Rupee Currency Notes Tonight',
-    text: 'Urgent WhatsApp warning: Reserve Bank of India is withdrawing all 500 currency notes from circulation midnight. Secret exposed share immediately before ban!',
-    riskBand: 'HIGH_RISK_FAKE'
-  },
-  selectedStrategy: 'algorithm_1_sisa',
+  selectedTarget: null,
+  selectedStrategy: 'algorithm_4_hybrid',
   ws: null,
   uploadedFile: null
 };
@@ -172,6 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
   loadUnlearningLedger();
   loadUserSubmissions();
   initBenchmarkTable();
+  loadLiveWeatherTicker();
+  loadLiveShardStats();
+  refreshDbExplorerTelemetry();
   // Auto-sync real-time breaking news wire on page load
   setTimeout(() => {
     syncLiveNews(true);
@@ -559,7 +556,7 @@ function updateUserUI() {
     ingestHeader.innerText = isAdmin ? 'Dual-Track Verification Verdict & XAI' : 'Verification Verdict & Editorial Receipt';
   }
   if (ingestTag) {
-    ingestTag.innerText = isAdmin ? 'DeBERTa-v3 + BGE-M3 + Neo4j' : 'Smriti Shuddhi Editorial Verification Gate';
+    ingestTag.innerText = isAdmin ? 'DeBERTa/BGE Neural + pgvector + Neo4j + Live APIs' : 'Smriti Shuddhi Editorial Verification Gate';
   }
 
   // Toggle reader modal certificates for user vs admin
@@ -839,7 +836,7 @@ function renderBreakingNewsTicker() {
       <span class="breaking-item" onclick="openFeaturedLeadArticle()">🚨 <strong>PIB FACT CHECK:</strong> Viral WhatsApp claim on currency demonetization is fake and unsubstantiated.</span>
       <span class="breaking-item">🛰️ <strong>ISRO ARCHIVE:</strong> Lunar elemental spectrometry repository released on ISSDC portal for global researchers.</span>
       <span class="breaking-item">📈 <strong>REUTERS INDIA:</strong> Indian capital markets register steady foreign institutional inflows across infrastructure.</span>
-      <span class="breaking-item">⚡ <strong>MACHINE UNLEARNING:</strong> 3 structural families active: SISA Partitioning, Decremental SVM, and Modular LoRA.</span>
+      <span class="breaking-item">⚡ <strong>MACHINE UNLEARNING:</strong> 5 strategies active: Baseline Retrain, SISA Partitioning, Decremental SVM, Modular LoRA & Unified Hybrid.</span>
     `;
     return;
   }
@@ -1072,9 +1069,28 @@ async function syncLiveNews(silent = false) {
   }
 }
 
-function openApiConfigModal() {
+async function openApiConfigModal() {
   const modal = document.getElementById('apiConfigModal');
   if (modal) modal.style.display = 'flex';
+  const badgesEl = document.getElementById('apiStatusBadges');
+  if (badgesEl) {
+    try {
+      const res = await fetch('/api/v1/news/status');
+      if (res.ok) {
+        const s = await res.json();
+        const mk = (ok, label) => `<span class="badge-pill ${ok ? 'badge-green' : 'badge-amber'}">${ok ? '✓' : '○'} ${label}</span>`;
+        badgesEl.innerHTML = [
+          mk(true, 'Official RSS & Google News'),
+          mk(s.has_guardian, 'The Guardian API'),
+          mk(s.has_thenewsapi, 'TheNewsAPI'),
+          mk(s.has_factcheck, 'Google Fact Check API'),
+          mk(s.has_gemini, 'Gemini Analyst'),
+          mk(s.has_newsapi, 'NewsAPI.org'),
+          mk(s.has_gnews, 'GNews.io')
+        ].join('');
+      }
+    } catch (_) {}
+  }
 }
 
 function closeApiConfigModal() {
@@ -1206,19 +1222,27 @@ function inspectGraphNode(nodeId, nodeType, date, status) {
 
 async function saveApiConfig(e) {
   if (e) e.preventDefault();
-  const newsApiKeyInput = document.getElementById('cfgNewsApiKey');
-  const gnewsApiKeyInput = document.getElementById('cfgGnewsApiKey');
-  const newsApiKey = newsApiKeyInput ? newsApiKeyInput.value.trim() : '';
-  const gnewsApiKey = gnewsApiKeyInput ? gnewsApiKeyInput.value.trim() : '';
-  
+  const payload = {};
+  const map = [
+    ['cfgGuardianApiKey', 'guardian_api_key'],
+    ['cfgTheNewsApiToken', 'the_news_api_token'],
+    ['cfgFactCheckApiKey', 'google_factcheck_api_key'],
+    ['cfgNewsApiKey', 'news_api_key'],
+    ['cfgGnewsApiKey', 'gnews_api_key']
+  ];
+  for (const [id, key] of map) {
+    const el = document.getElementById(id);
+    if (el && el.value.trim()) payload[key] = el.value.trim();
+  }
+
   try {
     const res = await fetch('/api/v1/news/configure-api', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ news_api_key: newsApiKey, gnews_api_key: gnewsApiKey })
+      body: JSON.stringify(payload)
     });
-    const d = await res.json();
-    showToast('🔑 API credentials saved. Ingesting live feeds...', 'success');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    showToast('🔑 API credentials updated. Syncing live feeds...', 'success');
     closeApiConfigModal();
     await syncLiveNews(false);
   } catch (err) {
@@ -1460,36 +1484,72 @@ function renderScanResult(data) {
   if (recHeadline) recHeadline.innerText = submittedHeadline;
   if (recByline) recByline.innerText = `Submitted by ${state.currentUser.name || 'Reporter'} • Just now`;
 
-  if (tag === 'REAL') {
+  if (tag === 'REAL' || tag === 'BREAKING_VERIFIED') {
     if (tagBadge) tagBadge.className = 'citizen-3tier-badge tag-real';
-    if (tagIcon) tagIcon.innerText = '✓';
-    if (tagText) tagText.innerText = 'REAL (VERIFIED AUTHENTIC)';
+    if (tagIcon) tagIcon.innerText = tag === 'BREAKING_VERIFIED' ? '⚡' : '✓';
+    if (tagText) tagText.innerText = tag === 'BREAKING_VERIFIED' ? 'BREAKING NEWS (MULTI-SOURCE CONFIRMED)' : 'REAL (VERIFIED AUTHENTIC)';
     if (confVal) {
       confVal.innerText = `${realPct}%`;
       confVal.className = 'gauge-value accent-green';
     }
-    if (expTitle) expTitle.innerText = 'Editorial Status: Auto-Published to News Wire';
+    if (expTitle) expTitle.innerText = tag === 'BREAKING_VERIFIED' ? 'Editorial Status: Breaking Wire Corroborated & Published' : 'Editorial Status: Auto-Published to News Wire';
     if (expText) expText.innerText = data.message || 'Your submitted story has successfully passed independent multi-source verification and is published immediately to the public front-page wire!';
-  } else if (tag === 'LIKELY_FAKE') {
+  } else if (tag === 'HALF_TRUTH') {
     if (tagBadge) tagBadge.className = 'citizen-3tier-badge tag-likely-fake';
     if (tagIcon) tagIcon.innerText = '⚖️';
-    if (tagText) tagText.innerText = 'LIKELY FAKE (EDITORIAL REVIEW)';
+    if (tagText) tagText.innerText = 'HALF-TRUTH (MIXED VERIFIED & UNVERIFIED)';
+    if (confVal) {
+      confVal.innerText = `${realPct}%`;
+      confVal.className = 'gauge-value accent-amber';
+    }
+    if (expTitle) expTitle.innerText = 'Editorial Status: Partial-Truth Breakdown & Review';
+    if (expText) expText.innerText = data.message || 'This submission blends verifiable facts with unsubstantiated claims. See the atomic clause verification below.';
+  } else if (tag === 'LIKELY_FAKE' || tag === 'DEVELOPING_STORY') {
+    if (tagBadge) tagBadge.className = 'citizen-3tier-badge tag-likely-fake';
+    if (tagIcon) tagIcon.innerText = tag === 'DEVELOPING_STORY' ? '⚡' : '⚖️';
+    if (tagText) tagText.innerText = tag === 'DEVELOPING_STORY' ? 'DEVELOPING STORY (AWAITING WIRE CONFIRMATION)' : 'LIKELY FAKE (EDITORIAL REVIEW)';
     if (confVal) {
       confVal.innerText = `${realPct}%`;
       confVal.className = 'gauge-value accent-amber';
     }
     if (expTitle) expTitle.innerText = 'Editorial Status: Held for Editorial Verification';
-    if (expText) expText.innerText = data.message || 'Our automated fact-checking detected potential ambiguities or unverified assertions. Routed to the Chief Fact-Checker Editorial Bureau for review.';
+    if (expText) expText.innerText = data.message || 'Our automated fact-checking detected potential ambiguities or developing assertions. Routed to the Editorial Bureau for verification.';
   } else {
     if (tagBadge) tagBadge.className = 'citizen-3tier-badge tag-fake';
     if (tagIcon) tagIcon.innerText = '🚨';
-    if (tagText) tagText.innerText = 'FAKE (BLOCKED & QUARANTINED)';
+    if (tagText) tagText.innerText = tag === 'CRITICAL_UNVERIFIED_RUMOR' ? 'CRITICAL RUMOR (ZERO WIRE CORROBORATION)' : 'FAKE (BLOCKED & QUARANTINED)';
     if (confVal) {
       confVal.innerText = `${realPct}%`;
       confVal.className = 'gauge-value accent-crimson';
     }
     if (expTitle) expTitle.innerText = 'Editorial Status: Blocked by Platform Safety Standards';
     if (expText) expText.innerHTML = `${escapeHtml(data.message || 'Our verification engine detected false or manipulative claims. This article has been quarantined and blocked from public distribution.')}<div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;"><button class="btn btn-secondary btn-xs" onclick="switchTab('submissions')">📁 View in Citizen Submissions</button><button class="btn btn-crimson btn-xs" onclick="sendToWorkbench('${data.news_id}')">⚡ Machine Unlearning Workbench</button></div>`;
+  }
+
+  const bulletsEl = document.getElementById('citizenJustificationBullets');
+  if (bulletsEl) {
+    const reasons = (data.xai && (data.xai.plain_english_summary || data.xai.primary_verdict_factors)) || [];
+    if (Array.isArray(reasons) && reasons.length > 0) {
+      bulletsEl.innerHTML = reasons.slice(0, 5).map(r => `<li>${escapeHtml(r)}</li>`).join('');
+      bulletsEl.style.display = 'block';
+    } else {
+      bulletsEl.innerHTML = '';
+      bulletsEl.style.display = 'none';
+    }
+  }
+
+  const subBox = document.getElementById('citizenSubclaimBox');
+  if (subBox) {
+    const sub = data.subclaim_analysis || (data.xai && data.xai.subclaim_analysis);
+    if (sub && sub.total_clauses_analyzed > 0) {
+      const okClauses = (sub.verified_clauses || []).map(c => `<div style="color: var(--accent-green);">✓ Verified: "${escapeHtml(c.clause)}"</div>`).join('');
+      const badClauses = (sub.contradicted_clauses || []).concat(sub.unverified_clauses || []).map(c => `<div style="color: var(--accent-crimson);">⚠️ Contested: "${escapeHtml(c.clause)}"</div>`).join('');
+      subBox.innerHTML = `<strong>🔬 Atomic Clause Check (${Math.round((sub.partial_truth_ratio || 0) * 100)}% Verified Clauses):</strong><div style="margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">${okClauses}${badClauses}</div>`;
+      subBox.style.display = 'block';
+    } else {
+      subBox.style.display = 'none';
+      subBox.innerHTML = '';
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -1551,7 +1611,7 @@ function renderScanResult(data) {
     if (action) action.innerText = 'BLOCKED & FLAGGED FOR UNLEARNING';
     if (notice) {
       notice.className = 'submission-notice notice-blocked';
-      notice.innerHTML = `🚨 <strong>Quarantine Alert:</strong> Deceptive cues or false claims detected! Article blocked from publication and routed to the 3-Family Unlearning Workbench.
+      notice.innerHTML = `🚨 <strong>Quarantine Alert:</strong> Deceptive cues or false claims detected! Article blocked from publication and routed to the Machine Unlearning Workbench.
       <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
         <button class="btn btn-crimson btn-xs" onclick="sendToWorkbench('${data.news_id}')">⚡ Machine Unlearning Workbench</button>
         <button class="btn btn-secondary btn-xs" onclick="switchTab('submissions')">📁 View Citizen Submissions</button>
@@ -1586,6 +1646,65 @@ function renderScanResult(data) {
       xaiList.innerHTML = (data.xai.primary_verdict_factors || []).map(f => `<li>${escapeHtml(f)}</li>`).join('');
     }
 
+    // Extended Part 1 Verifier Signals (Adversarial, NER/SPO, FactCheck, Stance, Diffusion, Sub-Claims, Weather, Zero-Knowledge, Gemini)
+    const extPanel = document.getElementById('extendedSignalsPanel');
+    const extGrid = document.getElementById('extendedSignalsGrid');
+    if (extPanel && extGrid) {
+      const adv = data.xai.adversarial_defense || {};
+      const ns = data.xai.ner_spo_lineage || {};
+      const fc = data.xai.live_factcheck_api || {};
+      const st = data.xai.headline_stance || {};
+      const wp = data.xai.website_propagation || {};
+      const sub = data.subclaim_analysis || data.xai.subclaim_analysis || {};
+      const zk = data.zero_knowledge_analysis || data.xai.zero_knowledge_analysis || {};
+      const wx = data.xai.open_meteo_weather || {};
+      const gem = data.xai.gemini_analyst_note || '';
+      const entObj = ns.entities || {};
+      const entCount = Object.values(entObj).reduce((acc, arr) => acc + (Array.isArray(arr) ? arr.length : 0), 0);
+      const quoteFlag = (ns.quote_lineage && ns.quote_lineage.unverified_quote_flag) ? 'Unverified Quotes' : 'Lineage OK';
+      const fcMatches = Array.isArray(fc.matches) ? fc.matches.length : 0;
+      const subLabel = sub.total_clauses_analyzed > 0
+        ? `${sub.is_half_truth ? '⚠️ Half-Truth' : '✓ Coherent'} (${Math.round((sub.partial_truth_ratio || 0) * 100)}% ok / ${sub.total_clauses_analyzed} clauses)`
+        : 'Single Assertion';
+      const wxLabel = wx.triggered ? `✓ ${wx.city || 'City'} (${wx.temp_actual_c ?? '--'}°C)` : 'No Weather Claim';
+
+      extGrid.innerHTML = `
+        <div style="background: var(--bg-surface); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+          <div style="color: var(--text-dim); font-size: 0.72rem; font-weight: 700;">ADVERSARIAL DEFENSE</div>
+          <div><strong>${adv.is_adversarial_attack ? '⚠️ Perturbation Detected' : '✓ Clean Input'}</strong> (Risk: ${Number(adv.adversarial_risk_score || 0).toFixed(2)})</div>
+        </div>
+        <div style="background: var(--bg-surface); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+          <div style="color: var(--text-dim); font-size: 0.72rem; font-weight: 700;">NER / SPO &amp; QUOTES</div>
+          <div><strong>${entCount} Entities • ${(ns.spo_triples || []).length} Triples</strong> (${escapeHtml(quoteFlag)})</div>
+        </div>
+        <div style="background: var(--bg-surface); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+          <div style="color: var(--text-dim); font-size: 0.72rem; font-weight: 700;">GOOGLE FACT CHECK API</div>
+          <div><strong>${escapeHtml(fc.status || 'CHECKED')}</strong> (${fcMatches} claim matches)</div>
+        </div>
+        <div style="background: var(--bg-surface); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+          <div style="color: var(--text-dim); font-size: 0.72rem; font-weight: 700;">HEADLINE STANCE (HSDI)</div>
+          <div><strong>${escapeHtml(st.stance_status || 'ALIGNED')}</strong> (Sim: ${Number(st.consistency_score ?? 0.85).toFixed(2)})</div>
+        </div>
+        <div style="background: var(--bg-surface); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+          <div style="color: var(--text-dim); font-size: 0.72rem; font-weight: 700;">SITE DIFFUSION (dM/dt)</div>
+          <div><strong>${wp.viral_burst_alert ? '🔥 Viral Spike' : '✓ Normal Velocity'}</strong> (${Number(wp.velocity_dm_dt_per_min || 0).toFixed(2)}/min)</div>
+        </div>
+        <div style="background: var(--bg-surface); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+          <div style="color: var(--text-dim); font-size: 0.72rem; font-weight: 700;">SUB-CLAIM PARTIAL TRUTH</div>
+          <div><strong>${subLabel}</strong></div>
+        </div>
+        <div style="background: var(--bg-surface); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+          <div style="color: var(--text-dim); font-size: 0.72rem; font-weight: 700;">ZERO-KNOWLEDGE &amp; WEATHER</div>
+          <div><strong>${escapeHtml(zk.disposition || 'STANDARD')}</strong> • ${escapeHtml(wxLabel)}</div>
+        </div>
+        ${gem ? `<div style="grid-column: 1 / -1; background: rgba(139, 92, 246, 0.08); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(139, 92, 246, 0.3);">
+          <div style="color: var(--accent-purple); font-size: 0.72rem; font-weight: 700;">✨ GEMINI BORDERLINE ANALYST NOTE</div>
+          <div>${escapeHtml(gem)}</div>
+        </div>` : ''}
+      `;
+      extPanel.style.display = 'block';
+    }
+
     // Token-Level Deceptive Rhetoric Heatmap
     const heatmapPanel = document.getElementById('heatmapPanel');
     const heatmapContainer = document.getElementById('heatmapTextContainer');
@@ -1617,7 +1736,7 @@ function renderScanResult(data) {
   } else if (tag === 'LIKELY_FAKE') {
     showToast('⚖️ Article routed to Admin Editorial Queue for review.', 'info');
   } else {
-    showToast('🚨 Quarantined Fake News! Added to 3-Family Unlearning Workbench.', 'alert');
+    showToast('🚨 Quarantined Fake News! Added to Machine Unlearning Workbench.', 'alert');
   }
 }
 
@@ -1769,7 +1888,11 @@ async function loadAdminQueue() {
       if (pending.length === 0) {
         pendingContainer.innerHTML = `<div style="text-align: center; padding: 24px; color: var(--text-dim);">No articles pending editorial review.</div>`;
       } else {
+        if (!state.adminBlockedMap) state.adminBlockedMap = {};
         pending.forEach(item => { state.adminBlockedMap[item.news_id] = item; });
+        if ((!state.selectedTarget || !state.selectedTarget.newsId) && blocked.length === 0) {
+          selectTargetArticleById(pending[0].news_id);
+        }
         pendingContainer.innerHTML = pending.map(item => `
           <div class="queue-item-card ${state.selectedTarget && state.selectedTarget.newsId === item.news_id ? 'selected' : ''}" id="queueCard_${item.news_id}" onclick="selectTargetArticleById('${item.news_id}')">
             <div class="queue-item-meta">
@@ -1913,7 +2036,59 @@ async function sendToWorkbench(newsId) {
 }
 
 function executeRecommendedUnlearning() {
-  executeSelectedUnlearning('algorithm_2_svm');
+  const sel = document.getElementById('adminActiveStrategySelect');
+  const activeStrat = (sel && sel.value) || 'algorithm_4_hybrid';
+  executeSelectedUnlearning(activeStrat);
+}
+
+async function saveActiveUnlearningStrategy() {
+  const sel = document.getElementById('adminActiveStrategySelect');
+  const strategy = sel ? sel.value : 'algorithm_4_hybrid';
+  try {
+    const res = await fetch('/api/v1/admin/unlearning-strategy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ strategy })
+    });
+    if (res.ok) {
+      showToast(`Saved active unlearning protocol: ${strategy}`, 'success');
+      await initBenchmarkTable();
+    }
+  } catch (e) {
+    showToast(`Failed to save strategy: ${e.message}`, 'error');
+  }
+}
+
+async function executeBatchUnlearning() {
+  const blocked = state.adminBlockedList || [];
+  if (blocked.length === 0) {
+    showToast('No flagged fake articles in queue for batch unlearning.', 'info');
+    return;
+  }
+  const batch = blocked.slice(0, 3);
+  const sampleIds = batch.map(b => b.sample_id || b.news_id);
+  const newsIds = batch.map(b => b.news_id);
+  const sel = document.getElementById('adminActiveStrategySelect');
+  const strategy = (sel && sel.value) || 'algorithm_4_hybrid';
+
+  runPurgeStepperAnimation();
+  logTerminal('BATCH_UNLEARN', `Executing batch unlearning across ${sampleIds.length} articles via [${strategy}]...`);
+  try {
+    const res = await fetch('/api/v1/admin/unlearn-batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sample_ids: sampleIds, news_ids: newsIds, strategy })
+    });
+    const data = await res.json();
+    renderBenchmarkTable(data.benchmark);
+    await loadAdminQueue();
+    await loadUnlearningLedger();
+    await loadPublishedNews();
+    await loadLiveShardStats();
+    showToast(`Batch unlearned ${data.batch_count} articles (${data.proof_hash ? data.proof_hash.slice(0, 12) : 'sealed'}).`, 'success');
+  } catch (e) {
+    showToast(`Batch unlearning failed: ${e.message}`, 'error');
+  }
 }
 
 // 4-Way Exact Machine Unlearning Execution & Comparative Evaluation
@@ -1926,15 +2101,12 @@ async function executeSelectedUnlearning(strategy) {
     if (state.adminBlockedList && state.adminBlockedList.length > 0) {
       await selectTargetArticleById(state.adminBlockedList[0].news_id);
       target = state.selectedTarget;
+    } else if (state.adminPendingList && state.adminPendingList.length > 0) {
+      await selectTargetArticleById(state.adminPendingList[0].news_id);
+      target = state.selectedTarget;
     } else {
-      target = {
-        sampleId: 'SYN_R_00445',
-        newsId: 'NEWS_DEFAULT',
-        title: 'VIRAL ALERT: RBI Invaliding All 500 Rupee Currency Notes Tonight',
-        text: 'Urgent WhatsApp warning: Reserve Bank of India is withdrawing all 500 currency notes from circulation midnight. Secret exposed share immediately before ban!',
-        riskBand: 'HIGH_RISK_FAKE'
-      };
-      state.selectedTarget = target;
+      showToast('Select or submit a story from the Editorial Queues first.', 'warning');
+      return;
     }
   }
 
@@ -1988,11 +2160,13 @@ async function executeSelectedUnlearning(strategy) {
       'baseline_retrain': 'Baseline Full Retraining',
       'algorithm_1_sisa': 'Algorithm 1: SISA Sharding',
       'algorithm_2_svm': 'Algorithm 2: Decremental Closed-Form SVM',
-      'algorithm_3_lora': 'Algorithm 3: Modular LoRA / S3T',
-      'all_benchmark': 'All 4 Structural Families Concurrent Benchmark'
+      'algorithm_3_lora': 'Algorithm 3: Modular LoRA Slice Deactivation',
+      'algorithm_4_hybrid': 'Algorithm 4: Unified Hybrid Engine',
+      'all_benchmark': 'All 5 Unlearning Strategies Concurrent Benchmark'
     };
     const stratName = stratNames[strategy] || strategy;
-    showToast(`⚡ Exact Machine Unlearning executed via ${stratName}. Zero residual influence confirmed!`, 'success');
+    await loadLiveShardStats();
+    showToast(`Executed ${stratName}. Updated shard & ledger telemetry!`, 'success');
   } catch (err) {
     console.error('Unlearn error:', err);
     showToast(`Unlearning request error: ${err.message}`, 'error');
@@ -2003,26 +2177,30 @@ function renderBenchmarkTable(benchmarkData) {
   const tbody = document.getElementById('benchmarkTableBody');
   if (!tbody || !benchmarkData || !benchmarkData.results) return;
 
-  // Update recommendation banner if present
+  const batchBadge = document.getElementById('benchmarkBatchBadge');
+  if (batchBadge) {
+    const bCnt = benchmarkData.batch_count || 1;
+    batchBadge.innerText = `${bCnt} Article(s) • Active: ${benchmarkData.executed_strategy || 'algorithm_4_hybrid'}`;
+  }
+
   if (benchmarkData.recommended_algorithm) {
     const titleEl = document.getElementById('recModelTitle');
     const descEl = document.getElementById('recModelDesc');
+    const sel = document.getElementById('adminActiveStrategySelect');
+    if (sel && benchmarkData.recommended_algorithm && sel.value !== benchmarkData.recommended_algorithm) {
+      sel.value = benchmarkData.recommended_algorithm;
+    }
     if (titleEl) {
-      if (benchmarkData.executed_strategy && benchmarkData.executed_strategy !== 'all_benchmark') {
-        const stratLabels = {
-          'baseline_retrain': 'Executed: Full Retraining (Reference Baseline)',
-          'algorithm_1_sisa': 'Executed: Algorithm 1 - SISA Sharding',
-          'algorithm_2_svm': 'Executed: Algorithm 2 - Decremental Closed-Form SVM (⭐ RECOMMENDED)',
-          'algorithm_3_lora': 'Executed: Algorithm 3 - Modular LoRA / S3T Deactivation'
-        };
-        titleEl.innerText = stratLabels[benchmarkData.executed_strategy] || `Executed: ${benchmarkData.executed_strategy}`;
-      } else if (benchmarkData.recommended_algorithm === 'algorithm_2_svm') {
-        titleEl.innerText = 'Algorithm 2: Decremental Closed-Form SVM (O(1) Algebraic)';
-      } else if (benchmarkData.recommended_algorithm === 'algorithm_3_lora') {
-        titleEl.innerText = 'Algorithm 3: Modular LoRA / S3T Deactivation (O(1) Pointer Drop)';
-      } else {
-        titleEl.innerText = 'Algorithm 1: SISA Sharding (Data-Partitioning)';
-      }
+      const stratLabels = {
+        'baseline_retrain': 'Baseline: Full Retraining from Scratch',
+        'algorithm_1_sisa': 'Algorithm 1: SISA Sharded Data Partitioning',
+        'algorithm_2_svm': 'Algorithm 2: Decremental Closed-Form SVM',
+        'algorithm_3_lora': 'Algorithm 3: Modular LoRA Domain Deactivation',
+        'algorithm_4_hybrid': 'Algorithm 4: Unified Hybrid Engine (Active Protocol)'
+      };
+      const key = (benchmarkData.executed_strategy && benchmarkData.executed_strategy !== 'all_benchmark')
+        ? benchmarkData.executed_strategy : benchmarkData.recommended_algorithm;
+      titleEl.innerText = stratLabels[key] || key;
     }
     if (descEl && benchmarkData.recommendation_summary) {
       descEl.innerText = benchmarkData.recommendation_summary;
@@ -2030,41 +2208,34 @@ function renderBenchmarkTable(benchmarkData) {
   }
 
   tbody.innerHTML = benchmarkData.results.map(row => {
-    const isRec = row.is_recommended || row.algorithm_id === 'algorithm_2_svm';
+    const isRec = row.is_recommended || row.algorithm_id === benchmarkData.recommended_algorithm;
     const isExec = Boolean(row.is_executed);
-    const precB = row.precision_before !== undefined ? (row.precision_before * 100).toFixed(1) + '%' : '98.5%';
-    const precA = row.precision_after !== undefined ? (row.precision_after * 100).toFixed(1) + '%' : '98.5%';
-    const recB = row.recall_before !== undefined ? (row.recall_before * 100).toFixed(1) + '%' : '98.8%';
-    const recA = row.recall_after !== undefined ? (row.recall_after * 100).toFixed(1) + '%' : '98.8%';
-    const f1B = row.f1_before !== undefined ? (row.f1_before * 100).toFixed(1) + '%' : '98.6%';
-    const f1A = row.f1_after !== undefined ? (row.f1_after * 100).toFixed(1) + '%' : '98.6%';
-    const accB = row.retain_accuracy_before !== undefined ? (row.retain_accuracy_before * 100).toFixed(1) + '%' : '100%';
-    const accA = row.retain_accuracy_after !== undefined ? (row.retain_accuracy_after * 100).toFixed(1) + '%' : '100%';
+    const accB = row.retain_accuracy_before !== undefined ? (row.retain_accuracy_before * 100).toFixed(1) + '%' : '--';
+    const accA = row.retain_accuracy_after !== undefined ? (row.retain_accuracy_after * 100).toFixed(1) + '%' : '--';
+    const precB = row.precision_before !== undefined ? (row.precision_before * 100).toFixed(1) + '%' : '--';
+    const precA = row.precision_after !== undefined ? (row.precision_after * 100).toFixed(1) + '%' : '--';
+    const recB = row.recall_before !== undefined ? (row.recall_before * 100).toFixed(1) + '%' : '--';
+    const recA = row.recall_after !== undefined ? (row.recall_after * 100).toFixed(1) + '%' : '--';
+    const f1B = row.f1_before !== undefined ? (row.f1_before * 100).toFixed(1) + '%' : '--';
+    const f1A = row.f1_after !== undefined ? (row.f1_after * 100).toFixed(1) + '%' : '--';
+    const miaVal = row.mia_auc !== undefined ? Number(row.mia_auc).toFixed(3) : '0.500';
+    const l2Val = row.weight_l2_parity !== undefined ? Number(row.weight_l2_parity).toExponential(1) : '0.0';
 
     let badges = '';
-    if (isExec) {
-      badges += '<span class="badge-pill badge-green" style="font-weight: 800; margin-left: 6px;">⚡ ACTIVE / EXECUTED</span>';
-    }
-    if (isRec) {
-      badges += '<span class="rec-star-badge" style="margin-left: 6px;">⭐ BEST MODEL</span>';
-    }
+    if (isExec) badges += '<span class="badge-pill badge-green" style="font-weight: 800; margin-left: 6px;">ACTIVE</span>';
+    if (isRec) badges += '<span class="rec-star-badge" style="margin-left: 6px;">RECOMMENDED</span>';
 
     return `
       <tr class="${isRec ? 'row-recommended' : ''} ${isExec ? 'row-executed' : ''}">
-        <td>
-          <div class="algo-name-cell">
-            <strong>${escapeHtml(row.algorithm_name)}</strong>
-            ${badges}
-          </div>
-        </td>
-        <td><span class="algo-family-tag tag-cyan">${escapeHtml(row.structural_family)}</span></td>
+        <td><div class="algo-name-cell"><strong>${escapeHtml(row.algorithm_name)}</strong>${badges}</div></td>
         <td><strong class="accent-cyan">${row.execution_time_ms} ms</strong></td>
         <td><span class="badge-pill badge-green">${row.speedup_vs_retrain}</span></td>
         <td><span class="metric-pair"><span class="m-before">${accB}</span> → <strong class="m-after accent-green">${accA}</strong></span></td>
         <td><span class="metric-pair"><span class="m-before">${precB}</span> → <strong class="m-after">${precA}</strong></span></td>
         <td><span class="metric-pair"><span class="m-before">${recB}</span> → <strong class="m-after">${recA}</strong></span></td>
         <td><span class="metric-pair"><span class="m-before">${f1B}</span> → <strong class="m-after">${f1A}</strong></span></td>
-        <td><strong class="accent-green">${row.forget_influence_remaining_pct.toFixed(2)}%</strong></td>
+        <td><code>${miaVal}</code></td>
+        <td><code>${l2Val}</code></td>
         <td>${row.parameters_modified_pct}%</td>
       </tr>
     `;
@@ -2081,11 +2252,11 @@ function runPurgeStepperAnimation() {
 
   const steps = [
     { num: 1, title: 'Routing Shard', desc: 'Identified target partition D_k', duration: 120 },
-    { num: 2, title: 'Database Purge', desc: 'Deleted sample from local & Mongo store', duration: 160 },
-    { num: 3, title: 'Weight Artifact Eviction', desc: 'Executed rm -rf ./sisa_adapters/shard_k/', duration: 240 },
-    { num: 4, title: 'Redis Cache Purge', desc: 'Evicted SHA-256 signatures & keys', duration: 140 },
-    { num: 5, title: 'Core Micro-Retraining', desc: 'Recalibrated sub-weights (W₀ frozen)', duration: 300 },
-    { num: 6, title: 'Evaluation Verification', desc: 'Confirmed 0.00% influence & 100% retain utility', duration: 180 }
+    { num: 2, title: 'Database Purge', desc: 'Deleted sample from shard CSV & Supabase PostgreSQL', duration: 160 },
+    { num: 3, title: 'Weight Artifact Eviction', desc: 'Purged shard weights & deactivated LoRA slice', duration: 240 },
+    { num: 4, title: 'Cache & Vector Purge', desc: 'Evicted Redis keys, Qdrant & pgvector anchors', duration: 140 },
+    { num: 5, title: 'Core Micro-Retraining', desc: 'Retrained affected shard & downdated H^-1', duration: 300 },
+    { num: 6, title: 'Evaluation Verification', desc: 'Verified MIA ROC-AUC, L2 parity & retain F1', duration: 180 }
   ];
 
   let current = 0;
@@ -2120,18 +2291,19 @@ async function loadUnlearningLedger() {
 
     const ledger = data.ledger || [];
     if (ledger.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-dim); padding: 14px;">No unlearning records yet. Run an algorithm above to populate.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-dim); padding: 14px;">No unlearning records yet. Run an algorithm above to populate.</td></tr>`;
       return;
     }
 
     tbody.innerHTML = ledger.slice(-10).reverse().map(item => `
       <tr>
-        <td><code>${(item.created_at || '').slice(11, 19)} UTC</code></td>
-        <td><strong>${item.sample_id}</strong></td>
-        <td>${escapeHtml((item.title || 'Target News').slice(0, 40))}...</td>
+        <td><code>${(item.created_at || item.timestamp || '').slice(11, 19)} UTC</code></td>
+        <td><strong>${escapeHtml(item.sample_id)}</strong></td>
+        <td>${escapeHtml((item.title || 'Target News').slice(0, 38))}...</td>
         <td><span class="badge-pill badge-cyan">${escapeHtml(item.strategy || 'Unlearn')}</span></td>
-        <td><strong class="accent-green">0.00% (Zero)</strong></td>
-        <td><span class="badge-pill badge-green">PURGED</span></td>
+        <td><strong class="accent-green">${Number(item.residual_influence_pct ?? 0).toFixed(4)}%</strong></td>
+        <td><code title="${escapeAttr(item.proof_hash || '')}">${item.proof_hash ? escapeHtml(item.proof_hash.slice(0, 12) + '...') : '—'}</code></td>
+        <td><span class="badge-pill badge-green">${escapeHtml(item.status || 'PURGED')}</span></td>
       </tr>
     `).join('');
     initScrollPaperTurns();
@@ -2152,6 +2324,7 @@ async function openArticleModal(newsId) {
     if (!article) return;
 
     state.currentModalArticle = article;
+    recordEngagement(newsId, 'view');
 
     document.getElementById('modalTitle').innerText = article.title;
     document.getElementById('modalCategory').innerText = article.category || 'General';
@@ -2319,6 +2492,29 @@ async function openArticleModal(newsId) {
               <span style="opacity:0.7;">Image Match:</span> <strong style="color:#38bdf8;">${((multi.image_headline_congruence_score || 0.9) * 100).toFixed(0)}%</strong>
             </div>` : ''}
           </div>
+        </div>`;
+      }
+
+      // Part 1 Extended External & Neural Signals (NER/SPO, FactCheck API, Adversarial, Breaking, Weather, Gemini)
+      const adv = xai.adversarial_defense || {};
+      const ns = xai.ner_spo_lineage || {};
+      const fc = xai.live_factcheck_api || {};
+      const brk = article.breaking_protocol || xai.breaking_news_protocol || {};
+      const wx = xai.open_meteo_weather || {};
+      const gemNote = xai.gemini_analyst_note || '';
+      const nsEnts = ns.entities || {};
+      const nsCount = Object.values(nsEnts).reduce((a, arr) => a + (Array.isArray(arr) ? arr.length : 0), 0);
+      if (nsCount > 0 || (fc.status && fc.status !== 'FAST_WIRE_SKIPPED') || adv.is_adversarial_attack || brk.is_breaking || wx.triggered || gemNote) {
+        breakdownHtml += `<div style="margin-top:10px; border-top:1px dashed var(--border-subtle); padding-top:8px; font-size:0.76rem;">
+          <div style="font-weight:700; color:var(--text-headline); margin-bottom:4px;">🛡️ Extended Entity, FactCheck &amp; Wire Signals:</div>
+          <div>
+            Entities: <strong>${nsCount}</strong> (${(ns.spo_triples || []).length} SPO triples) •
+            FactCheck API: <strong>${escapeHtml(fc.status || 'CHECKED')}</strong> •
+            Adversarial Guard: <strong>${adv.is_adversarial_attack ? '⚠️ Perturbation Flagged' : '✓ Clean'}</strong>
+            ${brk.is_breaking ? ` • Breaking Wire: <strong>${escapeHtml(brk.breaking_protocol_verdict || 'ACTIVE')}</strong>` : ''}
+            ${wx.triggered ? ` • Weather (${escapeHtml(wx.city || '')}): <strong>${wx.temp_actual_c ?? '--'}°C</strong>` : ''}
+          </div>
+          ${gemNote ? `<div style="margin-top:4px; color:var(--accent-purple);">✨ Gemini Analyst: ${escapeHtml(gemNote)}</div>` : ''}
         </div>`;
       }
 
@@ -2687,6 +2883,10 @@ async function directPurgeCurrentModalArticle() {
 // WEBSOCKET DISTRIBUTED STREAM
 // ==========================================================================
 function initWebSocket() {
+  if (state.wsPingTimer) {
+    clearInterval(state.wsPingTimer);
+    state.wsPingTimer = null;
+  }
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const wsUrl = `${protocol}//${window.location.host}/ws`;
 
@@ -2694,20 +2894,31 @@ function initWebSocket() {
 
   state.ws.onopen = () => {
     logTerminal('WS_CONNECTED', 'Real-time WebSocket event bridge established with server.');
+    // Keepalive ping every 25s to prevent Cloudflare 100s proxy idle disconnect
+    state.wsPingTimer = setInterval(() => {
+      if (state.ws && state.ws.readyState === WebSocket.OPEN) {
+        try { state.ws.send('ping'); } catch (_) {}
+      }
+    }, 25000);
   };
 
   state.ws.onmessage = (event) => {
+    if (event.data === 'pong') return;
     try {
       const data = JSON.parse(event.data);
       handleWebSocketMessage(data);
     } catch (e) {
-      // Keepalive pong
+      // Ignore non-JSON frames
     }
   };
 
   state.ws.onclose = () => {
-    logTerminal('WS_CLOSED', 'Bridge closed. Reconnecting in 3 seconds...');
-    setTimeout(initWebSocket, 3000);
+    if (state.wsPingTimer) {
+      clearInterval(state.wsPingTimer);
+      state.wsPingTimer = null;
+    }
+    logTerminal('WS_CLOSED', 'Bridge closed. Reconnecting in 4 seconds...');
+    setTimeout(initWebSocket, 4000);
   };
 }
 
@@ -2773,26 +2984,29 @@ async function initBenchmarkTable() {
     console.warn('Could not load live benchmark on init:', e);
   }
 
-  // Fallback calibrated rows if fetch fails
+  // Fallback offline schema (used only if backend benchmark endpoint is unreachable)
   const fallback = {
-    recommended_algorithm: 'algorithm_2_svm',
-    recommendation_summary: 'Decremental Closed-Form SVM achieves mathematically instantaneous O(1) unlearning via Sherman-Morrison inverse Hessian downdate (0.27ms, >1,800x speedup, 0.0000% residual influence, 100% retain utility).',
+    executed_strategy: 'algorithm_4_hybrid',
+    recommended_algorithm: 'algorithm_4_hybrid',
+    recommendation_summary: 'Unified Hybrid Engine purges raw SISA partition CSVs, retrains the affected Rank-8 DeBERTa LoRA adapter, downdates SVM inverse Hessian H^-1, deactivates modular LoRA slice, evicts Redis/Qdrant/pgvector, and seals a chained SHA-256 ledger proof.',
     results: [
       {
         algorithm_id: 'baseline_retrain',
         algorithm_name: 'Full Retraining from Scratch (Reference Baseline)',
         structural_family: 'Complete Optimization Re-computation',
-        execution_time_ms: 450.0,
+        execution_time_ms: 820.0,
         speedup_vs_retrain: '1.0x (Baseline)',
-        retain_accuracy_before: 1.0,
-        retain_accuracy_after: 1.0,
-        precision_before: 0.985,
-        precision_after: 0.985,
-        recall_before: 0.988,
-        recall_after: 0.988,
-        f1_before: 0.986,
-        f1_after: 0.986,
+        retain_accuracy_before: 0.72,
+        retain_accuracy_after: 0.72,
+        precision_before: 0.72,
+        precision_after: 0.72,
+        recall_before: 0.72,
+        recall_after: 0.72,
+        f1_before: 0.72,
+        f1_after: 0.72,
         forget_influence_remaining_pct: 0.0,
+        weight_l2_parity: 0.0,
+        mia_auc: 0.50,
         parameters_modified_pct: 100.0,
         is_recommended: false
       },
@@ -2800,17 +3014,19 @@ async function initBenchmarkTable() {
         algorithm_id: 'algorithm_1_sisa',
         algorithm_name: 'Algorithm 1: SISA Sharded Data Partitioning',
         structural_family: 'Data-Partitioning Frameworks',
-        execution_time_ms: 12.5,
-        speedup_vs_retrain: '36.0x Faster',
-        retain_accuracy_before: 1.0,
-        retain_accuracy_after: 1.0,
-        precision_before: 0.985,
-        precision_after: 0.985,
-        recall_before: 0.988,
-        recall_after: 0.988,
-        f1_before: 0.986,
-        f1_after: 0.986,
+        execution_time_ms: 2100.0,
+        speedup_vs_retrain: 'K=5 Isolate',
+        retain_accuracy_before: 0.74,
+        retain_accuracy_after: 0.74,
+        precision_before: 0.74,
+        precision_after: 0.74,
+        recall_before: 0.74,
+        recall_after: 0.74,
+        f1_before: 0.74,
+        f1_after: 0.74,
         forget_influence_remaining_pct: 0.0,
+        weight_l2_parity: 0.0,
+        mia_auc: 0.50,
         parameters_modified_pct: 20.0,
         is_recommended: false
       },
@@ -2818,37 +3034,61 @@ async function initBenchmarkTable() {
         algorithm_id: 'algorithm_2_svm',
         algorithm_name: 'Algorithm 2: Decremental Closed-Form SVM',
         structural_family: 'Algebraic & Deterministic Closed-Form Updates',
-        execution_time_ms: 0.27,
-        speedup_vs_retrain: '1,667x Faster',
-        retain_accuracy_before: 1.0,
-        retain_accuracy_after: 1.0,
-        precision_before: 0.990,
-        precision_after: 0.990,
-        recall_before: 0.992,
-        recall_after: 0.992,
-        f1_before: 0.991,
-        f1_after: 0.991,
-        forget_influence_remaining_pct: 0.0,
+        execution_time_ms: 4.5,
+        speedup_vs_retrain: '>150x Faster',
+        retain_accuracy_before: 0.78,
+        retain_accuracy_after: 0.78,
+        precision_before: 0.78,
+        precision_after: 0.78,
+        recall_before: 0.78,
+        recall_after: 0.78,
+        f1_before: 0.78,
+        f1_after: 0.78,
+        forget_influence_remaining_pct: 0.0001,
+        weight_l2_parity: 1e-8,
+        mia_auc: 0.50,
         parameters_modified_pct: 1.5,
-        is_recommended: true
+        is_recommended: false
       },
       {
         algorithm_id: 'algorithm_3_lora',
-        algorithm_name: 'Algorithm 3: Modular LoRA / S3T Structural Deactivation',
+        algorithm_name: 'Algorithm 3: Modular LoRA Sub-Slice Deactivation',
         structural_family: 'Modular & Parameter-Efficient Deactivation',
-        execution_time_ms: 0.08,
-        speedup_vs_retrain: '5,625x Faster',
-        retain_accuracy_before: 0.985,
-        retain_accuracy_after: 0.985,
-        precision_before: 0.982,
-        precision_after: 0.982,
-        recall_before: 0.988,
-        recall_after: 0.988,
-        f1_before: 0.985,
-        f1_after: 0.985,
+        execution_time_ms: 1.8,
+        speedup_vs_retrain: 'Instant Mask',
+        retain_accuracy_before: 0.73,
+        retain_accuracy_after: 0.73,
+        precision_before: 0.73,
+        precision_after: 0.73,
+        recall_before: 0.73,
+        recall_after: 0.73,
+        f1_before: 0.73,
+        f1_after: 0.73,
         forget_influence_remaining_pct: 0.0,
-        parameters_modified_pct: 0.05,
+        weight_l2_parity: 0.0,
+        mia_auc: 0.50,
+        parameters_modified_pct: 4.17,
         is_recommended: false
+      },
+      {
+        algorithm_id: 'algorithm_4_hybrid',
+        algorithm_name: 'Algorithm 4: Smriti Shuddhi Unified Hybrid Engine',
+        structural_family: 'Hybrid (SISA LoRA + Decremental SVM + Vector Purge)',
+        execution_time_ms: 2150.0,
+        speedup_vs_retrain: '>10x Full Purge',
+        retain_accuracy_before: 0.76,
+        retain_accuracy_after: 0.76,
+        precision_before: 0.76,
+        precision_after: 0.76,
+        recall_before: 0.76,
+        recall_after: 0.76,
+        f1_before: 0.76,
+        f1_after: 0.76,
+        forget_influence_remaining_pct: 0.0001,
+        weight_l2_parity: 1e-8,
+        mia_auc: 0.50,
+        parameters_modified_pct: 20.0,
+        is_recommended: true
       }
     ]
   };
@@ -3009,12 +3249,118 @@ async function probeModelMemory() {
     document.getElementById('probeInfluence').innerText = `${Number(data.residual_influence_score || 0).toFixed(4)}%`;
     document.getElementById('probeMargin').innerText = Number(data.svm_margin || 0).toFixed(4);
     document.getElementById('probePrediction').innerText = data.empirical_prediction || 'OUT_OF_DISTRIBUTION_UNSEEN';
-    document.getElementById('probeDetail').innerText = data.status_detail || data.mathematical_guarantee || 'Verified: 0.00% presence in parameters.';
+    document.getElementById('probeDetail').innerText = data.status_detail || data.mathematical_guarantee || 'Probe complete.';
 
-    showToast('🔬 Model probe completed: 0.0000% residual influence confirmed.', 'info');
+    showToast(`Probe: ${data.memorization_status} (Influence ${Number(data.residual_influence_score || 0).toFixed(2)}%)`, 'info');
   } catch (err) {
     console.error('Probe error:', err);
   }
+}
+
+async function recordEngagement(newsId, action) {
+  if (!newsId) return;
+  try {
+    await fetch(`/api/v1/news/${newsId}/engage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action })
+    });
+  } catch (e) {}
+}
+
+async function shareCurrentModalArticle() {
+  const art = state.currentModalArticle;
+  if (!art) return;
+  await recordEngagement(art.news_id, 'share');
+  const shareUrl = art.url || `${window.location.origin}/?article=${art.news_id}`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(shareUrl).catch(() => {});
+  }
+  showToast('Dispatch link copied & share propagation logged!', 'success');
+}
+
+async function extractArticleFromUrl() {
+  const urlInput = document.getElementById('articleUrlInput');
+  const url = urlInput ? urlInput.value.trim() : '';
+  if (!url) {
+    showToast('Please paste an http/https news URL first.', 'error');
+    return;
+  }
+  const btn = document.getElementById('btnFetchUrl');
+  if (btn) { btn.disabled = true; btn.innerText = 'Fetching...'; }
+  try {
+    const res = await fetch('/api/v1/news/extract-url', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Extract failed');
+    if (data.title) document.getElementById('headlineInput').value = data.title;
+    if (data.text) document.getElementById('bodyInput').value = data.text;
+    if (data.source) document.getElementById('sourceInput').value = data.source;
+    showToast('Article headline and body extracted cleanly from URL!', 'success');
+  } catch (err) {
+    showToast(`URL fetch failed: ${err.message}`, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerText = '🌐 Fetch Article'; }
+  }
+}
+
+async function searchLiveTopic(topic) {
+  const q = (topic || '').trim();
+  if (!q) return;
+  const frontInput = document.getElementById('frontPageSearchInput');
+  const clearBtn = document.getElementById('btnClearFrontSearch');
+  const badge = document.getElementById('wireSearchCountBadge');
+  if (frontInput) frontInput.value = q;
+  if (clearBtn) clearBtn.style.display = 'inline-flex';
+  if (state.currentTab !== 'wire') switchTab('wire');
+  if (badge) badge.innerText = `Searching Live Wire for "${q}"...`;
+
+  try {
+    const res = await fetch(`/api/v1/news/search-topic?q=${encodeURIComponent(q)}&limit=12`);
+    const data = await res.json();
+    const stories = data.stories || [];
+    if (badge) badge.innerText = `${stories.length} Live Topic Dispatches for "${q}"`;
+    renderCustomNewsGrid(stories);
+  } catch (err) {
+    if (badge) badge.innerText = `Showing Local Matches for "${q}"`;
+    executeUnifiedSearch(q);
+  }
+}
+
+async function loadLiveWeatherTicker() {
+  const cities = [
+    { id: 'wxDelhi', name: 'New Delhi' },
+    { id: 'wxHyderabad', name: 'Hyderabad' },
+    { id: 'wxMumbai', name: 'Mumbai' }
+  ];
+  for (const c of cities) {
+    const el = document.getElementById(c.id);
+    if (!el) continue;
+    try {
+      const res = await fetch(`/api/v1/weather/live?city=${encodeURIComponent(c.name)}`);
+      const d = await res.json();
+      if (d.temperature_c !== undefined && d.temperature_c !== null) {
+        el.innerHTML = `🌦️ <strong>${c.name}:</strong> ${d.temperature_c}°C • Wind ${d.wind_kmh || 0} km/h <span style="opacity:0.7;">(Open-Meteo)</span>`;
+      }
+    } catch (e) {}
+  }
+}
+
+async function loadLiveShardStats() {
+  try {
+    const res = await fetch('/api/v1/stats');
+    if (!res.ok) return;
+    const data = await res.json();
+    (data.shards || []).forEach(s => {
+      const cntEl = document.getElementById(`shardCount${s.shard_id}`);
+      const sizeEl = document.getElementById(`shardSize${s.shard_id}`);
+      if (cntEl) cntEl.innerText = `${s.sample_count} Samples`;
+      if (sizeEl) sizeEl.innerText = `${s.adapter_size_mb} MB (${s.is_trained ? 'Trained' : 'Ready'})`;
+    });
+  } catch (e) {}
 }
 
 // ==========================================================================
@@ -3271,20 +3617,19 @@ CRYPTO ANCHOR:   SHA-256 Verified Dual-Track Hybrid AI Dossier
 --------------------------------------------------------------------------------
 DUAL-TRACK AI VERIFICATION METRICS:
 - Overall Authenticity Confidence: ${realScore}
-- Track A Stylistic Risk (DeBERTa-v3 Base + LoRA): ${styleScore}
-- Track B Fact Vector Retrieval (Qdrant PIB/RBI/ISRO): ${factScore}
-- Track B Chronological Linearity (Neo4j Graph): ${graphScore}
+- Track A Stylistic Risk (DeBERTa-v3-xsmall + Rank-8 LoRA): ${styleScore}
+- Track B Fact Vector Retrieval (BGE-small Qdrant/pgvector): ${factScore}
+- Track B Chronological Linearity (Knowledge Graph): ${graphScore}
 --------------------------------------------------------------------------------
 ARTICLE DISPATCH CONTENT:
 ${body}
 --------------------------------------------------------------------------------
-EXACT MACHINE UNLEARNING MANDATE:
-Certified in accordance with IEEE/ACM Exact Unlearning Standards across
-3 Structural Families:
-- Data-Partitioning: SISA Framework (K=5 Shards, 80% Retraining Bound Reduction)
-- Algebraic Closed-Form: Decremental SVM (O(1) Sherman-Morrison Hessian Downdate)
-- Modular PEFT: LoRA Structural Deactivation (W_0 Base Weights Frozen)
-Guarantee: Forgotten data residual influence = 0.0000% | Retain Utility Preservation = 100.0%.
+EXACT MACHINE UNLEARNING SUITE (5 STRATEGIES):
+- Baseline Full Retraining: Deterministic reference baseline (re-trains entire corpus)
+- Algorithm 1 (SISA): K=5 isolated partition shards with selective shard retraining
+- Algorithm 2 (Decremental SVM): Sherman-Morrison-Woodbury inverse Hessian downdate
+- Algorithm 3 (Modular LoRA): Rank-8 low-rank sub-slice masking (B_k,s -> 0)
+- Algorithm 4 (Unified Hybrid): SISA CSV purge + shard LoRA retrain + H^-1 downdate + vector/cache purge + SHA-256 ledger
 ================================================================================`;
 
   const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
@@ -3739,12 +4084,15 @@ async function refreshDbExplorerTelemetry() {
     if (!res.ok) return;
     const data = await res.json();
     const d = data.telemetry;
+    const cols = d.database_collections || d.mongodb_collections || {};
+    const dbLabel = (data.database && data.database.backend) ? data.database.backend.split('(')[0].trim() : 'Primary Database';
+    const pgvCount = d.qdrant_vector_store.supabase_pgvector_vectors || 0;
 
     grid.innerHTML = `
       <div class="telemetry-stat-card" style="background: var(--bg-surface); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
-        <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">MongoDB Primary Store</div>
-        <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-cyan); margin: 4px 0;">${d.mongodb_collections.published_news} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-dim);">Records</span></div>
-        <div style="font-size: 0.78rem; color: var(--text-main);">Quarantined: <strong>${d.mongodb_collections.quarantined_fake_news}</strong> | Ledgers: <strong>${d.mongodb_collections.unlearning_ledger_records}</strong></div>
+        <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">${escapeHtml(dbLabel)}</div>
+        <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-cyan); margin: 4px 0;">${cols.published_news ?? 0} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-dim);">Published</span></div>
+        <div style="font-size: 0.78rem; color: var(--text-main);">Quarantined: <strong>${cols.quarantined_fake_news ?? 0}</strong> | Train Rows: <strong>${cols.training_samples ?? 0}</strong> | Ledgers: <strong>${cols.unlearning_ledger_records ?? 0}</strong></div>
       </div>
 
       <div class="telemetry-stat-card" style="background: var(--bg-surface); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
@@ -3754,14 +4102,14 @@ async function refreshDbExplorerTelemetry() {
       </div>
 
       <div class="telemetry-stat-card" style="background: var(--bg-surface); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
-        <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Qdrant Vector Database</div>
-        <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-purple); margin: 4px 0;">${d.qdrant_vector_store.total_vectors} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-dim);">Vectors</span></div>
-        <div style="font-size: 0.78rem; color: var(--text-main);">Dimensions: <strong>${d.qdrant_vector_store.dimensions}</strong> (BGE-M3) | Metric: <strong>${d.qdrant_vector_store.metric}</strong></div>
+        <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Dual Vector Stores</div>
+        <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-purple); margin: 4px 0;">${d.qdrant_vector_store.total_vectors} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-dim);">Qdrant Vectors</span></div>
+        <div style="font-size: 0.78rem; color: var(--text-main);">pgvector: <strong>${pgvCount}</strong> | Dim: <strong>${d.qdrant_vector_store.dimensions}-dim</strong></div>
       </div>
 
       <div class="telemetry-stat-card" style="background: var(--bg-surface); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
         <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">SISA Shard Memory Footprint</div>
-        <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-amber); margin: 4px 0;">5 <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-dim);">Shards</span></div>
+        <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-amber); margin: 4px 0;">${d.sisa_sharding.active_shards} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-dim);">Shards</span></div>
         <div style="font-size: 0.78rem; color: var(--text-main);">Adapters: <strong>${d.sisa_sharding.active_shards}</strong> | Memory: <strong>${d.sisa_sharding.total_adapter_memory_kb} KB</strong></div>
       </div>
     `;

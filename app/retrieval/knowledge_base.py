@@ -76,7 +76,7 @@ INTERNAL_FACT_EVIDENCE_ARCHIVE = [
         "truth_status": "VERIFIED_DEBUNK",
         "official_source": "Reserve Bank of India (RBI) & PIB Fact Check",
         "summary": "Reserve Bank of India has issued zero notifications invalidating 500 rupee banknotes. All 500 currency notes with or without star symbol are fully legal tender.",
-        "fact_score": 0.02
+        "fact_score": 0.98
     },
     {
         "evidence_id": "EVID_ISRO_CHANDRAYAAN_DATA",
@@ -772,7 +772,8 @@ class SubClaimDecompositionEngine:
             evid = evidence_engine.query_evidence("", clause)
             if evid.get("has_match") and evid.get("top_match"):
                 top = evid["top_match"]
-                if top["truth_status"] == "VERIFIED_OFFICIAL":
+                is_affirming_valid = any(w in clause_lower for w in ("remain legal tender", "notes valid", "fully valid", "legal tender"))
+                if top["truth_status"] == "VERIFIED_OFFICIAL" or (top["evidence_id"] == "EVID_RBI_500_CURRENCY" and is_affirming_valid and "ban" not in clause_lower):
                     verified_clauses.append({
                         "clause": clause,
                         "status": "VERIFIED_FACTUAL",
@@ -787,7 +788,7 @@ class SubClaimDecompositionEngine:
                 continue
 
             # 3. Check for obvious sensationalism / alarmism markers
-            has_panic = bool(re.search(r'\b(panic|midnight|curfew|banned|freeze|emergency|destroy|secret exposed|alert)\b', clause_lower))
+            has_panic = bool(re.search(r'\b(panic|midnight|curfew|ban(?:s|ned|ning)?|freeze|emergency|destroy|secret\s+(?:exposed|order)|alert)\b', clause_lower))
             if has_panic:
                 unverified_clauses.append({
                     "clause": clause,

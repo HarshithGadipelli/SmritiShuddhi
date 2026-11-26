@@ -228,6 +228,7 @@ devices_col = db['devices']
 audit_col = db['audit_logs']
 users_col = db['users']
 unlearning_ledger_col = db['unlearning_ledger']
+settings_col = db['app_settings']
 
 
 def seed_demo_users():

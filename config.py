@@ -19,10 +19,15 @@ HOST = os.getenv('HOST', '0.0.0.0')
 PORT = int(os.getenv('PORT', '8000'))
 FLASK_PORT = int(os.getenv('FLASK_PORT', '5000'))
 
-# Live Real-Time News Feed & API Linking (Optional keys for NewsAPI.org or GNews.io)
+# Live Real-Time News Feed & Verification APIs
 NEWS_API_KEY = os.getenv('NEWS_API_KEY', '')
 GNEWS_API_KEY = os.getenv('GNEWS_API_KEY', '')
-NEWS_AUTO_SYNC_MINUTES = int(os.getenv('NEWS_AUTO_SYNC_MINUTES', '15'))
+THE_NEWS_API_TOKEN = os.getenv('THE_NEWS_API_TOKEN', '')
+GUARDIAN_API_KEY = os.getenv('GUARDIAN_API_KEY', '')
+GOOGLE_FACTCHECK_API_KEY = os.getenv('GOOGLE_FACTCHECK_API_KEY', '')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-flash-latest')
+NEWS_AUTO_SYNC_MINUTES = int(os.getenv('NEWS_AUTO_SYNC_MINUTES', '5'))
 
 # Redis Cache Controller Configuration
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')

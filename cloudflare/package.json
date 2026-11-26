@@ -1,0 +1,19 @@
+{
+  "name": "smritishuddhi",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync": "node scripts/sync-assets.mjs",
+    "dev": "wrangler dev --experimental-new-config",
+    "build": "node scripts/sync-assets.mjs && wrangler deploy --experimental-new-config --dry-run",
+    "deploy": "wrangler deploy --experimental-new-config",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20261123.0",
+    "cf": "^0.15.0",
+    "typescript": "^6.0.2",
+    "wrangler": "4.168.0"
+  }
+}

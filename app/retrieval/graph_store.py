@@ -197,7 +197,11 @@ class TemporalGraphEngine:
         dates = re.findall(r'\b(\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{4})\b', safe_text)
 
         # Future-oriented phrasing
-        future_markers = re.findall(r'\b(will happen tomorrow|next week|in upcoming months|to be banned soon|predicted for 202[5-9])\b', safe_text, re.IGNORECASE)
+        future_markers = re.findall(
+            r'\b(will happen tomorrow|starting tomorrow|from midnight|next week|next month|in upcoming months|to be banned soon|will abolish|will cancel|predicted for 202[6-9])\b',
+            safe_text,
+            re.IGNORECASE,
+        )
 
         # Matched historical entities
         found_entities = []
@@ -257,6 +261,18 @@ class TemporalGraphEngine:
                     f"Temporal Discontinuity: '{event_name}' concluded on {anchor_date}, but text frames it as a future event."
                 )
 
+        # Unanchored futuristic predictive policy/ban claims (Zero-day/Future Assertion Check)
+        future_ban_claim = re.search(
+            r'\b(will|going to|scheduled to|starting\s+(?:tomorrow|midnight|next\s+week))\s+.*?\b(ban|abolish|shut\s*down|freeze|confiscate|cancel\s+all|mandatory|free\s+(?:phone|laptop|cash|electricity))\b',
+            combined,
+            re.IGNORECASE,
+        )
+        has_official_gazette = any(k in combined.lower() for k in ("gazette notification", "pib press release", "official circular", "parliament passed", "rbi circular"))
+        if future_ban_claim and not has_official_gazette and not contradictions:
+            anomalies.append(
+                "Unverified Future Policy Assertion: Claim asserts an imminent ban/sweeping directive without referencing an official Gazette notification or Ministerial press circular."
+            )
+
         if contradictions:
             temporal_score = 0.15  # Heavy factual conflict
             verdict = "TIMELINE_CONTRADICTION"
@@ -272,6 +288,7 @@ class TemporalGraphEngine:
             "timeline_verdict": verdict,
             "contradictions": contradictions,
             "anomalies": anomalies,
+            "future_assertion_detected": bool(extracted["future_markers"] or future_ban_claim),
             "extracted_entities": [a["entity"] for a in extracted["matched_anchors"]],
             "graph_backend": "neo4j_cluster" if self.using_neo4j else "embedded_networkx_graph"
         }

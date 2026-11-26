@@ -1,9 +1,15 @@
 import re
 import math
 import hashlib
+import logging
+from pathlib import Path
 from typing import List, Dict, Any, Union
 import numpy as np
 from config import BGE_MODEL_NAME
+
+logger = logging.getLogger(__name__)
+ROOT_DIR = Path(__file__).resolve().parents[2]
+MODELS_CACHE_DIR = ROOT_DIR / "models_cache"
 
 # Indian regional keywords & Hinglish indicators
 HINGLISH_PATTERNS = [
@@ -27,21 +33,44 @@ class MultilingualRegionalEncoder:
         self._neural_model = None
         self._tokenizer = None
         self._neural_available = False
+        self._init_attempted = False
+        self._loaded_model_id = BGE_MODEL_NAME
 
     def _try_init_neural(self):
-        if self._neural_available or self._neural_model is not None:
+        if self._init_attempted:
             return
+        self._init_attempted = True
+        candidates = []
+        for folder_name in ("multilingual-e5-small", "bge-small-en-v1.5"):
+            local_p = MODELS_CACHE_DIR / folder_name
+            if local_p.exists() and ((local_p / "model.safetensors").exists() or (local_p / "pytorch_model.bin").exists()):
+                candidates.append(str(local_p))
+        candidates.append(BGE_MODEL_NAME)
+
         try:
             from transformers import AutoTokenizer, AutoModel
-            import torch
-            # Use local_files_only to prevent network timeout when running on offline/edge hardware
-            self._tokenizer = AutoTokenizer.from_pretrained(BGE_MODEL_NAME, local_files_only=True)
-            self._neural_model = AutoModel.from_pretrained(BGE_MODEL_NAME, local_files_only=True)
-            self._neural_model.eval()
-            self._neural_available = True
+            for cand in candidates:
+                try:
+                    self._tokenizer = AutoTokenizer.from_pretrained(cand, local_files_only=True)
+                    self._neural_model = AutoModel.from_pretrained(cand, local_files_only=True)
+                    self._neural_model.eval()
+                    self._loaded_model_id = cand
+                    self._neural_available = True
+                    logger.info("Dense neural encoder initialized from %s", cand)
+                    return
+                except Exception:
+                    continue
         except Exception:
-            # High-resolution subword hash projection fallback (instant & offline)
-            self._neural_available = False
+            pass
+        self._neural_available = False
+
+    @property
+    def active_backend_label(self) -> str:
+        self._try_init_neural()
+        if self._neural_available:
+            name = Path(self._loaded_model_id).name if "models_cache" in str(self._loaded_model_id) else str(self._loaded_model_id)
+            return f"{name} (384-dim Neural Transformer)"
+        return "Subword-Hash 384-dim Projection (Fallback)"
 
     def detect_regional_cues(self, text: str) -> Dict[str, Any]:
         """Detects linguistic script composition and Hinglish sensational markers."""
@@ -116,35 +145,44 @@ class MultilingualRegionalEncoder:
             vec /= norm
         return vec
 
-    def encode(self, texts: Union[str, List[str]]) -> np.ndarray:
-        """Encodes single text or list of texts into normalized embedding vectors."""
+    def encode(self, texts: Union[str, List[str]], is_query: bool = False) -> np.ndarray:
+        """Encodes single text or list of texts into normalized 384-dim vectors."""
         is_single = isinstance(texts, str)
-        text_list = [texts] if is_single else texts
+        text_list = [texts] if is_single else [str(t or "") for t in texts]
 
         self._try_init_neural()
 
         if self._neural_available and self._neural_model is not None:
             try:
                 import torch
-                encoded_input = self._tokenizer(
-                    text_list, padding=True, truncation=True, max_length=512, return_tensors='pt'
-                )
-                with torch.no_grad():
-                    model_output = self._neural_model(**encoded_input)
-                    # Use CLS token or mean pooling
-                    token_embeddings = model_output[0]
-                    input_mask_expanded = encoded_input['attention_mask'].unsqueeze(-1).expand(token_embeddings.size()).float()
-                    sum_embeddings = torch.sum(token_embeddings * input_mask_expanded, 1)
-                    sum_mask = torch.clamp(input_mask_expanded.sum(1), min=1e-9)
-                    pooled = sum_embeddings / sum_mask
-                    # Normalize
-                    pooled = torch.nn.functional.normalize(pooled, p=2, dim=1)
-                    res = pooled.cpu().numpy()
-                    return res[0] if is_single else res
-            except Exception:
-                pass
+                prefixed = text_list
+                if "e5" in str(self._loaded_model_id).lower():
+                    prefix = "query: " if is_query else "passage: "
+                    prefixed = [prefix + t[:1200] for t in text_list]
 
-        # Fallback to hash projection
+                chunks = []
+                batch_size = 32
+                for i in range(0, len(prefixed), batch_size):
+                    batch = prefixed[i:i + batch_size]
+                    encoded_input = self._tokenizer(
+                        batch, padding=True, truncation=True, max_length=256, return_tensors='pt'
+                    )
+                    with torch.no_grad():
+                        model_output = self._neural_model(**encoded_input)
+                        token_embeddings = model_output[0]
+                        input_mask_expanded = encoded_input['attention_mask'].unsqueeze(-1).expand(token_embeddings.size()).float()
+                        sum_embeddings = torch.sum(token_embeddings * input_mask_expanded, 1)
+                        sum_mask = torch.clamp(input_mask_expanded.sum(1), min=1e-9)
+                        pooled = sum_embeddings / sum_mask
+                        if pooled.shape[1] > self.vector_dim:
+                            pooled = pooled[:, :self.vector_dim]
+                        pooled = torch.nn.functional.normalize(pooled, p=2, dim=1)
+                        chunks.append(pooled.cpu().numpy().astype(np.float32))
+                res = np.vstack(chunks) if chunks else np.zeros((0, self.vector_dim), dtype=np.float32)
+                return res[0] if is_single else res
+            except Exception as e:
+                logger.debug("Neural encoder fallback triggered: %s", e)
+
         vectors = [self._hash_embed(t) for t in text_list]
         arr = np.array(vectors, dtype=np.float32)
         return arr[0] if is_single else arr

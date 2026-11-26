@@ -1,0 +1,27 @@
+.gcloudignore
+.git/
+.gitignore
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+.env.local
+scratch/
+logs/
+*.log
+*.db
+models_cache/
+data/raw/
+data/liar_plus/
+data/local_store.json
+data/qdrant_storage/
+static/uploads/
+artifacts/
+test_*.py
+training/
+scripts/
+node_modules/
+
+# Cloudflare Edge Worker frontend workspace (deployed separately via Wrangler / cf)
+cloudflare/
