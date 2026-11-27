@@ -27,6 +27,10 @@ on:
           - frontend
           - backend
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   verify:
     name: Verify & Detect Changed Components
@@ -98,64 +102,29 @@ jobs:
     if: github.event_name != 'pull_request' && needs.verify.outputs.backend_changed == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Check Cloud Run deploy configuration
+      - name: Resolve Google Cloud project
         id: gcp_cfg
         env:
-          GCP_SA_KEY_RAW: ${{ secrets.GCP_SA_KEY }}
           VAR_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
         run: |
           PROJECT_ID="${VAR_PROJECT_ID:-project-5e24ddd4-8856-4b35-aeb}"
-          if [ -z "$GCP_SA_KEY_RAW" ]; then
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::Skipping Cloud Run deploy: add GCP_SA_KEY secret in GitHub Repo Settings -> Secrets and variables -> Actions."
-            exit 0
-          fi
-          VALID_SA=$(python3 - <<'PY'
-          import base64, json, os
-          raw = os.environ.get("GCP_SA_KEY_RAW", "").strip()
-          candidates = [raw]
-          try:
-              candidates.append(base64.b64decode(raw).decode("utf-8", "ignore").strip())
-          except Exception:
-              pass
-          ok = False
-          for c in candidates:
-              try:
-                  obj = json.loads(c)
-                  if isinstance(obj, dict) and obj.get("type") == "service_account" and obj.get("private_key") and obj.get("client_email"):
-                      ok = True
-                      break
-              except Exception:
-                  pass
-          print("true" if ok else "false")
-          PY
-          )
-          if [ "$VALID_SA" != "true" ]; then
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::error::GCP_SA_KEY secret is present but is NOT valid Google Service Account JSON (expected fields: type='service_account', client_email, private_key). Create/download a Service Account JSON key in Google Cloud IAM and paste the full JSON into GitHub secret GCP_SA_KEY."
-            exit 1
-          fi
-          echo "enabled=true" >> "$GITHUB_OUTPUT"
           echo "project_id=$PROJECT_ID" >> "$GITHUB_OUTPUT"
 
       - name: Checkout repository
-        if: steps.gcp_cfg.outputs.enabled == 'true'
         uses: actions/checkout@v4
 
-      - name: Authenticate to Google Cloud
-        if: steps.gcp_cfg.outputs.enabled == 'true'
+      - name: Authenticate to Google Cloud (Keyless Workload Identity OIDC)
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: 'projects/889339834867/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: '889339834867-compute@developer.gserviceaccount.com'
 
       - name: Set up Google Cloud SDK
-        if: steps.gcp_cfg.outputs.enabled == 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ steps.gcp_cfg.outputs.project_id }}
 
       - name: Deploy Backend to Cloud Run
-        if: steps.gcp_cfg.outputs.enabled == 'true'
         env:
           DEPLOY_METHOD: ${{ vars.GCP_DEPLOY_METHOD }}
           PROJECT_ID: ${{ steps.gcp_cfg.outputs.project_id }}
