@@ -79,10 +79,10 @@ jobs:
         run: |
           python -m compileall -q app config.py db.py
 
-      - name: Set up Node.js 20
+      - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Verify Cloudflare Worker & Pages frontend build
         working-directory: cloudflare
@@ -183,11 +183,11 @@ jobs:
         if: steps.cf_cfg.outputs.enabled == 'true'
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 20
+      - name: Set up Node.js 22
         if: steps.cf_cfg.outputs.enabled == 'true'
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Deploy Cloudflare Worker & smritishuddhi.pages.dev
         if: steps.cf_cfg.outputs.enabled == 'true'
