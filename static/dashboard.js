@@ -277,7 +277,7 @@ function playPaperRustleSound(type = 'unfold') {
 }
 
 function initTheme() {
-  const savedTheme = localStorage.getItem('smriti_shuddhi_theme') || 'light';
+  const savedTheme = localStorage.getItem('smriti_shuddhi_theme') || 'paper';
   setTheme(savedTheme, false);
 }
 
