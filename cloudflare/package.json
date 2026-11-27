@@ -7,7 +7,10 @@
     "sync": "node scripts/sync-assets.mjs",
     "dev": "wrangler dev",
     "build": "wrangler deploy --dry-run",
-    "deploy": "wrangler deploy",
+    "build:pages": "node scripts/build-pages.mjs",
+    "deploy:worker": "wrangler deploy",
+    "deploy:pages": "node scripts/build-pages.mjs && wrangler pages deploy dist-pages --project-name=smritishuddhi --branch=main --commit-dirty=true",
+    "deploy": "wrangler deploy && npm run deploy:pages",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

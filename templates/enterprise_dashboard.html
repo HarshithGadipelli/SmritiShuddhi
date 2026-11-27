@@ -505,8 +505,8 @@
           <div class="input-form">
             <div class="form-group" style="margin-bottom: 10px;">
               <label for="articleUrlInput">Optional: Extract From Live News Article URL</label>
-              <div style="display: flex; gap: 8px;">
-                <input type="url" id="articleUrlInput" placeholder="https://www.thehindu.com/..." style="flex: 1;">
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <input type="url" id="articleUrlInput" placeholder="https://www.thehindu.com/..." style="flex: 1 1 200px; min-width: 0;">
                 <button type="button" class="btn btn-secondary btn-sm" id="btnFetchUrl" onclick="extractArticleFromUrl()">🌐 Fetch Article</button>
               </div>
             </div>
@@ -856,8 +856,8 @@
                 👋 <strong>Hello, Chief Editor!</strong> I am your AI Copilot. Ask me to recommend the best unlearning algorithm, audit MIA resilience, summarize editorial queues, or execute one-click unlearning on quarantined stories.
               </div>
               <!-- PROMPT INPUT ROW -->
-              <form onsubmit="handleCopilotSubmit(event)" style="display: flex; gap: 8px; margin-top: 10px;">
-                <input type="text" id="copilotQueryInput" placeholder="Ask Copilot about models, queues, MIA risk, or database state..." style="flex: 1; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-size: 0.84rem;">
+              <form onsubmit="handleCopilotSubmit(event)" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+                <input type="text" id="copilotQueryInput" placeholder="Ask Copilot about models, queues, MIA risk, or database state..." style="flex: 1 1 200px; min-width: 0; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-size: 0.84rem;">
                 <button type="submit" class="btn btn-primary btn-sm" id="btnCopilotSend">
                   <span>Send</span> ⚡
                 </button>
@@ -1538,7 +1538,7 @@
               <span>⚡</span> Send to Unlearning Workbench
             </button>
           </div>
-          <div style="display: flex; gap: 8px;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button type="button" class="btn btn-crimson" onclick="deleteArticleFromEditor()">
               <span>🗑️</span> Purge Story
             </button>
@@ -1698,8 +1698,8 @@
           <input type="text" id="cfgGnewsApiKey" placeholder="e.g. d41d8cd98f00b204e9800998ecf8427e..." autocomplete="off">
         </div>
 
-        <div style="display: flex; gap: 10px; margin-top: 18px;">
-          <button type="submit" class="btn btn-primary" style="flex: 1;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px;">
+          <button type="submit" class="btn btn-primary" style="flex: 1 1 200px;">
             Save & Sync Live Wire Now
           </button>
           <button type="button" class="btn btn-secondary" onclick="closeApiConfigModal()">
@@ -1782,12 +1782,12 @@
             <option value="CITIZEN_CONTEST">Citizen Factual Contest / Correction</option>
           </select>
         </div>
-        <div style="display: flex; gap: 10px;">
-          <div style="flex: 1;" class="form-group">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <div style="flex: 1 1 180px; min-width: 0;" class="form-group">
             <label for="removalRequesterName" style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px;">Your Name / Alias</label>
             <input type="text" id="removalRequesterName" placeholder="Concerned Reader" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
           </div>
-          <div style="flex: 1;" class="form-group">
+          <div style="flex: 1 1 180px; min-width: 0;" class="form-group">
             <label for="removalRequesterEmail" style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px;">Email (For Audit Receipt)</label>
             <input type="email" id="removalRequesterEmail" placeholder="reader@domain.com" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
           </div>

@@ -38,24 +38,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Detect changed stack paths
         id: changes
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          DEPLOY_TARGET: ${{ inputs.deploy_target }}
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TARGET="${{ inputs.deploy_target }}"
-            echo "backend=$([ "$TARGET" = "both" ] || [ "$TARGET" = "backend" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
-            echo "frontend=$([ "$TARGET" = "both" ] || [ "$TARGET" = "frontend" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "backend=$([ "$DEPLOY_TARGET" = "both" ] || [ "$DEPLOY_TARGET" = "backend" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+            echo "frontend=$([ "$DEPLOY_TARGET" = "both" ] || [ "$DEPLOY_TARGET" = "frontend" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
+          if [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ] && git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+            CHANGED=$(git diff --name-only "$BEFORE_SHA" "$CURRENT_SHA" 2>/dev/null || echo "")
+          elif git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
             CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
-            BACKEND=$(echo "$CHANGED" | grep -E '^(app/|config\.py|db\.py|Dockerfile|requirements\.txt|Procfile|\.python-version|project\.toml|\.dockerignore|\.gcloudignore|cloudbuild\.yaml|supabase_schema\.sql|data/|sisa_adapters/|templates/|static/|\.github/workflows/deploy\.yml)' -q && echo true || echo false)
-            FRONTEND=$(echo "$CHANGED" | grep -E '^(cloudflare/|templates/|static/|\.github/workflows/deploy\.yml)' -q && echo true || echo false)
           else
+            CHANGED=""
+          fi
+          if [ -z "$CHANGED" ]; then
             BACKEND=true
             FRONTEND=true
+          else
+            BACKEND=$(echo "$CHANGED" | grep -E '^(app/|config\.py|db\.py|Dockerfile|requirements\.txt|Procfile|\.python-version|project\.toml|\.dockerignore|\.gcloudignore|cloudbuild\.yaml|supabase_schema\.sql|data/|sisa_adapters/|templates/|static/|\.github/workflows/deploy\.yml)' -q && echo true || echo false)
+            FRONTEND=$(echo "$CHANGED" | grep -E '^(cloudflare/|templates/|static/|\.github/workflows/deploy\.yml)' -q && echo true || echo false)
           fi
           echo "backend=$BACKEND" >> "$GITHUB_OUTPUT"
           echo "frontend=$FRONTEND" >> "$GITHUB_OUTPUT"
@@ -74,12 +84,13 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Sync & typecheck Cloudflare Worker frontend
+      - name: Verify Cloudflare Worker & Pages frontend build
         working-directory: cloudflare
         run: |
           npm ci
           npm run sync
           npm run typecheck
+          npm run build:pages
 
   deploy-backend-cloudrun:
     name: Auto-Deploy Backend to Cloud Run
@@ -91,14 +102,16 @@ jobs:
         id: gcp_cfg
         env:
           HAS_SA_KEY: ${{ secrets.GCP_SA_KEY != '' }}
-          PROJECT_ID: ${{ vars.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID || 'project-5e24ddd4-8856-4b35-aeb' }}
+          VAR_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
         run: |
+          PROJECT_ID="${VAR_PROJECT_ID:-project-5e24ddd4-8856-4b35-aeb}"
           if [ "$HAS_SA_KEY" = "true" ] && [ -n "$PROJECT_ID" ]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
             echo "project_id=$PROJECT_ID" >> "$GITHUB_OUTPUT"
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "Skipping Cloud Run deploy: set GCP_SA_KEY secret (and optional GCP_PROJECT_ID) in GitHub Actions."
+            echo "::warning::Skipping Cloud Run deploy: add GCP_SA_KEY secret in GitHub Repo Settings -> Secrets and variables -> Actions."
+            echo "Cloud Run deploy skipped: missing \`GCP_SA_KEY\` secret for project \`$PROJECT_ID\`." >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Checkout repository
@@ -119,8 +132,11 @@ jobs:
 
       - name: Deploy Backend to Cloud Run
         if: steps.gcp_cfg.outputs.enabled == 'true'
+        env:
+          DEPLOY_METHOD: ${{ vars.GCP_DEPLOY_METHOD }}
+          PROJECT_ID: ${{ steps.gcp_cfg.outputs.project_id }}
         run: |
-          if [ "${{ vars.GCP_DEPLOY_METHOD }}" = "source" ]; then
+          if [ "$DEPLOY_METHOD" = "source" ]; then
             gcloud run deploy smritishuddhi \
               --source . \
               --region=asia-south1 \
@@ -136,13 +152,13 @@ jobs:
               --session-affinity \
               --cpu-boost \
               --quiet \
-              --project "${{ steps.gcp_cfg.outputs.project_id }}"
+              --project "$PROJECT_ID"
           else
-            gcloud builds submit --config cloudbuild.yaml --project "${{ steps.gcp_cfg.outputs.project_id }}"
+            gcloud builds submit --config cloudbuild.yaml --project "$PROJECT_ID"
           fi
 
   deploy-frontend-cloudflare:
-    name: Auto-Deploy Frontend Edge Worker
+    name: Auto-Deploy Cloudflare Pages & Worker
     needs: verify
     if: github.event_name != 'pull_request' && needs.verify.outputs.frontend_changed == 'true'
     runs-on: ubuntu-latest
@@ -151,12 +167,16 @@ jobs:
         id: cf_cfg
         env:
           HAS_CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+          VAR_CF_ACCOUNT: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: |
+          ACCOUNT_ID="${VAR_CF_ACCOUNT:-0e9d9e3453b93f963b60116f28e8368a}"
           if [ "$HAS_CF_TOKEN" = "true" ]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "account_id=$ACCOUNT_ID" >> "$GITHUB_OUTPUT"
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "Skipping Cloudflare deploy: set CLOUDFLARE_API_TOKEN secret in GitHub Actions."
+            echo "::warning::Skipping Cloudflare deploy: add CLOUDFLARE_API_TOKEN secret in GitHub Repo Settings -> Secrets and variables -> Actions."
+            echo "Cloudflare deploy skipped: missing \`CLOUDFLARE_API_TOKEN\` secret." >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Checkout repository
@@ -169,12 +189,12 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Deploy Cloudflare Worker via Scoped API Token
+      - name: Deploy Cloudflare Worker & smritishuddhi.pages.dev
         if: steps.cf_cfg.outputs.enabled == 'true'
         working-directory: cloudflare
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID || '0e9d9e3453b93f963b60116f28e8368a' }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.cf_cfg.outputs.account_id }}
         run: |
           npm ci
           npm run deploy
