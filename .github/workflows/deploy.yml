@@ -101,18 +101,42 @@ jobs:
       - name: Check Cloud Run deploy configuration
         id: gcp_cfg
         env:
-          HAS_SA_KEY: ${{ secrets.GCP_SA_KEY != '' }}
+          GCP_SA_KEY_RAW: ${{ secrets.GCP_SA_KEY }}
           VAR_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
         run: |
           PROJECT_ID="${VAR_PROJECT_ID:-project-5e24ddd4-8856-4b35-aeb}"
-          if [ "$HAS_SA_KEY" = "true" ] && [ -n "$PROJECT_ID" ]; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-            echo "project_id=$PROJECT_ID" >> "$GITHUB_OUTPUT"
-          else
+          if [ -z "$GCP_SA_KEY_RAW" ]; then
             echo "enabled=false" >> "$GITHUB_OUTPUT"
             echo "::warning::Skipping Cloud Run deploy: add GCP_SA_KEY secret in GitHub Repo Settings -> Secrets and variables -> Actions."
-            echo "Cloud Run deploy skipped: missing \`GCP_SA_KEY\` secret for project \`$PROJECT_ID\`." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
+          VALID_SA=$(python3 - <<'PY'
+          import base64, json, os
+          raw = os.environ.get("GCP_SA_KEY_RAW", "").strip()
+          candidates = [raw]
+          try:
+              candidates.append(base64.b64decode(raw).decode("utf-8", "ignore").strip())
+          except Exception:
+              pass
+          ok = False
+          for c in candidates:
+              try:
+                  obj = json.loads(c)
+                  if isinstance(obj, dict) and obj.get("type") == "service_account" and obj.get("private_key") and obj.get("client_email"):
+                      ok = True
+                      break
+              except Exception:
+                  pass
+          print("true" if ok else "false")
+          PY
+          )
+          if [ "$VALID_SA" != "true" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::error::GCP_SA_KEY secret is present but is NOT valid Google Service Account JSON (expected fields: type='service_account', client_email, private_key). Create/download a Service Account JSON key in Google Cloud IAM and paste the full JSON into GitHub secret GCP_SA_KEY."
+            exit 1
+          fi
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+          echo "project_id=$PROJECT_ID" >> "$GITHUB_OUTPUT"
 
       - name: Checkout repository
         if: steps.gcp_cfg.outputs.enabled == 'true'
@@ -166,18 +190,17 @@ jobs:
       - name: Check Cloudflare deploy configuration
         id: cf_cfg
         env:
-          HAS_CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+          CF_TOKEN_RAW: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           VAR_CF_ACCOUNT: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           ACCOUNT_ID="${VAR_CF_ACCOUNT:-0e9d9e3453b93f963b60116f28e8368a}"
-          if [ "$HAS_CF_TOKEN" = "true" ]; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-            echo "account_id=$ACCOUNT_ID" >> "$GITHUB_OUTPUT"
-          else
+          if [ -z "$CF_TOKEN_RAW" ]; then
             echo "enabled=false" >> "$GITHUB_OUTPUT"
             echo "::warning::Skipping Cloudflare deploy: add CLOUDFLARE_API_TOKEN secret in GitHub Repo Settings -> Secrets and variables -> Actions."
-            echo "Cloudflare deploy skipped: missing \`CLOUDFLARE_API_TOKEN\` secret." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+          echo "account_id=$ACCOUNT_ID" >> "$GITHUB_OUTPUT"
 
       - name: Checkout repository
         if: steps.cf_cfg.outputs.enabled == 'true'
@@ -189,12 +212,31 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Deploy Cloudflare Worker & smritishuddhi.pages.dev
+      - name: Install Cloudflare dependencies
+        if: steps.cf_cfg.outputs.enabled == 'true'
+        working-directory: cloudflare
+        run: npm ci
+
+      - name: Verify Cloudflare API token authentication
         if: steps.cf_cfg.outputs.enabled == 'true'
         working-directory: cloudflare
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ steps.cf_cfg.outputs.account_id }}
-        run: |
-          npm ci
-          npm run deploy
+        run: npx wrangler whoami
+
+      - name: Deploy Cloudflare Pages (smritishuddhi.pages.dev)
+        if: steps.cf_cfg.outputs.enabled == 'true'
+        working-directory: cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.cf_cfg.outputs.account_id }}
+        run: npm run deploy:pages
+
+      - name: Deploy Cloudflare Worker (workers.dev fallback)
+        if: steps.cf_cfg.outputs.enabled == 'true'
+        working-directory: cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.cf_cfg.outputs.account_id }}
+        run: npm run deploy:worker

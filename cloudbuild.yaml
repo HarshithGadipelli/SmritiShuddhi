@@ -60,6 +60,28 @@ steps:
       - '--cpu-boost'
       - '--quiet'
 
+  # 5. Keep Git-linked Cloud Run mirror service synced with latest image (best-effort)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud run deploy smritishuddhi-git \
+          --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi:latest \
+          --region=${_REGION} \
+          --platform=managed \
+          --allow-unauthenticated \
+          --port=8080 \
+          --memory=2Gi \
+          --cpu=2 \
+          --concurrency=40 \
+          --timeout=300 \
+          --min-instances=0 \
+          --max-instances=3 \
+          --session-affinity \
+          --cpu-boost \
+          --quiet || true
+
 options:
   logging: CLOUD_LOGGING_ONLY
 
