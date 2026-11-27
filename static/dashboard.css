@@ -238,7 +238,7 @@
   --accent-purple-glow: rgba(124, 58, 237, 0.12);
   --accent-blue: #2563eb;
 
-  --font-masthead: 'Algerian', 'Vast Shadow', 'Cinzel Decorative', 'Cinzel', 'Playfair Display', Georgia, serif;
+  --font-masthead: 'Cinzel Decorative', 'Cinzel', 'Playfair Display', Georgia, serif;
   --font-editorial: 'Newsreader', Georgia, serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -313,7 +313,7 @@
   --accent-purple-glow: rgba(107, 33, 168, 0.15);
   --accent-blue: #1d4ed8;
 
-  --font-masthead: 'Algerian', 'Vast Shadow', 'Cinzel Decorative', 'Cinzel', 'Playfair Display', Georgia, serif;
+  --font-masthead: 'Cinzel Decorative', 'Cinzel', 'Playfair Display', Georgia, serif;
   --font-editorial: 'Newsreader', Georgia, serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -845,7 +845,7 @@ body {
 
 /* ALGERIAN NEWSPAPER MASTHEAD TITLE */
 .newspaper-title {
-  font-family: 'Algerian', 'Vast Shadow', 'Cinzel Decorative', 'Cinzel', 'Playfair Display', Georgia, serif;
+  font-family: 'Cinzel Decorative', 'Cinzel', 'Playfair Display', Georgia, serif;
   font-size: 3.8rem;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -5399,7 +5399,7 @@ body {
   --accent-purple-glow: rgba(88, 28, 135, 0.18);
   --accent-blue: #1e3a8a;
 
-  --font-masthead: 'Algerian', 'Vast Shadow', 'Cinzel Decorative', 'Cinzel', 'Playfair Display', Georgia, serif;
+  --font-masthead: 'Cinzel Decorative', 'Cinzel', 'Playfair Display', Georgia, serif;
   --font-editorial: 'Newsreader', Georgia, 'Times New Roman', serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -5461,7 +5461,7 @@ body {
 }
 
 [data-theme="paper"] .newspaper-title {
-  font-family: 'Algerian', 'Vast Shadow', 'Cinzel Decorative', 'Cinzel', 'Playfair Display', Georgia, serif;
+  font-family: 'Cinzel Decorative', 'Cinzel', 'Playfair Display', Georgia, serif;
   font-weight: 900;
   color: #110903;
   letter-spacing: 0.08em;
