@@ -3991,7 +3991,7 @@ body {
   font-family: var(--font-headline);
   font-size: 1.25rem;
   font-weight: 800;
-  color: var(--text-headline);
+  color: #f8fafc;
   letter-spacing: -0.01em;
 }
 
@@ -6719,10 +6719,12 @@ body {
   }
 
   .nav-search-box {
+    flex: 0 0 auto;
     width: 100%;
     max-width: none;
     min-width: 0;
-    padding: 6px 12px;
+    min-height: 40px;
+    padding: 8px 12px;
   }
 
   .anime-anchor-broadcast-card {
