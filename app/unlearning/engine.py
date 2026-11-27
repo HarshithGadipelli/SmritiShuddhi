@@ -3,6 +3,7 @@ import shutil
 import hashlib
 import json
 import logging
+import threading
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional, Tuple, List
@@ -34,6 +35,7 @@ class UnlearningEngine:
     """
     def __init__(self):
         self.shards_dir = SISA_ADAPTERS_DIR
+        self._partition_lock = threading.Lock()
         self._ensure_manifest()
 
     def _ensure_manifest(self):
@@ -95,6 +97,29 @@ class UnlearningEngine:
         except Exception as e:
             logger.debug("Supabase purged_sample_ids mirror notice: %s", e)
 
+    def _materialize_partition_csvs(self, train_csv_path: Optional[Path] = None, respect_purged: bool = True) -> bool:
+        """Fast hash-only split of train.csv into shard_0..N CSVs when pre-trained .pt adapters exist without CSVs."""
+        if train_csv_path is None:
+            train_csv_path = PROCESSED_DIR / "train.csv"
+        if not train_csv_path.exists():
+            return False
+        with self._partition_lock:
+            df = pd.read_csv(train_csv_path).fillna('')
+            df['sample_id'] = df['sample_id'].astype(str)
+            if respect_purged:
+                purged = set(self.get_purged_ids())
+                if purged:
+                    df = df[~df['sample_id'].isin(purged)].reset_index(drop=True)
+            df['shard_id'] = df['sample_id'].map(
+                lambda sid: int(hashlib.sha256(sid.encode()).hexdigest()[:8], 16) % SISA_SHARDS
+            )
+            self.partitions_dir.mkdir(parents=True, exist_ok=True)
+            for shard_id in range(SISA_SHARDS):
+                shard_df = df[df.shard_id == shard_id].copy().reset_index(drop=True)
+                target = self.partitions_dir / f"shard_{shard_id}.csv"
+                shard_df.to_csv(target, index=False)
+        return True
+
     def _shard_csv_path(self, shard_id: int) -> Path:
         """Keep raw partition CSVs isolated from purged weight artifact folders."""
         new_path = self.partitions_dir / f"shard_{shard_id}.csv"
@@ -104,6 +129,11 @@ class UnlearningEngine:
                 new_path.write_bytes(legacy_path.read_bytes())
             except Exception:
                 pass
+        if not new_path.exists() and (PROCESSED_DIR / "train.csv").exists():
+            try:
+                self._materialize_partition_csvs(respect_purged=True)
+            except Exception as e:
+                logger.debug("Partition CSV materialization notice: %s", e)
         return new_path
 
     def get_manifest(self) -> Dict[str, Any]:
@@ -342,17 +372,19 @@ class UnlearningEngine:
         eval_n = 0
         if test_path.exists():
             from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-            test_df = pd.read_csv(test_path).head(250).fillna('')
+            test_df = pd.read_csv(test_path).head(120).fillna('')
             eval_n = len(test_df)
-            y_true = test_df['label'].astype(int).tolist()
-            y_pred = []
-            for _, r in test_df.iterrows():
-                pred = lora_sisa_engine.predict_style(str(r.get('title', '')), str(r.get('text', '')))
-                y_pred.append(1 if pred["s_style"] >= 0.50 else 0)
-            test_accuracy = round(float(accuracy_score(y_true, y_pred)), 4)
-            test_precision = round(float(precision_score(y_true, y_pred, zero_division=0)), 4)
-            test_recall = round(float(recall_score(y_true, y_pred, zero_division=0)), 4)
-            test_f1 = round(float(f1_score(y_true, y_pred, zero_division=0)), 4)
+            if eval_n > 0:
+                y_true = pd.to_numeric(test_df['label'], errors='coerce').fillna(0).astype(int).tolist()
+                titles_eval = test_df['title'].astype(str).tolist()
+                texts_eval = test_df['text'].astype(str).tolist()
+                X_eval = lora_sisa_engine.extract_batch_features(titles_eval, texts_eval)
+                shard_probs = np.mean([ad.forward(X_eval).reshape(-1) for ad in lora_sisa_engine.adapters], axis=0)
+                y_pred = [1 if float(p) >= 0.50 else 0 for p in shard_probs]
+                test_accuracy = round(float(accuracy_score(y_true, y_pred)), 4)
+                test_precision = round(float(precision_score(y_true, y_pred, zero_division=0)), 4)
+                test_recall = round(float(recall_score(y_true, y_pred, zero_division=0)), 4)
+                test_f1 = round(float(f1_score(y_true, y_pred, zero_division=0)), 4)
 
         probe_after = 0.5
         if purged_row_text:

@@ -6,7 +6,7 @@
   "scaling": 2.0,
   "input_dim": 512,
   "sample_count": 1541,
-  "bias": -0.51868,
-  "last_bce_loss": 0.1336,
-  "updated_at": "2026-11-26 10:44:32"
+  "bias": -0.46972,
+  "last_bce_loss": 0.16675,
+  "updated_at": "2026-11-27 12:29:46"
 }

@@ -37,6 +37,12 @@ def ensure_initial_sisa_shards():
     if not (ROOT_DIR / "data" / "processed" / "train.csv").exists():
         print("[preload] train.csv absent; skipping initial SISA build.")
         return
+    if shard0_pt.exists():
+        print("[preload] Pre-trained SISA LoRA weights present; materializing partition CSVs from train.csv...")
+        from app.unlearning.engine import unlearning_engine
+        ok = unlearning_engine._materialize_partition_csvs(respect_purged=True)
+        print(f"[preload] Partition CSVs materialized: {ok}")
+        return
     print("[preload] Pre-building initial 5 SISA shards & embedding cache...")
     os.environ["HF_HUB_OFFLINE"] = "1"
     os.environ["TRANSFORMERS_OFFLINE"] = "1"

@@ -40,6 +40,7 @@ class EnsembleFusionLayer:
         stance_result: Optional[Dict[str, Any]] = None,
         ner_spo_result: Optional[Dict[str, Any]] = None,
         website_prop_result: Optional[Dict[str, Any]] = None,
+        live_corroboration_result: Optional[Dict[str, Any]] = None,
         gemini_summary: Optional[str] = None
     ) -> Dict[str, Any]:
         """5-Pillar Multi-Aspect Decoupled Ensemble Fusion:
@@ -136,8 +137,21 @@ class EnsembleFusionLayer:
                 w_risk = float(wx_res["weather_risk"])
                 if w_risk >= 0.75:
                     s_quant = max(s_quant, w_risk)
+                elif w_risk <= 0.35:
+                    s_fact_base = min(s_fact_base, w_risk)
             for w_note in wx_res.get("weather_anomalies", []):
                 xai_factors.append(f"Open-Meteo Telemetry: {w_note}")
+
+        # Incorporate Live General News Wire & NSE/BSE Financial Market Corroboration
+        live_corr = live_corroboration_result or {"status": "SKIPPED", "corroborated": False, "corroboration_risk": None, "news_matches": [], "market_match": None, "corroboration_notes": []}
+        if live_corr.get("corroboration_risk") is not None:
+            c_risk = float(live_corr["corroboration_risk"])
+            if c_risk >= 0.75:
+                s_quant = max(s_quant, c_risk)
+            elif c_risk <= 0.30:
+                s_fact_base = min(s_fact_base, c_risk)
+        for c_note in live_corr.get("corroboration_notes", []):
+            xai_factors.append(c_note)
 
         # Quantitative anomaly escalation
         if quant_res.get("has_anomaly") and quant_res.get("anomalies"):
@@ -275,12 +289,22 @@ class EnsembleFusionLayer:
             xai_factors.append("Multimodal Misattribution Risk: Incongruent image detected relative to headline assertions.")
 
         # Critical Safety Overrides & Escalations
+        has_live_corroboration = bool(live_corr.get("corroborated") or wx_res.get("corroborated"))
+        clean_non_viral = (
+            not quant_res.get("has_anomaly")
+            and not contradictions
+            and not adv_res.get("is_adversarial_attack")
+            and source_verdict != "UNVERIFIED_VIRAL_CHANNEL"
+            and prop_res.get("propagation_band") != "HIGH_COERCIVE_VIRALITY"
+        )
         if quant_res.get("has_anomaly") or (int_evid.get("has_match") and int_evid.get("top_match", {}).get("truth_status") == "VERIFIED_DEBUNK"):
             raw_fake_prob = max(raw_fake_prob, 0.88)
         elif fc_res.get("factcheck_risk") is not None and fc_res["factcheck_risk"] >= 0.85:
             raw_fake_prob = max(raw_fake_prob, 0.88)
         elif wx_res.get("weather_risk") is not None and wx_res["weather_risk"] >= 0.85:
             raw_fake_prob = max(raw_fake_prob, 0.88)
+        elif live_corr.get("corroboration_risk") is not None and live_corr["corroboration_risk"] >= 0.75:
+            raw_fake_prob = max(raw_fake_prob, 0.84)
         elif zk_res.get("disposition") == "BLOCK_ZERO_DAY_PANIC_HOAX":
             raw_fake_prob = max(raw_fake_prob, 0.88)
         elif zk_res.get("disposition") == "REJECT_PHYSICAL_IMPOSSIBILITY":
@@ -295,8 +319,10 @@ class EnsembleFusionLayer:
             raw_fake_prob = min(raw_fake_prob, 0.10)
         elif fc_res.get("factcheck_risk") is not None and fc_res["factcheck_risk"] <= 0.15 and s_content < 0.35 and not contradictions:
             raw_fake_prob = min(raw_fake_prob, 0.16)
-        elif source_verdict == "VERIFIED_INSTITUTIONAL_WIRE" and s_content < 0.30 and not quant_res.get("has_anomaly") and not contradictions and not adv_res.get("is_adversarial_attack"):
+        elif source_verdict == "VERIFIED_INSTITUTIONAL_WIRE" and s_content < 0.30 and clean_non_viral:
             raw_fake_prob = min(raw_fake_prob, 0.08)
+        elif has_live_corroboration and clean_non_viral and s_content < 0.55 and not (int_evid.get("has_match") and int_evid.get("top_match", {}).get("truth_status") == "VERIFIED_DEBUNK"):
+            raw_fake_prob = min(raw_fake_prob, 0.22)
 
         fake_prob = round(float(np.clip(raw_fake_prob, 0.01, 0.99)), 4)
         real_prob = round(1.0 - fake_prob, 4)
@@ -385,6 +411,7 @@ class EnsembleFusionLayer:
             "epistemic_calibration": calibration_res,
             "live_factcheck_api": fc_res,
             "open_meteo_weather": wx_res,
+            "live_corroboration": live_corr,
             "adversarial_defense": adv_res,
             "headline_stance": st_res,
             "ner_spo_lineage": ns_res,

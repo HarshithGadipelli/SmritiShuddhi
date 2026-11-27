@@ -8,7 +8,8 @@ artifacts/evaluation/
 logs/*.log
 *.db
 models_cache/
-sisa_adapters/
+sisa_adapters/partitions/emb_cache.npz
+sisa_adapters/partitions/shard_*.csv
 data/raw/
 data/liar_plus/
 data/local_store.json

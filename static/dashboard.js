@@ -290,14 +290,7 @@ function setTheme(theme, isUserClick = true) {
     playPaperRustleSound('rustle');
   }
 
-  const btnLight = document.getElementById('btnThemeLight');
-  const btnPaper = document.getElementById('btnThemePaper');
-  const btnDark = document.getElementById('btnThemeDark');
-  if (btnLight) btnLight.classList.toggle('active', theme === 'light');
-  if (btnPaper) btnPaper.classList.toggle('active', theme === 'paper');
-  if (btnDark) btnDark.classList.toggle('active', theme === 'dark');
-
-  // Drawer buttons & checks
+  // Drawer theme buttons & checks
   const dModePaper = document.getElementById('btnModePaper');
   const dModeLight = document.getElementById('btnModeLight');
   const dModeDark = document.getElementById('btnModeDark');
@@ -356,13 +349,6 @@ function setUiLanguage(lang) {
   state.currentLang = lang;
   localStorage.setItem('smriti_shuddhi_lang', lang);
 
-  const btnEn = document.getElementById('btnUiEn');
-  const btnHi = document.getElementById('btnUiHi');
-  const btnTe = document.getElementById('btnUiTe');
-  if (btnEn) btnEn.classList.toggle('active', lang === 'en');
-  if (btnHi) btnHi.classList.toggle('active', lang === 'hi');
-  if (btnTe) btnTe.classList.toggle('active', lang === 'te');
-
   // Drawer language pills
   const dLangEn = document.getElementById('btnLangEn');
   const dLangHi = document.getElementById('btnLangHi');
@@ -420,9 +406,6 @@ function setUiLanguage(lang) {
   const lblLang = document.getElementById('lblLangFilter');
   if (lblLang) lblLang.innerText = t.language;
 
-  const anchorRole = document.getElementById('anchorRoleBadge');
-  if (anchorRole) anchorRole.innerText = t.anchorRole;
-
   const anchorDialogue = document.getElementById('anchorDialogue');
   if (anchorDialogue) anchorDialogue.innerHTML = t.anchorDialogue;
 
@@ -442,13 +425,6 @@ function setUiLanguage(lang) {
   if (btnExportText) btnExportText.innerText = t.exportDossier;
   const btnBookmarkText = document.getElementById('btnBookmarkText');
   if (btnBookmarkText) btnBookmarkText.innerText = t.saveStory;
-
-  const navSignInText = document.getElementById('navSignInText');
-  if (navSignInText) navSignInText.innerText = t.signIn;
-  const navRegisterText = document.getElementById('navRegisterText');
-  if (navRegisterText) navRegisterText.innerText = t.register;
-  const navLogoutText = document.getElementById('navLogoutText');
-  if (navLogoutText) navLogoutText.innerText = t.signOut;
 
   const certHeadingText = document.getElementById('certHeadingText');
   if (certHeadingText) certHeadingText.innerText = t.certHeading;
@@ -476,8 +452,6 @@ function updateUserUI() {
   const nameEl = document.getElementById('navUserName');
   const badgeEl = document.getElementById('navUserBadge');
   const avatarEl = document.getElementById('navAvatar');
-  const btnJournalist = document.getElementById('btnRoleJournalist');
-  const btnAdmin = document.getElementById('btnRoleAdmin');
   const adminTab = document.getElementById('tabAdminBtn');
 
   const isAdmin = (state.currentRole === 'ADMIN');
@@ -508,23 +482,17 @@ function updateUserUI() {
     authorInput.value = state.currentUser.name || (isAdmin ? 'Dr. Sarah Mitchell' : 'Alex Rivera');
   }
 
-  if (btnJournalist && btnAdmin) {
-    if (isAdmin) {
-      btnAdmin.classList.add('active');
-      btnJournalist.classList.remove('active');
-    } else {
-      btnJournalist.classList.add('active');
-      btnAdmin.classList.remove('active');
-    }
-  }
-
-  // Strict role abstraction for Admin controls
+  // Strict role abstraction for Admin tabs & controls
+  const auditTab = document.getElementById('tabAuditBtn');
   if (adminTab) {
     adminTab.style.display = isAdmin ? 'inline-flex' : 'none';
   }
+  if (auditTab) {
+    auditTab.style.display = isAdmin ? 'inline-flex' : 'none';
+  }
 
-  // If user is not admin and currently on admin tab, route back to wire
-  if (!isAdmin && state.currentTab === 'admin') {
+  // If user is not admin and currently on admin/audit tab, route back to wire
+  if (!isAdmin && (state.currentTab === 'admin' || state.currentTab === 'audit')) {
     switchTab('wire');
   }
 
@@ -1315,17 +1283,17 @@ async function processUploadedFile(file) {
   if (nameEl) nameEl.innerText = file.name;
   if (detailsEl) detailsEl.innerText = `Extracting structured text...`;
 
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
   const reader = new FileReader();
 
-  // If plain text / markdown / csv
-  if (file.name.endsWith('.txt') || file.name.endsWith('.md') || file.name.endsWith('.csv') || file.name.endsWith('.json')) {
+  // Read pure plain text / markdown directly on client; send PDF, DOCX, images, HTML, JSON, CSV, XLSX, EML to backend multimodal extractor
+  if (ext === 'txt' || ext === 'text' || ext === 'md' || ext === 'markdown' || ext === 'log') {
     reader.onload = (event) => {
       const text = event.target.result;
       populateExtractedContent(file.name, text);
     };
     reader.readAsText(file);
   } else {
-    // For DOCX, PDF, etc., convert to Base64 and call backend extraction endpoint
     reader.onload = async (event) => {
       const base64 = event.target.result;
       try {
@@ -1334,27 +1302,31 @@ async function processUploadedFile(file) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ filename: file.name, base64_content: base64 })
         });
-        const data = await res.json();
-        if (data.success) {
-          populateExtractedContent(data.title || file.name, data.text || '');
+        const raw = await res.text();
+        let data = {};
+        try { data = raw ? JSON.parse(raw) : {}; } catch (_) {}
+        if (res.ok && data.success) {
+          populateExtractedContent(data.title || file.name, data.text || '', data.extraction_metadata || null);
         } else {
-          populateExtractedContent(file.name, 'Document text could not be extracted automatically.');
+          const msg = (data && (data.detail || data.message)) || 'Document text could not be extracted automatically.';
+          populateExtractedContent(file.name, msg);
+          showToast(msg, 'warning');
         }
       } catch (err) {
         console.error('Doc parse error:', err);
+        showToast(`Document extraction error: ${err.message}`, 'error');
       }
     };
     reader.readAsDataURL(file);
   }
 }
 
-function populateExtractedContent(title, body) {
+function populateExtractedContent(title, body, meta = null) {
   const headlineInput = document.getElementById('headlineInput');
   const bodyInput = document.getElementById('bodyInput');
   const detailsEl = document.getElementById('parsedFileDetails');
 
-  // Format title if needed
-  let cleanTitle = title.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+  let cleanTitle = String(title || '').replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
   if (cleanTitle.length > 5) {
     cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
   }
@@ -1363,10 +1335,15 @@ function populateExtractedContent(title, body) {
   if (bodyInput && body) bodyInput.value = body;
 
   const wordCount = (body || '').split(/\s+/).filter(Boolean).length;
+  const extraParts = [];
+  if (meta && meta.ocr_used) extraParts.push('Vision OCR');
+  if (meta && meta.images_detected > 0) extraParts.push(`${meta.images_detected} img(s)`);
+  if (meta && meta.tables_extracted > 0) extraParts.push(`${meta.tables_extracted} table(s)`);
+  const extraTag = extraParts.length ? ` • ${extraParts.join(' • ')}` : '';
   if (detailsEl) {
-    detailsEl.innerText = `${Math.round((state.uploadedFile ? state.uploadedFile.size : 1024) / 1024)} KB • ${wordCount} words extracted`;
+    detailsEl.innerText = `${Math.round((state.uploadedFile ? state.uploadedFile.size : 1024) / 1024)} KB • ${wordCount} words extracted${extraTag}`;
   }
-  logTerminal('DOC_PARSED', `Document text extracted successfully (${wordCount} words).`);
+  logTerminal('DOC_PARSED', `Document text extracted successfully (${wordCount} words${extraTag}).`);
 }
 
 function clearUploadedFile() {
@@ -1583,15 +1560,25 @@ function renderScanResult(data) {
   const action = document.getElementById('verdictAction');
   const notice = document.getElementById('submissionOutcomeNotice');
 
-  if (tag === 'REAL') {
+  if (tag === 'REAL' || tag === 'BREAKING_VERIFIED') {
     if (badge) {
-      badge.innerText = 'REAL // LOW RISK FACTUAL';
+      badge.innerText = tag === 'BREAKING_VERIFIED' ? 'BREAKING VERIFIED // LIVE WIRE' : 'REAL // LOW RISK FACTUAL';
       badge.className = 'verdict-badge accent-green';
     }
     if (action) action.innerText = 'AUTO-PUBLISHED TO PUBLIC NEWS WIRE';
     if (notice) {
       notice.className = 'submission-notice notice-published';
-      notice.innerHTML = `✓ <strong>Verified Authentic:</strong> Article verified against official truth repositories and published directly to the front page news wire!`;
+      notice.innerHTML = `✓ <strong>Verified Authentic:</strong> Article verified against live telemetry and truth repositories and published directly to the front page news wire!`;
+    }
+  } else if (tag === 'DEVELOPING_STORY' || tag === 'HALF_TRUTH') {
+    if (badge) {
+      badge.innerText = tag === 'HALF_TRUTH' ? 'HALF-TRUTH // PARTIAL VERIFICATION' : 'DEVELOPING // UNCORROBORATED REPORT';
+      badge.className = 'verdict-badge accent-amber';
+    }
+    if (action) action.innerText = 'ROUTED TO ADMIN EDITORIAL REVIEW';
+    if (notice) {
+      notice.className = 'submission-notice notice-pending';
+      notice.innerHTML = `⚖️ <strong>Editorial Verification Pending:</strong> ${escapeHtml(data.message || 'Developing story awaiting editorial review before front-page wire broadcast.')}`;
     }
   } else if (tag === 'LIKELY_FAKE') {
     if (badge) {
@@ -2178,7 +2165,16 @@ async function executeSelectedUnlearning(strategy) {
         strategy: strategy
       })
     });
-    const data = await res.json();
+    const rawBody = await res.text();
+    let data = null;
+    try {
+      data = rawBody ? JSON.parse(rawBody) : {};
+    } catch (_) {
+      throw new Error(rawBody ? rawBody.slice(0, 180) : `HTTP ${res.status}`);
+    }
+    if (!res.ok) {
+      throw new Error((data && (data.detail || data.message)) || `HTTP ${res.status}`);
+    }
     logTerminal('UNLEARN_SUCCESS', `Unlearning executed successfully for ${target.sampleId}. 0.00% residual influence.`);
 
     // Flash affected SISA Shard
@@ -2628,14 +2624,24 @@ function closeArticleModal() {
 async function approveArticle(newsId) {
   try {
     const res = await fetch(`/api/v1/admin/approve/${newsId}`, { method: 'POST' });
-    const data = await res.json();
+    const raw = await res.text();
+    let data = {};
+    try { data = raw ? JSON.parse(raw) : {}; } catch (_) {}
     if (res.ok) {
-      showToast(`✓ Story ${newsId} approved and published to live news wire!`, 'success');
+      if (data.article && data.article.news_id) {
+        state.allNews = deduplicateArticles([data.article, ...(state.allNews || []).filter(a => a.news_id !== newsId)]);
+      }
+      state.selectedCategory = 'All';
+      state.selectedLanguage = 'All';
+      document.querySelectorAll('.cat-pill').forEach((p, idx) => p.classList.toggle('active', idx === 0));
+      document.querySelectorAll('.lang-pill').forEach((p, idx) => p.classList.toggle('active', idx === 0));
+      renderNewsWire();
+      showToast(`✓ Story ${newsId} approved and published to Front Page Wire!`, 'success');
       logTerminal('ARTICLE_APPROVED', `Article ${newsId} approved for live publication by Chief Fact-Checker.`);
       await loadAdminQueue();
       await loadPublishedNews();
     } else {
-      showToast(`Approval failed: ${data.detail || 'Unknown error'}`, 'error');
+      showToast(`Approval failed: ${data.detail || raw || 'Unknown error'}`, 'error');
     }
   } catch (err) {
     console.error('Approve error:', err);
@@ -3195,6 +3201,29 @@ function quickFilterTopic(topic) {
   executeUnifiedSearch(topic);
 }
 
+let _liveSearchDebounce = null;
+
+function _scoreArticleSearchMatch(n, q, tokens) {
+  const hay = [
+    n.title || '',
+    n.text || '',
+    n.category || '',
+    n.source || '',
+    n.author || '',
+    n.region || ''
+  ].join(' ').toLowerCase();
+  if (!hay.trim()) return 0;
+  if (hay.includes(q)) return 100 + (n.is_user_submission ? 25 : 0);
+  if (tokens.length === 0) return 0;
+  const matched = tokens.filter(t => hay.includes(t)).length;
+  if (matched === 0) return 0;
+  const titleLow = (n.title || '').toLowerCase();
+  const titleHits = tokens.filter(t => titleLow.includes(t)).length;
+  if (tokens.length <= 1) return matched >= 1 ? 40 + (n.is_user_submission ? 15 : 0) : 0;
+  if (matched === tokens.length) return 60 + titleHits * 10 + (n.is_user_submission ? 15 : 0);
+  return 0;
+}
+
 function executeUnifiedSearch(query) {
   const q = (query || '').trim().toLowerCase();
   const badge = document.getElementById('wireSearchCountBadge');
@@ -3206,18 +3235,40 @@ function executeUnifiedSearch(query) {
     renderNewsWire();
     return;
   }
-  const filtered = (state.allNews || []).filter(n =>
-    (n.title || '').toLowerCase().includes(q) ||
-    (n.text || '').toLowerCase().includes(q) ||
-    (n.category || '').toLowerCase().includes(q) ||
-    (n.source || '').toLowerCase().includes(q) ||
-    (n.author || '').toLowerCase().includes(q) ||
-    (n.region || '').toLowerCase().includes(q)
-  );
+  const tokens = q.split(/\s+/).filter(t => t.length >= 2);
+  const scored = (state.allNews || [])
+    .map(n => ({ item: n, score: _scoreArticleSearchMatch(n, q, tokens) }))
+    .filter(x => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(x => x.item);
+
   if (badge) {
-    badge.innerText = `${filtered.length} Dispatches Matching "${query}"`;
+    badge.innerText = `${scored.length} Dispatches Matching "${query}"`;
   }
-  renderCustomNewsGrid(filtered);
+  renderCustomNewsGrid(scored);
+
+  // Also query backend full PostgreSQL/DB search when typed query has >= 2 chars
+  if (q.length >= 2) {
+    if (_liveSearchDebounce) clearTimeout(_liveSearchDebounce);
+    _liveSearchDebounce = setTimeout(async () => {
+      try {
+        const currentInput = ((document.getElementById('frontPageSearchInput') || {}).value || (document.getElementById('newsSearchInput') || {}).value || '').trim().toLowerCase();
+        if (currentInput !== q) return;
+        const res = await fetch(`/api/v1/news?q=${encodeURIComponent(query.trim())}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const dbHits = deduplicateArticles((data.news || []).concat(scored));
+        if (dbHits.length > scored.length) {
+          const reScored = dbHits
+            .map(n => ({ item: n, score: _scoreArticleSearchMatch(n, q, tokens) || 10 }))
+            .sort((a, b) => b.score - a.score)
+            .map(x => x.item);
+          if (badge) badge.innerText = `${reScored.length} Dispatches Matching "${query}"`;
+          renderCustomNewsGrid(reScored);
+        }
+      } catch (_) {}
+    }, 260);
+  }
 }
 
 function renderCustomNewsGrid(items) {
@@ -3369,21 +3420,36 @@ async function extractArticleFromUrl() {
 
 async function searchLiveTopic(topic) {
   const q = (topic || '').trim();
-  if (!q) return;
+  if (!q) {
+    executeUnifiedSearch('');
+    return;
+  }
   const frontInput = document.getElementById('frontPageSearchInput');
   const clearBtn = document.getElementById('btnClearFrontSearch');
   const badge = document.getElementById('wireSearchCountBadge');
   if (frontInput) frontInput.value = q;
   if (clearBtn) clearBtn.style.display = 'inline-flex';
   if (state.currentTab !== 'wire') switchTab('wire');
-  if (badge) badge.innerText = `Searching Live Wire for "${q}"...`;
+  if (badge) badge.innerText = `Searching Database & Live Wire for "${q}"...`;
+
+  const qLow = q.toLowerCase();
+  const tokens = qLow.split(/\s+/).filter(t => t.length >= 2);
+  const localMatches = (state.allNews || [])
+    .map(n => ({ item: n, score: _scoreArticleSearchMatch(n, qLow, tokens) }))
+    .filter(x => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(x => x.item);
 
   try {
-    const res = await fetch(`/api/v1/news/search-topic?q=${encodeURIComponent(q)}&limit=12`);
-    const data = await res.json();
-    const stories = data.stories || [];
-    if (badge) badge.innerText = `${stories.length} Live Topic Dispatches for "${q}"`;
-    renderCustomNewsGrid(stories);
+    const [dbRes, liveRes] = await Promise.allSettled([
+      fetch(`/api/v1/news?q=${encodeURIComponent(q)}`).then(r => (r.ok ? r.json() : { news: [] })),
+      fetch(`/api/v1/news/search-topic?q=${encodeURIComponent(q)}&limit=12`).then(r => (r.ok ? r.json() : { stories: [] })),
+    ]);
+    const dbStories = (dbRes.status === 'fulfilled' && dbRes.value && Array.isArray(dbRes.value.news)) ? dbRes.value.news : [];
+    const liveStories = (liveRes.status === 'fulfilled' && liveRes.value && Array.isArray(liveRes.value.stories)) ? liveRes.value.stories : [];
+    const combined = deduplicateArticles([...dbStories, ...localMatches, ...liveStories]);
+    if (badge) badge.innerText = `${combined.length} Dispatches (Database + Live Wire) for "${q}"`;
+    renderCustomNewsGrid(combined);
   } catch (err) {
     if (badge) badge.innerText = `Showing Local Matches for "${q}"`;
     executeUnifiedSearch(q);
@@ -3404,6 +3470,10 @@ async function loadLiveWeatherTicker() {
       const d = await res.json();
       if (d.temperature_c !== undefined && d.temperature_c !== null) {
         el.innerHTML = `🌦️ <strong>${c.name}:</strong> ${d.temperature_c}°C • Wind ${d.wind_kmh || 0} km/h <span style="opacity:0.7;">(Open-Meteo)</span>`;
+        if (c.id === 'wxDelhi') {
+          const earEl = document.getElementById('mastheadEarWeather');
+          if (earEl) earEl.innerText = `🌦️ ${c.name.toUpperCase()} ${d.temperature_c}°C • OPEN-METEO`;
+        }
       }
     } catch (e) {}
   }
@@ -4039,9 +4109,11 @@ async function approveRemovalRequest(requestId) {
     const res = await fetch(`/api/v1/admin/removal-requests/${requestId}/approve`, {
       method: 'POST'
     });
-    const data = await res.json();
+    const raw = await res.text();
+    let data = {};
+    try { data = raw ? JSON.parse(raw) : {}; } catch (_) {}
     if (res.ok && data.success) {
-      showToast(`⚡ Article unlearned and removed from system via Decremental SVM!`, 'success');
+      showToast(`⚡ Article unlearned and removed from system!`, 'success');
       logTerminal('CITIZEN_REMOVAL_APPROVED', `Unlearned story for request ${requestId} (0.00% residual influence)`);
       await loadRemovalRequests();
       await loadAdminQueue();
@@ -4049,10 +4121,11 @@ async function approveRemovalRequest(requestId) {
       await loadPublishedNews();
       await refreshDbExplorerTelemetry();
     } else {
-      showToast(`Approval error: ${data.detail || 'Failed'}`, 'error');
+      showToast(`Approval error: ${(data && (data.detail || data.message)) || raw.slice(0, 120) || 'Failed'}`, 'error');
     }
   } catch (err) {
     console.error('Approve removal error:', err);
+    showToast(`Removal approval error: ${err.message}`, 'error');
   }
 }
 

@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "sync": "node scripts/sync-assets.mjs",
-    "dev": "wrangler dev --experimental-new-config",
-    "build": "node scripts/sync-assets.mjs && wrangler deploy --experimental-new-config --dry-run",
-    "deploy": "wrangler deploy --experimental-new-config",
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

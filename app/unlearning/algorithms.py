@@ -58,6 +58,8 @@ def _compute_empirical_mia_score(forget_probs: List[float], test_probs: np.ndarr
     s_mia = np.array(f_conf + t_conf)
     try:
         auc = float(roc_auc_score(y_mia, s_mia))
+        if math.isnan(auc) or math.isinf(auc):
+            auc = 0.50
     except Exception:
         auc = 0.50
     adv = abs(auc - 0.50) * 2.0
@@ -516,10 +518,11 @@ class BaselineFullRetrainEngine:
         cleaned_df = self.data[~self.data["sample_id"].astype(str).isin(drop_set)].reset_index(drop=True)
         self.data = cleaned_df
         texts = (cleaned_df["title"].fillna("") + " " + cleaned_df["text"].fillna("")).tolist()
-        X = self.vectorizer.fit_transform(texts)
-        y = cleaned_df["label"].astype(int).to_numpy()
+        y = pd.to_numeric(cleaned_df["label"], errors="coerce").fillna(0).astype(int).to_numpy()
         self.model = LogisticRegression(max_iter=100)
-        self.model.fit(X, y)
+        if len(texts) > 0 and len(set(y)) >= 2:
+            X = self.vectorizer.fit_transform(texts)
+            self.model.fit(X, y)
         elapsed_ms = (time.perf_counter() - t0) * 1000.0
 
         probs_after = self.predict_probs(target_df).tolist() if len(target_df) > 0 else [0.5]
@@ -542,6 +545,7 @@ class MultiModelUnlearningSuite:
         self.is_ready = False
         self.active_strategy = "algorithm_4_hybrid"
         self._init_lock = threading.Lock()
+        self._bench_lock = threading.Lock()
 
     def initialize_all(self, train_df: pd.DataFrame, test_df: pd.DataFrame):
         logger.info("Initializing 5-Strategy Unlearning Suite on %d train / %d test samples...", len(train_df), len(test_df))
@@ -826,49 +830,53 @@ class MultiModelUnlearningSuite:
         if not self.is_ready:
             self._lazy_init()
 
-        target_ids = [str(s) for s in (sample_ids or [sample_id]) if s]
-        # Snapshot clean pre-unlearning states so each benchmark strategy drops the exact same sample(s)
-        snap_base = copy.deepcopy(self.baseline_engine)
-        snap_sisa = copy.deepcopy(self.sisa_engine)
-        snap_svm = copy.deepcopy(self.svm_engine)
-        snap_lora = copy.deepcopy(self.lora_engine)
+        with self._bench_lock:
+            target_ids = [str(s) for s in (sample_ids or [sample_id]) if s]
+            # Snapshot clean pre-unlearning states so each benchmark strategy drops the exact same sample(s)
+            snap_base = copy.deepcopy(self.baseline_engine)
+            snap_sisa = copy.deepcopy(self.sisa_engine)
+            snap_svm = copy.deepcopy(self.svm_engine)
+            snap_lora = copy.deepcopy(self.lora_engine)
 
-        strategies = [
-            "baseline_retrain",
-            "algorithm_1_sisa",
-            "algorithm_2_svm",
-            "algorithm_3_lora",
-            "algorithm_4_hybrid",
-        ]
-        results = []
-        committed_engines = None
+            strategies = [
+                "baseline_retrain",
+                "algorithm_1_sisa",
+                "algorithm_2_svm",
+                "algorithm_3_lora",
+                "algorithm_4_hybrid",
+            ]
+            results = []
+            committed_engines = None
 
-        for strat in strategies:
-            # Start each strategy from identical snapshot
-            self.baseline_engine = copy.deepcopy(snap_base)
-            self.sisa_engine = copy.deepcopy(snap_sisa)
-            self.svm_engine = copy.deepcopy(snap_svm)
-            self.lora_engine = copy.deepcopy(snap_lora)
+            for strat in strategies:
+                # Start each strategy from identical snapshot
+                self.baseline_engine = copy.deepcopy(snap_base)
+                self.sisa_engine = copy.deepcopy(snap_sisa)
+                self.svm_engine = copy.deepcopy(snap_svm)
+                self.lora_engine = copy.deepcopy(snap_lora)
 
-            res = self.run_strategy(
-                strat,
-                sample_id=target_ids[0],
-                sample_title=sample_title,
-                sample_text=sample_text,
-                sample_ids=target_ids,
-            )
-            r_dict = res.to_dict()
-            is_exec = (executed_strategy == "all_benchmark") or bool(executed_strategy and strat == executed_strategy)
-            r_dict["is_executed"] = is_exec
-            r_dict["execution_status"] = "ACTIVE & EXECUTED" if is_exec else "BENCHMARK COMPARISON"
-            results.append(r_dict)
-            if is_exec or (strat == self.active_strategy and committed_engines is None):
-                committed_engines = (self.baseline_engine, self.sisa_engine, self.svm_engine, self.lora_engine)
+                res = self.run_strategy(
+                    strat,
+                    sample_id=target_ids[0],
+                    sample_title=sample_title,
+                    sample_text=sample_text,
+                    sample_ids=target_ids,
+                )
+                r_dict = res.to_dict()
+                for rk, rv in list(r_dict.items()):
+                    if isinstance(rv, float) and (math.isnan(rv) or math.isinf(rv)):
+                        r_dict[rk] = 0.0
+                is_exec = (executed_strategy == "all_benchmark") or bool(executed_strategy and strat == executed_strategy)
+                r_dict["is_executed"] = is_exec
+                r_dict["execution_status"] = "ACTIVE & EXECUTED" if is_exec else "BENCHMARK COMPARISON"
+                results.append(r_dict)
+                if is_exec or (strat == self.active_strategy and committed_engines is None):
+                    committed_engines = (self.baseline_engine, self.sisa_engine, self.svm_engine, self.lora_engine)
 
-        if committed_engines is not None:
-            self.baseline_engine, self.sisa_engine, self.svm_engine, self.lora_engine = committed_engines
-            if executed_strategy in ("algorithm_3_lora", "algorithm_4_hybrid", "all_benchmark"):
-                self.lora_engine.save_mask()
+            if committed_engines is not None:
+                self.baseline_engine, self.sisa_engine, self.svm_engine, self.lora_engine = committed_engines
+                if executed_strategy in ("algorithm_3_lora", "algorithm_4_hybrid", "all_benchmark"):
+                    self.lora_engine.save_mask()
 
         baseline_time = max(results[0]["execution_time_ms"], 0.01)
         for item in results:

@@ -56,18 +56,19 @@ class FrozenDebertaBackbone:
                 (local_p / "pytorch_model.bin").exists() or (local_p / "model.safetensors").exists()
             ):
                 if (local_p / "pytorch_model.bin").stat().st_size > 10_000_000 if (local_p / "pytorch_model.bin").exists() else (local_p / "model.safetensors").stat().st_size > 10_000_000:
-                    candidates.append(str(local_p))
-        candidates.append(DEBERTA_MODEL_NAME)
+                    candidates.append((str(local_p), True))
+        strict_offline = os.getenv("HF_HUB_OFFLINE") == "1" or os.getenv("TRANSFORMERS_OFFLINE") == "1"
+        candidates.append((DEBERTA_MODEL_NAME, strict_offline))
 
         try:
             from transformers import AutoTokenizer, AutoModel
-            for cand in candidates:
+            for cand, local_only in candidates:
                 try:
                     try:
-                        tok = AutoTokenizer.from_pretrained(cand, local_files_only=True)
+                        tok = AutoTokenizer.from_pretrained(cand, local_files_only=local_only)
                     except Exception:
-                        tok = AutoTokenizer.from_pretrained(cand, local_files_only=True, use_fast=False)
-                    mdl = AutoModel.from_pretrained(cand, local_files_only=True)
+                        tok = AutoTokenizer.from_pretrained(cand, local_files_only=local_only, use_fast=False)
+                    mdl = AutoModel.from_pretrained(cand, local_files_only=local_only)
                     for p in mdl.parameters():
                         p.requires_grad = False
                     mdl.eval()
@@ -437,14 +438,21 @@ class LoRADrivenSemanticSISAEngine:
             shard_predictions.append(prob)
 
         raw_s_style = float(np.mean(shard_predictions))
+        median_s_style = float(np.median(shard_predictions)) if shard_predictions else raw_s_style
         std_shards = float(np.std(shard_predictions)) if shard_predictions else 0.0
         agree_ratio = round(max(0.0, 1.0 - std_shards * 2.0), 4)
 
         cue_bonus = min(xai_info["sensational_cue_count"] * 0.14 + xai_info["exclamation_density"] * 1.1, 0.35)
         if xai_info["stylistic_framing_risk"] == "HIGH":
             s_style = float(np.clip(raw_s_style + cue_bonus, 0.05, 0.96))
-        elif xai_info["sensational_cue_count"] == 0 and xai_info["exclamation_density"] == 0 and raw_s_style < 0.65:
-            s_style = float(np.clip(raw_s_style - 0.08, 0.04, 0.95))
+        elif xai_info["sensational_cue_count"] == 0 and xai_info["exclamation_density"] == 0 and xai_info["all_caps_word_ratio"] < 0.08:
+            # Objective calm prose: when shards diverge strongly (std >= 0.28) on unseen local/domain names,
+            # use median consensus instead of being pulled high by two outlier shards.
+            base_clean = (0.45 * raw_s_style + 0.55 * median_s_style) if std_shards >= 0.28 else raw_s_style
+            if base_clean < 0.65:
+                s_style = float(np.clip(base_clean - 0.08, 0.04, 0.95))
+            else:
+                s_style = float(np.clip(base_clean, 0.04, 0.96))
         else:
             s_style = float(np.clip(raw_s_style, 0.04, 0.96))
 

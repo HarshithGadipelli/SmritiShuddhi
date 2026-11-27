@@ -1,27 +1,40 @@
-.gcloudignore
 .git/
-.gitignore
+.github/
 .venv/
+venv/
 __pycache__/
 *.pyc
 *.pyo
-.env
-.env.local
+*.pyd
+*.db
 scratch/
+.env
+.env.*
+
+# Heavy local caches (downloaded cleanly on build or startup)
+models_cache/
+sisa_adapters/partitions/emb_cache.npz
+sisa_adapters/partitions/shard_*.csv
+
+# Runtime / local database & upload state
 logs/
 *.log
-*.db
-models_cache/
-data/raw/
-data/liar_plus/
 data/local_store.json
 data/qdrant_storage/
+data/raw/
+data/liar_plus/
 static/uploads/
-artifacts/
+
+# Unused training/eval artifacts & tests
+artifacts/models/*.joblib
+artifacts/sisa/*.joblib
+artifacts/evaluation/
 test_*.py
 training/
 scripts/
-node_modules/
+*.md
+PROJECT_TREE.txt
 
-# Cloudflare Edge Worker frontend workspace (deployed separately via Wrangler / cf)
+# Cloudflare Edge Worker frontend workspace
 cloudflare/
+node_modules/

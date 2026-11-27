@@ -188,20 +188,25 @@ class TemporalGraphEngine:
         }
 
     def extract_temporal_entities(self, text: str) -> Dict[str, Any]:
-        """Extracts dates, years, and recognized entities from text."""
+        """Extracts dates, years, and recognized entities dynamically relative to current server year."""
         safe_text = str(text or "")
+        current_year = datetime.now(timezone.utc).year
         # Find explicit 4-digit years (e.g., 2018 to 2035)
         years = re.findall(r'\b(20[1-3][0-9])\b', safe_text)
-        
+        explicit_future_years = [y for y in years if int(y) > current_year]
+
         # Find explicit date patterns (YYYY-MM-DD or DD/MM/YYYY)
         dates = re.findall(r'\b(\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{4})\b', safe_text)
 
-        # Future-oriented phrasing
+        # Future-oriented speculative directive phrasing (only strictly future years > current_year)
         future_markers = re.findall(
-            r'\b(will happen tomorrow|starting tomorrow|from midnight|next week|next month|in upcoming months|to be banned soon|will abolish|will cancel|predicted for 202[6-9])\b',
+            r'\b(will happen tomorrow|starting tomorrow|from midnight|next week|next month|in upcoming months|to be banned soon|will abolish|will cancel)\b',
             safe_text,
             re.IGNORECASE,
         )
+        for fy in explicit_future_years:
+            if re.search(rf'\b(predicted for|scheduled for|by)\s+{fy}\b', safe_text, re.IGNORECASE):
+                future_markers.append(f"future_year_{fy}")
 
         # Matched historical entities
         found_entities = []
@@ -261,9 +266,9 @@ class TemporalGraphEngine:
                     f"Temporal Discontinuity: '{event_name}' concluded on {anchor_date}, but text frames it as a future event."
                 )
 
-        # Unanchored futuristic predictive policy/ban claims (Zero-day/Future Assertion Check)
+        # Unanchored futuristic predictive policy/ban claims (avoid flagging ordinary business/weather forecasts)
         future_ban_claim = re.search(
-            r'\b(will|going to|scheduled to|starting\s+(?:tomorrow|midnight|next\s+week))\s+.*?\b(ban|abolish|shut\s*down|freeze|confiscate|cancel\s+all|mandatory|free\s+(?:phone|laptop|cash|electricity))\b',
+            r'\b(will|going to|scheduled to|starting\s+(?:tomorrow|midnight|next\s+week))\s+(?:[a-z]+\s+){0,4}(?:ban|abolish|shut\s*down|freeze\s+(?:all|bank|accounts)|confiscate|cancel\s+all|demonetize|provide\s+free\s+(?:phone|laptop|cash|electricity))\b',
             combined,
             re.IGNORECASE,
         )

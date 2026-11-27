@@ -344,7 +344,9 @@ class ContextPropagationAnalyzer:
         "the hindu business line", "pib", "press information bureau", "pib national wire",
         "isro", "isro press office", "rbi", "rbi central bulletin", "imd", "imd weather bureau",
         "ndtv", "indian express", "hindustan times", "economic times", "business standard",
-        "mint", "live law", "eenadu", "sakshi", "bbc news", "ani", "pti", "dd news", "all india radio"
+        "mint", "livemint", "moneycontrol", "financial express", "cnbc tv18", "telangana today",
+        "deccan chronicle", "deccan herald", "hans india", "live law", "eenadu", "sakshi",
+        "bbc news", "ani", "pti", "dd news", "all india radio", "nse", "bse", "sebi"
     ]
 
     UNVERIFIED_SOURCE_MARKERS = [
@@ -375,7 +377,7 @@ class ContextPropagationAnalyzer:
             source_risk = 0.85
             source_verdict = "UNVERIFIED_VIRAL_CHANNEL"
         else:
-            source_risk = 0.40
+            source_risk = 0.24
             source_verdict = "INDEPENDENT_CITIZEN_SUBMISSION"
 
         # 2. Viral Propagation & Coercive Forwarding Cues (Pillar 4)
@@ -469,8 +471,9 @@ class EntitySpecificityAnalyzer:
     ]
 
     INSTITUTIONAL_ENTITY_MARKERS = [
-        r'\b(isro|drdo|iit|iisc|aiims|csir|icmr|dst|barc|tifr|nasa|mit|stanford|oxford|cambridge|who|rbi|sebi|pib|bse|nse)\b',
-        r'\b(dr\.|prof\.|professor|minister|ministry|director|spokesperson|chief justice|court|patent)\b'
+        r'\b(isro|drdo|iit|iisc|aiims|csir|icmr|dst|barc|tifr|nasa|mit|stanford|oxford|cambridge|who|rbi|sebi|pib|bse|nse|imd)\b',
+        r'\b(dr\.|prof\.|professor|minister|ministry|director|spokesperson|chief justice|court|patent|limited|ltd\.?|dairy|bank)\b',
+        r'\b(hyderabad|telangana|andhra pradesh|rangareddy|nadergul|mumbai|delhi|bengaluru|chennai|kolkata)\b'
     ]
 
     def analyze_specificity(self, title: str, text: str) -> Dict[str, Any]:

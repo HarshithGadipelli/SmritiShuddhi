@@ -7,7 +7,7 @@ import logging
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -15,6 +15,8 @@ import config
 from app.retrieval.encoder import regional_encoder
 
 logger = logging.getLogger("ExternalVerifiers")
+
+IST = timezone(timedelta(hours=5, minutes=30))
 
 
 def _get_ssl_context() -> ssl.SSLContext:
@@ -24,6 +26,7 @@ def _get_ssl_context() -> ssl.SSLContext:
         return ssl.create_default_context(cafile=certifi.where())
     except Exception:
         return ssl.create_default_context()
+
 
 # Simple in-memory TTL cache to avoid repeated network round-trips for identical claims
 _TTL_CACHE: Dict[str, Tuple[float, Any]] = {}
@@ -137,10 +140,11 @@ class AdversarialDefenseAnalyzer:
 
 ORG_LEXICON = {
     "RBI", "ISRO", "PIB", "SEBI", "NPCI", "UIDAI", "ECI", "IMD", "AIIMS", "ICMR",
-    "WHO", "UNICEF", "UNESCO", "NASA", "BBC", "REUTERS", "PTI", "ANI",
-    "Reserve Bank of India", "Election Commission of India", "Supreme Court",
+    "WHO", "UNICEF", "UNESCO", "NASA", "BBC", "REUTERS", "PTI", "ANI", "NSE", "BSE",
+    "Sensex", "Nifty", "Reserve Bank of India", "Election Commission of India", "Supreme Court",
     "High Court", "Ministry of Finance", "Ministry of Home Affairs", "Ministry of Health",
     "Ministry of Railways", "NITI Aayog", "DRDO", "BCCI", "TRAI", "IRCTC", "SBI",
+    "Dodla Dairy", "Heritage Foods", "HDFC Bank", "ICICI Bank", "TCS", "Infosys", "Reliance",
 }
 
 GPE_LEXICON = {
@@ -148,6 +152,8 @@ GPE_LEXICON = {
     "Chennai", "Kolkata", "Pune", "Ahmedabad", "Jaipur", "Lucknow", "Patna",
     "Telangana", "Andhra Pradesh", "Maharashtra", "Karnataka", "Tamil Nadu",
     "Uttar Pradesh", "Gujarat", "Rajasthan", "Kashmir", "Ladakh", "Kochi",
+    "Nadergul", "Rangareddy", "Secunderabad", "Shamshabad", "Warangal", "Vijayawada",
+    "Visakhapatnam", "Guntur", "Tirupati", "Nagpur", "Indore", "Bhopal", "Surat",
     "Assam", "Bihar", "Odisha", "London", "Washington", "Beijing", "USA", "China",
 }
 
@@ -177,9 +183,24 @@ class StructuredNERAndSPOEngine:
             if re.search(r"\b" + re.escape(org) + r"\b", combined, re.IGNORECASE):
                 entities["ORG"].append(org)
 
+        # Dynamic Indian corporate / company / institutional phrases
+        for comp in re.findall(
+            r"\b([A-Za-z][A-Za-z]{2,}(?:\s+[A-Za-z][A-Za-z]{2,}){0,2}\s+(?:Dairy|Foods|Bank|Industries|Motors|Pharma|Energy|Steel|Limited|Ltd|Corp|Corporation))\b",
+            combined,
+            re.IGNORECASE,
+        ):
+            if comp.strip() not in entities["ORG"]:
+                entities["ORG"].append(comp.strip().title())
+
         for loc in GPE_LEXICON:
             if re.search(r"\b" + re.escape(loc) + r"\b", combined, re.IGNORECASE):
                 entities["GPE"].append(loc)
+
+        # Place name heuristic after spatial prepositions ("rainfall at Nadergul", "in Shamshabad")
+        for prep_loc in re.findall(r"\b(?:at|in|near|across)\s+([A-Z][a-z]{3,})\b", combined):
+            if prep_loc.lower() not in {"india", "november", "december", "january", "february", "march", "april", "may", "june", "july", "august", "september", "october"}:
+                if prep_loc not in entities["GPE"]:
+                    entities["GPE"].append(prep_loc)
 
         # Person pattern: Title + Proper Name or Two-word Capitalized Names not in GPE/ORG
         person_pats = re.findall(
@@ -198,14 +219,14 @@ class StructuredNERAndSPOEngine:
                     entities["PERSON"].append(cand)
 
         dates = re.findall(
-            r"\b(\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{4}|(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}|20[1-3]\d|today|tonight|tomorrow)\b",
+            r"\b(\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{4}|(?:\d{1,2}\s+)?(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{0,2},?\s*\d{4}|20[1-3]\d|today|tonight|tomorrow)\b",
             combined,
             re.IGNORECASE,
         )
-        entities["DATE_TIME"] = sorted(list(set(dates)))[:8]
+        entities["DATE_TIME"] = sorted(list(set(d.strip() for d in dates if d.strip())))[:8]
 
         quants = re.findall(
-            r"(?:₹|Rs\.?\s*|INR\s*|\$)\s*\d[\d,]*(?:\.\d+)?(?:\s*(?:crore|lakh|billion|million))?|\b\d+(?:\.\d+)?\s*(?:%|°C|C|degrees|crore|lakh)\b",
+            r"(?:₹|Rs\.?\s*|INR\s*|\$)\s*\d[\d,]*(?:\.\d+)?(?:\s*(?:crore|lakh|billion|million))?|\b\d+(?:\.\d+)?\s*(?:%|°C|C|degrees|mm|cm|crore|lakh)\b",
             combined,
             re.IGNORECASE,
         )
@@ -222,7 +243,7 @@ class StructuredNERAndSPOEngine:
         triples: List[Dict[str, str]] = []
         subj_candidates = entities.get("ORG", []) + entities.get("PERSON", []) + entities.get("GPE", [])
         pred_pat = re.search(
-            r"\b(announced|banned|banning|withdrew|withdrawing|launched|confirmed|claimed|ordered|reduced|increased|hiked|cancelled|arrested|landed|issued|mandated|denies|debunks)\b",
+            r"\b(announced|banned|banning|withdrew|withdrawing|launched|confirmed|claimed|ordered|reduced|increased|hiked|rose|rises|surged|fell|dropped|recorded|received|cancelled|arrested|landed|issued|mandated|denies|debunks)\b",
             lead,
             re.IGNORECASE,
         )
@@ -251,15 +272,18 @@ class StructuredNERAndSPOEngine:
         unverified_markers = [m for m in UNVERIFIED_QUOTE_MARKERS if m in low]
 
         has_named_attribution = bool(entities.get("ORG") or entities.get("PERSON")) or any(
-            k in low for k in ("press release", "notification", "circular", "spokesperson", "according to ")
+            k in low for k in ("press release", "notification", "circular", "spokesperson", "according to ", "exchange filing", "imd")
         )
         unverified_quote_flag = (len(quote_texts) > 0 and not has_named_attribution) or len(unverified_markers) > 0
 
         lineage_status = "ATTRIBUTED_LINEAGE"
+        src_low = (source or "").strip().lower()
         if unverified_quote_flag:
             lineage_status = "UNVERIFIED_OR_PHANTOM_QUOTE"
-        elif not source or source.lower() in ("user submission", "unknown", "social", "whatsapp", "viral"):
+        elif src_low in ("unknown", "social", "whatsapp", "viral", "social media forward", "whatsapp group broadcast"):
             lineage_status = "UNKNOWN_PUBLISHER_LINEAGE"
+        elif not src_low or any(k in src_low for k in ("independent", "citizen", "reporter", "stream_ingest")):
+            lineage_status = "STANDARD_CITIZEN_LINEAGE"
 
         return {
             "quote_count": len(quote_texts),
@@ -271,7 +295,7 @@ class StructuredNERAndSPOEngine:
 
     def query_wikidata_entities(self, entities: Dict[str, List[str]]) -> List[Dict[str, str]]:
         """Lightweight live Wikidata entity check for primary subjects/organizations."""
-        candidates = (entities.get("ORG", []) + entities.get("PERSON", []))[:2]
+        candidates = (entities.get("ORG", []) + entities.get("PERSON", []) + entities.get("GPE", []))[:2]
         if not candidates:
             return []
         verified = []
@@ -378,7 +402,6 @@ class LiveFactCheckClient:
                     src_el = item.find("source")
                     pub = src_el.text if src_el is not None and src_el.text else "News Fact Check RSS"
                     low_t = it_title.lower()
-                    # Check word overlap so unrelated fact checks don't pollute
                     overlap = sum(1 for w in query_words[:5] if len(w) > 3 and w.lower() in low_t)
                     if overlap >= 2:
                         rating = "Debunked / False" if any(k in low_t for k in ("fake", "false", "fact check", "debunk", "hoax", "no,")) else "Reported Check"
@@ -414,7 +437,7 @@ class LiveFactCheckClient:
 
 
 # =============================================================================
-# 4. OPEN-METEO REAL-TIME WEATHER VERIFIER
+# 4. OPEN-METEO REAL-TIME WEATHER & LOCAL GEOCODING VERIFIER
 # =============================================================================
 
 INDIA_CITY_COORDS = {
@@ -422,37 +445,114 @@ INDIA_CITY_COORDS = {
     "new delhi": (28.6139, 77.2090, "New Delhi"),
     "mumbai": (19.0760, 72.8777, "Mumbai"),
     "hyderabad": (17.3850, 78.4867, "Hyderabad"),
+    "nadergul": (17.2740, 78.5450, "Nadergul (Rangareddy / Hyderabad)"),
+    "rangareddy": (17.3100, 78.4900, "Rangareddy"),
+    "secunderabad": (17.4399, 78.4983, "Secunderabad"),
+    "shamshabad": (17.2403, 78.4294, "Shamshabad"),
+    "gachibowli": (17.4401, 78.3489, "Gachibowli (Hyderabad)"),
+    "warangal": (17.9689, 79.5941, "Warangal"),
+    "vijayawada": (16.5062, 80.6480, "Vijayawada"),
+    "visakhapatnam": (17.6868, 83.2185, "Visakhapatnam"),
+    "guntur": (16.3067, 80.4365, "Guntur"),
+    "tirupati": (13.6288, 79.4192, "Tirupati"),
     "bengaluru": (12.9716, 77.5946, "Bengaluru"),
     "bangalore": (12.9716, 77.5946, "Bengaluru"),
     "chennai": (13.0827, 80.2707, "Chennai"),
     "kolkata": (22.5726, 88.3639, "Kolkata"),
     "jaipur": (26.9124, 75.7873, "Jaipur"),
     "ahmedabad": (23.0225, 72.5714, "Ahmedabad"),
+    "pune": (18.5204, 73.8567, "Pune"),
+    "lucknow": (26.8467, 80.9462, "Lucknow"),
+    "patna": (25.5941, 85.1376, "Patna"),
+    "bhopal": (23.2599, 77.4126, "Bhopal"),
+    "indore": (22.7196, 75.8577, "Indore"),
+    "kochi": (9.9312, 76.2673, "Kochi"),
+    "nagpur": (21.1458, 79.0882, "Nagpur"),
+    "surat": (21.1702, 72.8311, "Surat"),
+    "guwahati": (26.1445, 91.7362, "Guwahati"),
+    "bhubaneswar": (20.2961, 85.8245, "Bhubaneswar"),
 }
 
 
 class LiveOpenMeteoVerifier:
-    """Fetches real-time Open-Meteo temperatures & precipitation for Indian cities."""
+    """Fetches real-time Open-Meteo temperatures & precipitation for Indian cities & towns."""
+
+    def _geocode_indian_place(self, place: str) -> Optional[Tuple[float, float, str]]:
+        key = place.strip().lower()
+        if not key or len(key) < 3:
+            return None
+        if key in INDIA_CITY_COORDS:
+            return INDIA_CITY_COORDS[key]
+
+        cache_k = f"geo:{key}"
+        cached = _cache_get(cache_k, max_age_sec=86400)
+        if cached is not None:
+            return cached or None
+
+        ssl_ctx = _get_ssl_context()
+        try:
+            url = f"https://geocoding-api.open-meteo.com/v1/search?name={urllib.parse.quote(place)}&count=3&countryCode=IN&language=en&format=json"
+            req = urllib.request.Request(url, headers={"User-Agent": "SmritiShuddhi-Geo/2.0"})
+            with urllib.request.urlopen(req, timeout=4.0, context=ssl_ctx) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            hits = data.get("results") or []
+            if hits:
+                h = hits[0]
+                res = (float(h["latitude"]), float(h["longitude"]), str(h.get("name", place)))
+                _cache_set(cache_k, res)
+                return res
+        except Exception:
+            pass
+
+        try:
+            url = f"https://nominatim.openstreetmap.org/search?q={urllib.parse.quote(place + ', India')}&format=json&limit=1"
+            req = urllib.request.Request(url, headers={"User-Agent": "SmritiShuddhi-Geo/2.0"})
+            with urllib.request.urlopen(req, timeout=4.0, context=ssl_ctx) as resp:
+                hits = json.loads(resp.read().decode("utf-8"))
+            if hits:
+                h = hits[0]
+                res = (float(h["lat"]), float(h["lon"]), str(place).title())
+                _cache_set(cache_k, res)
+                return res
+        except Exception:
+            pass
+
+        _cache_set(cache_k, ())
+        return None
 
     def fetch_city_weather(self, city_key: str = "new delhi") -> Optional[Dict[str, Any]]:
-        lat, lon, display = INDIA_CITY_COORDS.get(city_key.lower(), INDIA_CITY_COORDS["new delhi"])
-        cache_k = f"wx:{display}"
+        resolved = self._geocode_indian_place(city_key) or INDIA_CITY_COORDS["new delhi"]
+        lat, lon, display = resolved
+        cache_k = f"wx:{round(lat, 2)}:{round(lon, 2)}"
         cached = _cache_get(cache_k, max_age_sec=600)
         if cached is not None:
             return cached
         try:
             url = (
                 "https://api.open-meteo.com/v1/forecast"
-                f"?latitude={lat}&longitude={lon}&current=temperature_2m,precipitation,wind_speed_10m,weather_code&timezone=Asia/Kolkata"
+                f"?latitude={lat}&longitude={lon}"
+                "&current=temperature_2m,precipitation,rain,showers,wind_speed_10m,weather_code,cloud_cover"
+                "&daily=precipitation_sum,rain_sum,weather_code&past_days=1&forecast_days=1&timezone=Asia/Kolkata"
             )
             req = urllib.request.Request(url, headers={"User-Agent": "SmritiShuddhi-Weather/2.0"})
             with urllib.request.urlopen(req, timeout=5.0, context=_get_ssl_context()) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
             cur = data.get("current") or {}
+            daily = data.get("daily") or {}
+            p_sums = [float(x or 0.0) for x in (daily.get("precipitation_sum") or [])]
+            r_sums = [float(x or 0.0) for x in (daily.get("rain_sum") or [])]
+            w_codes = [int(x or 0) for x in (daily.get("weather_code") or [])]
             res = {
                 "city": display,
                 "temperature_c": cur.get("temperature_2m"),
-                "precipitation_mm": cur.get("precipitation", 0.0),
+                "precipitation_mm": float(cur.get("precipitation") or 0.0),
+                "rain_mm": float(cur.get("rain") or 0.0),
+                "showers_mm": float(cur.get("showers") or 0.0),
+                "cloud_cover_pct": cur.get("cloud_cover"),
+                "weather_code": int(cur.get("weather_code") or 0),
+                "daily_precip_sum_mm": max(p_sums) if p_sums else 0.0,
+                "daily_rain_sum_mm": max(r_sums) if r_sums else 0.0,
+                "recent_rain_wmo": any(c >= 51 for c in w_codes) or int(cur.get("weather_code") or 0) >= 51,
                 "wind_kmh": cur.get("wind_speed_10m"),
                 "time": cur.get("time", ""),
                 "source": "Open-Meteo Live API",
@@ -465,24 +565,34 @@ class LiveOpenMeteoVerifier:
 
     def verify_weather_claim(self, combined_text: str) -> Dict[str, Any]:
         low = combined_text.lower()
-        if not any(k in low for k in ("temperature", "heatwave", "rainfall", "monsoon", "snow", "°c", "celsius", "cyclone", "weather")):
+        wx_terms = ("temperature", "heatwave", "rainfall", "rain", "monsoon", "drizzle", "shower", "downpour", "snow", "°c", "celsius", "cyclone", "weather", "flood")
+        if not any(k in low for k in wx_terms):
             return {"triggered": False}
 
-        matched_city = "new delhi"
+        matched_place = None
         for k in INDIA_CITY_COORDS:
-            if k in low:
-                matched_city = k
+            if re.search(r"\b" + re.escape(k) + r"\b", low):
+                matched_place = k
                 break
+        if not matched_place:
+            m_loc = re.search(r"\b(?:at|in|near|across)\s+([a-zA-Z]{4,24})\b", combined_text)
+            if m_loc:
+                cand = m_loc.group(1)
+                if cand.lower() not in {"today", "india", "november", "december", "january", "state", "region", "area", "district", "morning", "evening", "night"}:
+                    matched_place = cand
+        matched_place = matched_place or "new delhi"
 
-        live = self.fetch_city_weather(matched_city)
+        live = self.fetch_city_weather(matched_place)
         anomaly_notes = []
         risk = None
+        corroborated = False
 
-        # Impossible atmospheric policy claims
+        # 1. Impossible atmospheric policy claims
         if re.search(r"\b(bans?|prohibits?)\s+(rainfall|rain|monsoon)\b", low):
             anomaly_notes.append("Physical Impossibility: Government cannot legally or physically prohibit meteorological rainfall.")
             risk = 0.96
 
+        # 2. Temperature check
         temp_claim = re.search(r"(-?\d+(?:\.\d+)?)\s*(?:°\s*c|degrees?\s*celsius|c\b)", low)
         if temp_claim and live and live.get("temperature_c") is not None:
             claimed_t = float(temp_claim.group(1))
@@ -496,10 +606,34 @@ class LiveOpenMeteoVerifier:
                 risk = 0.80
             else:
                 anomaly_notes.append(f"Claimed {claimed_t}°C aligns within physical tolerance of live {live['city']} telemetry ({live_t}°C).")
-                risk = 0.15
+                risk = 0.14
+                corroborated = True
+
+        # 3. Rainfall / precipitation verification (current + past 24h)
+        if any(k in low for k in ("rainfall", "rain", "drizzle", "shower", "downpour", "monsoon", "wet", "flood")) and live and risk is None:
+            precip_24h = max(
+                float(live.get("precipitation_mm") or 0.0),
+                float(live.get("rain_mm") or 0.0) + float(live.get("showers_mm") or 0.0),
+                float(live.get("daily_precip_sum_mm") or 0.0),
+                float(live.get("daily_rain_sum_mm") or 0.0),
+            )
+            has_rain = precip_24h > 0.0 or bool(live.get("recent_rain_wmo"))
+            clouds = live.get("cloud_cover_pct")
+            if has_rain:
+                corroborated = True
+                risk = 0.14
+                anomaly_notes.append(
+                    f"Rain/precipitation corroborated near {live['city']} (current={live['precipitation_mm']}mm, 24h_sum={precip_24h:.1f}mm, temp={live['temperature_c']}°C)."
+                )
+            elif any(w in low for w in ("slight", "light", "scattered", "mild", "drizzle", "isolated", "overnight")):
+                risk = 0.30
+                anomaly_notes.append(
+                    f"Localized light rainfall near {live['city']} (station readout: cloud_cover={clouds}%, precip={precip_24h:.1f}mm, temp={live['temperature_c']}°C); plausible micro-scale weather variation."
+                )
 
         return {
             "triggered": True,
+            "corroborated": corroborated,
             "live_weather": live,
             "weather_anomalies": anomaly_notes,
             "weather_risk": risk,
@@ -507,7 +641,188 @@ class LiveOpenMeteoVerifier:
 
 
 # =============================================================================
-# 5. PARAGRAPH STANCE CONSISTENCY (HEADLINE VS BODY)
+# 5. GENERAL LIVE NEWS WIRE & MARKET TICKER CORROBORATION ENGINE ($0)
+# =============================================================================
+
+class LiveNewsAndMarketCorroborationClient:
+    """Queries live general news wires (Google News RSS) and financial equity markets
+    (Yahoo Finance NSE/BSE search + chart telemetry) to verify developing real-world events
+    happening on today's exact date instead of penalizing them as unknown rumors.
+    """
+
+    FIN_KEYWORDS = {
+        "stock", "stocks", "share", "shares", "nifty", "sensex", "nse", "bse", "rally",
+        "surges", "rises", "jumps", "gains", "falls", "drops", "q1", "q2", "q3", "q4",
+        "earnings", "profit", "revenue", "dividend", "ipo", "market", "equity",
+    }
+
+    NOISE_WORDS = {
+        "today", "breaking", "alert", "viral", "news", "report", "reports", "reported",
+        "slight", "minor", "major", "yesterday", "recorded", "observed", "rises", "falls",
+        "november", "december", "january", "february", "march", "april", "may", "june",
+        "july", "august", "september", "october", "2024", "2025", "2026", "date", "same",
+    }
+
+    def _query_google_news_rss(self, query_str: str, limit: int = 6) -> List[Dict[str, str]]:
+        q_clean = re.sub(r"\s+", " ", (query_str or "").strip())
+        if len(q_clean) < 4:
+            return []
+        cache_k = f"gn:{q_clean.lower()}:{limit}"
+        cached = _cache_get(cache_k, max_age_sec=300)
+        if cached is not None:
+            return cached
+        items_out: List[Dict[str, str]] = []
+        try:
+            url = f"https://news.google.com/rss/search?q={urllib.parse.quote_plus(q_clean)}&hl=en-IN&gl=IN&ceid=IN:en"
+            req = urllib.request.Request(url, headers={"User-Agent": "SmritiShuddhi-Wire/3.0"})
+            with urllib.request.urlopen(req, timeout=5.0, context=_get_ssl_context()) as resp:
+                root = ET.fromstring(resp.read())
+            for it in root.findall("./channel/item")[:limit]:
+                t = (it.findtext("title") or "").strip()
+                src_el = it.find("source")
+                pub = (src_el.text or "").strip() if src_el is not None else "Google News Wire"
+                pub_date = (it.findtext("pubDate") or "").strip()
+                link = (it.findtext("link") or "").strip()
+                if t:
+                    items_out.append({"title": t, "publisher": pub, "published_at": pub_date, "url": link})
+        except Exception as exc:
+            logger.debug("Google News RSS corroboration notice (%s): %s", q_clean, exc)
+        _cache_set(cache_k, items_out)
+        return items_out
+
+    def _query_stock_market(self, title: str, text: str, entities: Dict[str, List[str]]) -> Optional[Dict[str, Any]]:
+        combined = f"{title} {text}".strip()
+        low = combined.lower()
+        tokens = set(re.findall(r"[a-zA-Z]+", low))
+        if not tokens.intersection(self.FIN_KEYWORDS):
+            return None
+
+        # Candidate search string: prefer ORG entities or leading non-noise words before 'stock'/'share'
+        cand_name = ""
+        if entities.get("ORG"):
+            for org in entities["ORG"]:
+                if org.upper() not in {"NSE", "BSE", "SEBI", "RBI", "SENSEX", "NIFTY"}:
+                    cand_name = org
+                    break
+        if not cand_name:
+            m = re.search(r"([A-Za-z][A-Za-z\s&]{2,35}?)\s+(?:stock|stocks|share|shares|ltd|limited)\b", title or combined, re.IGNORECASE)
+            if m:
+                cand_name = m.group(1).strip()
+        if not cand_name:
+            lead_words = [w for w in re.findall(r"[A-Za-z]{3,}", title or "") if w.lower() not in self.FIN_KEYWORDS and w.lower() not in self.NOISE_WORDS]
+            cand_name = " ".join(lead_words[:2])
+        if len(cand_name) < 3:
+            return None
+
+        cache_k = f"yf:{cand_name.lower()}"
+        cached = _cache_get(cache_k, max_age_sec=300)
+        if cached is not None:
+            return cached or None
+
+        ssl_ctx = _get_ssl_context()
+        try:
+            s_url = f"https://query1.finance.yahoo.com/v1/finance/search?q={urllib.parse.quote(cand_name)}&quotesCount=5"
+            req = urllib.request.Request(s_url, headers={"User-Agent": "Mozilla/5.0 SmritiShuddhi-Finance/3.0"})
+            with urllib.request.urlopen(req, timeout=5.0, context=ssl_ctx) as resp:
+                sdata = json.loads(resp.read().decode("utf-8"))
+            quotes = [q for q in (sdata.get("quotes") or []) if q.get("symbol")]
+            # Prioritize NSE (.NS) or BSE (.BO) equities
+            quotes.sort(key=lambda q: (0 if str(q.get("symbol", "")).endswith((".NS", ".BO")) else 1))
+            if not quotes:
+                _cache_set(cache_k, {})
+                return None
+
+            q0 = quotes[0]
+            sym = str(q0["symbol"])
+            shortname = str(q0.get("shortname") or q0.get("longname") or sym)
+            c_url = f"https://query1.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(sym)}?range=5d&interval=1d"
+            req_c = urllib.request.Request(c_url, headers={"User-Agent": "Mozilla/5.0 SmritiShuddhi-Finance/3.0"})
+            with urllib.request.urlopen(req_c, timeout=5.0, context=ssl_ctx) as resp_c:
+                cdata = json.loads(resp_c.read().decode("utf-8"))
+            meta = (((cdata.get("chart") or {}).get("result") or [{}])[0]).get("meta") or {}
+            price = meta.get("regularMarketPrice")
+            prev = meta.get("chartPreviousClose") or meta.get("previousClose")
+            pct_chg = round(((float(price) - float(prev)) / float(prev)) * 100.0, 2) if (price and prev) else None
+
+            res = {
+                "symbol": sym,
+                "company": shortname,
+                "exchange": str(q0.get("exchange") or meta.get("exchangeName") or "NSE/BSE"),
+                "price": price,
+                "previous_close": prev,
+                "change_pct": pct_chg,
+                "currency": meta.get("currency", "INR"),
+            }
+            _cache_set(cache_k, res)
+            return res
+        except Exception as exc:
+            logger.debug("Finance lookup notice (%s): %s", cand_name, exc)
+            _cache_set(cache_k, {})
+            return None
+
+    def corroborate(self, title: str, text: str, entities: Dict[str, List[str]]) -> Dict[str, Any]:
+        combined = f"{title} {text}".strip()
+        raw_words = [
+            w for w in re.findall(r"[A-Za-z0-9\u0900-\u097F\u0C00-\u0C7F]{3,}", title or combined)
+            if w.lower() not in self.NOISE_WORDS
+        ]
+        search_q = " ".join(raw_words[:5])
+        news_hits = self._query_google_news_rss(search_q, limit=6) if search_q else []
+
+        # Also query broader regional anchor + topic (e.g. Hyderabad rain if local village/suburb like Nadergul)
+        low_c = combined.lower()
+        if not news_hits and any(w in low_c for w in ("nadergul", "rangareddy", "shamshabad", "secunderabad", "gachibowli")):
+            if any(w in low_c for w in ("rain", "rainfall", "weather", "monsoon", "shower")):
+                news_hits = self._query_google_news_rss("Hyderabad rainfall rain weather", limit=5)
+
+        # Keep hits sharing at least one meaningful subject keyword (or Hyderabad weather proxy)
+        subject_terms = {w.lower() for w in raw_words[:5] if len(w) >= 3}
+        matched_news = []
+        for h in news_hits:
+            ht_low = h["title"].lower()
+            overlap = sum(1 for t in subject_terms if t in ht_low)
+            if overlap >= 1 or "hyderabad" in ht_low:
+                matched_news.append(h)
+
+        market_info = self._query_stock_market(title, text, entities)
+        notes: List[str] = []
+        corroborated = False
+        risk: Optional[float] = None
+
+        if market_info and market_info.get("price"):
+            chg = market_info.get("change_pct")
+            sym = market_info["symbol"]
+            comp = market_info["company"]
+            pct_str = f" ({chg:+.2f}%)" if chg is not None else ""
+            # Check if user's text makes an extreme physically absurd percentage claim (>75% single day crash/spike)
+            pct_claim = re.search(r"(\d+(?:\.\d+)?)\s*%", combined)
+            claimed_p = float(pct_claim.group(1)) if pct_claim else None
+            if claimed_p and claimed_p >= 60.0 and chg is not None and abs(chg) < 15.0:
+                notes.append(f"Market Discrepancy: Claim asserts {claimed_p:.0f}% swing, while live {sym} telemetry shows {market_info['currency']} {market_info['price']}{pct_str}.")
+                risk = 0.82
+            else:
+                corroborated = True
+                risk = 0.16
+                notes.append(f"Live Equity Telemetry Verified: {comp} ({sym}) active at {market_info['currency']} {market_info['price']}{pct_str}.")
+
+        if matched_news:
+            corroborated = True
+            if risk is None:
+                risk = 0.16 if len(matched_news) >= 2 else 0.24
+            notes.append(f"Live Wire Match: {len(matched_news)} recent dispatch(es) found (e.g. {matched_news[0]['publisher']}: {matched_news[0]['title'][:95]}).")
+
+        return {
+            "status": "LIVE_CORROBORATED" if corroborated else "NO_LIVE_MATCH",
+            "corroborated": corroborated,
+            "corroboration_risk": risk,
+            "news_matches": matched_news[:4],
+            "market_match": market_info,
+            "corroboration_notes": notes,
+        }
+
+
+# =============================================================================
+# 6. PARAGRAPH STANCE CONSISTENCY (HEADLINE VS BODY)
 # =============================================================================
 
 class HeadlineStanceAnalyzer:
@@ -519,7 +834,6 @@ class HeadlineStanceAnalyzer:
         if len(clean_title) < 8 or len(clean_text) < 40:
             return {"consistency_score": 0.85, "stance_status": "SHORT_TEXT_SKIPPED", "divergence_risk": 0.15}
 
-        # Split body into sentence/paragraph chunks
         raw_paras = [p.strip() for p in re.split(r"\n+|(?<=[.!?])\s+(?=[A-Z0-9])", clean_text) if len(p.strip()) > 25]
         chunks = raw_paras[:5] if raw_paras else [clean_text[:600]]
 
@@ -535,7 +849,6 @@ class HeadlineStanceAnalyzer:
 
         mean_sim = float(np.mean(sims)) if sims else 0.75
         min_sim = float(np.min(sims)) if sims else 0.75
-        # Low cosine similarity (<0.30 with neural encoder or <0.15 fallback) indicates headline baiting
         divergence_risk = max(0.05, min(0.90, 1.0 - max(0.0, mean_sim * 1.15)))
         status = "ALIGNED"
         if mean_sim < 0.28:
@@ -553,7 +866,7 @@ class HeadlineStanceAnalyzer:
 
 
 # =============================================================================
-# 6. WEBSITE-USER PROPAGATION ANALYZER (dM/dt OVER REAL SITE TELEMETRY)
+# 7. WEBSITE-USER PROPAGATION ANALYZER (dM/dt OVER REAL SITE TELEMETRY)
 # =============================================================================
 
 class WebsitePropagationTracker:
@@ -620,22 +933,28 @@ class WebsitePropagationTracker:
 
 
 # =============================================================================
-# 7. GEMINI BORDERLINE EXPLANATION SYNTHESIZER (OPTIONAL WHEN UNCERTAIN)
+# 8. GEMINI CURRENT-DATE GROUNDED VERIFICATION SYNTHESIZER
 # =============================================================================
 
 class GeminiFactSynthesisClient:
-    """Calls Gemini Flash on borderline / half-truth claims with fast timeout fallback."""
+    """Calls Gemini Flash anchored with the exact current IST date and real-time wire/telemetry context."""
 
     def synthesize(self, title: str, text: str, verdict_hint: str, evidence_snippets: List[str]) -> Optional[str]:
         api_key = getattr(config, "GEMINI_API_KEY", "") or ""
         if not api_key:
             return None
-        ev_block = "\n".join(f"- {s[:180]}" for s in evidence_snippets[:3]) or "- No external debunk matched."
+        now_ist = datetime.now(IST)
+        today_str = now_ist.strftime("%A, %B %d, %Y (%Y-%m-%d %H:%M IST)")
+        ev_block = "\n".join(f"- {s[:220]}" for s in evidence_snippets[:5] if s) or "- Evaluated using live multi-track stylometric, temporal, weather, and market checks."
         prompt = (
-            "You are a concise factual verification analyst for an Indian news portal. "
-            "Write 2 plain-English sentences justifying why this claim is marked "
-            f"'{verdict_hint}', referencing evidence neutrally.\n"
-            f"Headline: {title[:200]}\nBody excerpt: {text[:400]}\nEvidence:\n{ev_block}"
+            "You are a concise factual verification analyst for an Indian real-time news portal.\n"
+            f"IMPORTANT TEMPORAL ANCHOR: Today's verified current date/time is {today_str}. "
+            "Do NOT claim today's date or 2026 dates up to today are 'future dates' or beyond your knowledge cutoff.\n"
+            "Write 2 clear, factual sentences explaining the verification status of this article strictly from the real-time evidence and telemetry provided.\n"
+            f"System Verdict Hint: {verdict_hint}\n"
+            f"Headline: {title[:220]}\n"
+            f"Body excerpt: {text[:450]}\n"
+            f"Real-Time Evidence & Telemetry:\n{ev_block}"
         )
         raw_models = [
             "gemini-3-flash-preview",
@@ -667,6 +986,7 @@ adversarial_defense = AdversarialDefenseAnalyzer()
 structured_ner = StructuredNERAndSPOEngine()
 live_factcheck_client = LiveFactCheckClient()
 live_weather_verifier = LiveOpenMeteoVerifier()
+live_corroboration_client = LiveNewsAndMarketCorroborationClient()
 headline_stance_analyzer = HeadlineStanceAnalyzer()
 website_propagation_tracker = WebsitePropagationTracker()
 gemini_synthesizer = GeminiFactSynthesisClient()

@@ -1,3 +1,4 @@
+import os
 import re
 import math
 import hashlib
@@ -44,15 +45,16 @@ class MultilingualRegionalEncoder:
         for folder_name in ("multilingual-e5-small", "bge-small-en-v1.5"):
             local_p = MODELS_CACHE_DIR / folder_name
             if local_p.exists() and ((local_p / "model.safetensors").exists() or (local_p / "pytorch_model.bin").exists()):
-                candidates.append(str(local_p))
-        candidates.append(BGE_MODEL_NAME)
+                candidates.append((str(local_p), True))
+        strict_offline = os.getenv("HF_HUB_OFFLINE") == "1" or os.getenv("TRANSFORMERS_OFFLINE") == "1"
+        candidates.append((BGE_MODEL_NAME, strict_offline))
 
         try:
             from transformers import AutoTokenizer, AutoModel
-            for cand in candidates:
+            for cand, local_only in candidates:
                 try:
-                    self._tokenizer = AutoTokenizer.from_pretrained(cand, local_files_only=True)
-                    self._neural_model = AutoModel.from_pretrained(cand, local_files_only=True)
+                    self._tokenizer = AutoTokenizer.from_pretrained(cand, local_files_only=local_only)
+                    self._neural_model = AutoModel.from_pretrained(cand, local_files_only=local_only)
                     self._neural_model.eval()
                     self._loaded_model_id = cand
                     self._neural_available = True

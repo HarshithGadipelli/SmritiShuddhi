@@ -41,6 +41,7 @@ from app.retrieval.external_verifiers import (
     structured_ner,
     live_factcheck_client,
     live_weather_verifier,
+    live_corroboration_client,
     headline_stance_analyzer,
     website_propagation_tracker,
     gemini_synthesizer,
@@ -458,6 +459,16 @@ app.add_middleware(
 )
 
 
+@app.exception_handler(Exception)
+async def global_json_exception_handler(request, exc):
+    """Ensure unhandled exceptions always return structured JSON instead of plain-text 500."""
+    logger.exception("Unhandled exception on %s %s: %s", request.method, request.url.path, exc)
+    return JSONResponse(
+        status_code=500,
+        content={"success": False, "detail": f"Server error while processing request: {str(exc)}"},
+    )
+
+
 @app.middleware("http")
 async def cloudflare_proxy_headers_middleware(request, call_next):
     response = await call_next(request)
@@ -519,30 +530,41 @@ def execute_hybrid_inference(
     # Track C: Temporal Knowledge Graph
     graph_res = graph_engine.verify_timeline(clean_title, clean_text)
 
-    # Track D: Quantitative Knowledge Base & Live Open-Meteo Grounding
+    # Track D & F base (local fast checks)
     quant_res = quantitative_anomaly_engine.analyze_quantities(clean_title, clean_text)
-    wx_res = {"triggered": False} if fast_mode else live_weather_verifier.verify_weather_claim(combined_text)
-
-    # Track E: Context & Real Website-User Propagation Dynamics
     prop_res = propagation_analyzer.analyze_context_and_propagation(source, author, clean_title, clean_text)
-    w_prop_res = (
-        {"website_propagation_risk_delta": 0.0, "viral_burst_alert": False, "velocity_dm_dt_per_min": 0.0}
-        if fast_mode else website_propagation_tracker.measure_website_diffusion(news_col, clean_title, clean_text)
-    )
-
-    # Track F: Internal Archive + Structured NER/SPO + Quote Lineage + Live Fact-Check API
     int_evid_res = internal_evidence_engine.query_evidence(clean_title, clean_text)
     ner_entities = structured_ner.extract_entities(clean_title, clean_text)
     spo_triples = structured_ner.extract_spo_triples(clean_title, clean_text, ner_entities)
     quote_lineage = structured_ner.audit_quotes_and_lineage(clean_text, source, ner_entities)
-    wikidata_hits = [] if fast_mode else structured_ner.query_wikidata_entities(ner_entities)
+
+    # Concurrent Live Verifiers (Weather Telemetry, Live Fact-Check, Live News+Market Corroboration, Wikidata)
+    if fast_mode:
+        wx_res = {"triggered": False, "corroborated": False}
+        w_prop_res = {"website_propagation_risk_delta": 0.0, "viral_burst_alert": False, "velocity_dm_dt_per_min": 0.0}
+        wikidata_hits = []
+        fc_res = {"status": "FAST_WIRE_SKIPPED", "matches": [], "factcheck_risk": None}
+        live_corr_res = {"status": "FAST_WIRE_SKIPPED", "corroborated": False, "corroboration_risk": None, "news_matches": [], "market_match": None, "corroboration_notes": []}
+    else:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=5) as pool:
+            f_wx = pool.submit(live_weather_verifier.verify_weather_claim, combined_text)
+            f_wp = pool.submit(website_propagation_tracker.measure_website_diffusion, news_col, clean_title, clean_text)
+            f_wd = pool.submit(structured_ner.query_wikidata_entities, ner_entities)
+            f_fc = pool.submit(live_factcheck_client.check_claim, clean_title, clean_text, spo_triples)
+            f_lc = pool.submit(live_corroboration_client.corroborate, clean_title, clean_text, ner_entities)
+            wx_res = f_wx.result(timeout=8.0) if f_wx else {"triggered": False}
+            w_prop_res = f_wp.result(timeout=8.0) if f_wp else {"website_propagation_risk_delta": 0.0, "viral_burst_alert": False, "velocity_dm_dt_per_min": 0.0}
+            wikidata_hits = f_wd.result(timeout=8.0) if f_wd else []
+            fc_res = f_fc.result(timeout=8.0) if f_fc else {"status": "SKIPPED", "matches": [], "factcheck_risk": None}
+            live_corr_res = f_lc.result(timeout=8.0) if f_lc else {"status": "SKIPPED", "corroborated": False, "corroboration_risk": None, "news_matches": [], "market_match": None, "corroboration_notes": []}
+
     ner_spo_res = {
         "entities": ner_entities,
         "spo_triples": spo_triples,
         "quote_lineage": quote_lineage,
         "wikidata": wikidata_hits,
     }
-    fc_res = {"status": "FAST_WIRE_SKIPPED", "matches": [], "factcheck_risk": None} if fast_mode else live_factcheck_client.check_claim(clean_title, clean_text, spo_triples)
 
     # Track G: Informational Density & Entity Specificity
     spec_res = entity_specificity_analyzer.analyze_specificity(clean_title, clean_text)
@@ -608,13 +630,17 @@ def execute_hybrid_inference(
         adversarial_result=adv_res,
         stance_result=stance_res,
         ner_spo_result=ner_spo_res,
-        website_prop_result=w_prop_res
+        website_prop_result=w_prop_res,
+        live_corroboration_result=live_corr_res,
     )
 
     p_fake = float(verdict.get("fake_probability", 0.5))
-    if not fast_mode and 0.28 <= p_fake <= 0.72 and getattr(config, "GEMINI_API_KEY", ""):
-        ev_snips = [m.get("snippet", "") for m in retrieval_res.get("matches", [])[:2]]
+    if not fast_mode and (0.12 <= p_fake <= 0.78 or live_corr_res.get("corroborated") or wx_res.get("corroborated")) and getattr(config, "GEMINI_API_KEY", ""):
+        ev_snips = []
+        ev_snips.extend(live_corr_res.get("corroboration_notes", [])[:3])
+        ev_snips.extend(wx_res.get("weather_anomalies", [])[:2])
         ev_snips.extend([m.get("claim_text", "") for m in fc_res.get("matches", [])[:2]])
+        ev_snips.extend([m.get("snippet", "") for m in retrieval_res.get("matches", [])[:2]])
         gem_note = gemini_synthesizer.synthesize(clean_title, clean_text, verdict.get("prediction", "UNCERTAIN"), ev_snips)
         if gem_note:
             verdict["xai"]["gemini_analyst_note"] = gem_note
@@ -641,21 +667,50 @@ def get_health():
 
 @app.get("/api/v1/news")
 def get_published_news(q: Optional[str] = None):
-    """Returns published real news articles for the public wire feed with optional search filter."""
-    docs = list(news_col.find({"status": "PUBLISHED"}).sort("created_at", -1).limit(150))
+    """Returns published real news articles for the public wire feed with database-wide multi-token search & deduplication."""
     if q and q.strip():
-        term = q.strip().lower()
-        docs = [
-            d for d in docs
-            if term in d.get("title", "").lower()
-            or term in d.get("text", "").lower()
-            or term in d.get("category", "").lower()
-            or term in d.get("source", "").lower()
-        ]
+        q_clean = q.strip()
+        raw_tokens = re.findall(r"[A-Za-z0-9\u0900-\u097F\u0C00-\u0C7F]{2,}", q_clean.lower())
+        pat = "|".join(re.escape(t) for t in raw_tokens[:5]) if raw_tokens else re.escape(q_clean)
+        candidates = list(
+            news_col.find({
+                "status": "PUBLISHED",
+                "$or": [
+                    {"title": {"$regex": pat, "$options": "i"}},
+                    {"text": {"$regex": pat, "$options": "i"}},
+                    {"category": {"$regex": pat, "$options": "i"}},
+                    {"source": {"$regex": pat, "$options": "i"}},
+                ],
+            }).sort("created_at", -1).limit(300)
+        )
+        q_low = q_clean.lower()
+        exact_or_all = []
+        partial_docs = []
+        for d in candidates:
+            hay = f"{d.get('title', '')} {d.get('text', '')} {d.get('category', '')} {d.get('source', '')}".lower()
+            hits = sum(1 for t in raw_tokens if t in hay)
+            if q_low in hay:
+                sc = 100 + (20 if d.get("is_user_submission") else 0)
+                exact_or_all.append((sc, d))
+            elif raw_tokens and hits == len(raw_tokens):
+                sc = 60 + sum(10 for t in raw_tokens if t in (d.get("title") or "").lower()) + (15 if d.get("is_user_submission") else 0)
+                exact_or_all.append((sc, d))
+            elif len(raw_tokens) <= 1 and hits >= 1:
+                exact_or_all.append((40 + (15 if d.get("is_user_submission") else 0), d))
+            elif len(raw_tokens) >= 2 and hits >= max(1, (len(raw_tokens) + 1) // 2):
+                partial_docs.append((25 + hits * 8, d))
+        chosen = exact_or_all if exact_or_all else partial_docs
+        chosen.sort(key=lambda pair: pair[0], reverse=True)
+        docs = [pair[1] for pair in chosen]
+    else:
+        user_approved = list(news_col.find({"status": "PUBLISHED", "is_user_submission": True}).sort("created_at", -1).limit(40))
+        wire_recent = list(news_col.find({"status": "PUBLISHED"}).sort("created_at", -1).limit(320))
+        docs = user_approved + wire_recent
+
     seen_titles = set()
     unique_docs = []
     for d in docs:
-        norm_title = (d.get("title") or "").strip().lower()
+        norm_title = re.sub(r"\s+", " ", (d.get("title") or "").strip().lower())
         if not norm_title or norm_title in seen_titles:
             continue
         seen_titles.add(norm_title)
@@ -680,7 +735,13 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
     3. If MODERATE_RISK -> Route to Admin Review Queue
     4. If HIGH_RISK_FAKE -> Block & Quarantine; place into Admin Unlearning Queue
     """
+    from app.retrieval.news_feed import categorize_headline
     start_total = time.perf_counter()
+    auto_cat = categorize_headline(payload.title, payload.text)
+    effective_category = payload.category or "General"
+    if effective_category in ("General", "Governance & Policy") and auto_cat in ("Banking & Economy", "Weather & Safety", "Science & Space", "Sports", "Technology & AI"):
+        effective_category = auto_cat
+
     signature = cache_controller.generate_signature(payload.title, payload.text)
 
     # Check cache first (unless explicitly bypassed)
@@ -692,14 +753,14 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         else:
             verdict = execute_hybrid_inference(
                 payload.title, payload.text, source=payload.source,
-                author=payload.author, image_url=payload.image_url, category=payload.category
+                author=payload.author, image_url=payload.image_url, category=effective_category
             )
             cache_hit = False
             cache_controller.cache_verdict(signature, verdict, ttl=86400)
     else:
         verdict = execute_hybrid_inference(
             payload.title, payload.text, source=payload.source,
-            author=payload.author, image_url=payload.image_url, category=payload.category
+            author=payload.author, image_url=payload.image_url, category=effective_category
         )
         cache_hit = False
         cache_controller.cache_verdict(signature, verdict, ttl=86400)
@@ -708,18 +769,25 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
     news_id = f"NEWS_{uuid.uuid4().hex[:8].upper()}"
     sample_id = f"SYN_U_{uuid.uuid4().hex[:6].upper()}"
     risk_band = verdict["risk_band"]
+    p_fake = float(verdict.get("fake_probability", 0.5))
 
-    # 3-Tier Classification Tagging (REAL, LIKELY_FAKE, FAKE)
+    # 3-Tier Classification Tagging (REAL, DEVELOPING_REVIEW / LIKELY_FAKE, FAKE)
     if risk_band == "LOW_RISK_FACTUAL":
         tag = "REAL"
         tag_display = "REAL (VERIFIED FACTUAL)"
         status = "PUBLISHED"
-        user_message = "Your article has passed independent fact verification and is published live on the news wire!"
+        user_message = "Your article has passed multi-track fact verification and is published live on the news wire!"
     elif risk_band == "MODERATE_RISK":
-        tag = "LIKELY_FAKE"
-        tag_display = "LIKELY FAKE (UNDER EDITORIAL REVIEW)"
-        status = "PENDING_ADMIN_REVIEW"
-        user_message = "Our automated fact-checking detected potential ambiguities. Placed in the editorial queue for verification."
+        if p_fake < 0.55 and verdict.get("s_source", 0.4) < 0.70:
+            tag = "DEVELOPING_STORY"
+            tag_display = "DEVELOPING / UNCORROBORATED (EDITORIAL REVIEW)"
+            status = "PENDING_ADMIN_REVIEW"
+            user_message = "This developing or regional dispatch showed no contradictions or spam markers and is awaiting quick editorial verification."
+        else:
+            tag = "LIKELY_FAKE"
+            tag_display = "LIKELY FAKE (UNDER EDITORIAL REVIEW)"
+            status = "PENDING_ADMIN_REVIEW"
+            user_message = "Our automated fact-checking detected potential ambiguities. Placed in the editorial queue for verification."
     else:
         tag = "FAKE"
         tag_display = "FAKE (BLOCKED & QUARANTINED)"
@@ -771,11 +839,11 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "text": payload.text,
         "source": payload.source,
         "author": payload.author,
-        "category": payload.category,
+        "category": effective_category,
         "is_user_submission": True,
         "language": detected_lang,
         "region": detected_reg,
-        "image_url": payload.image_url or TOPIC_IMAGE_MAP.get(payload.category, FALLBACK_IMAGE),
+        "image_url": payload.image_url or TOPIC_IMAGE_MAP.get(effective_category, FALLBACK_IMAGE),
         "reading_time": f"{max(1, len(payload.text.split()) // 55)} min read",
         "tag": tag,
         "tag_display": tag_display,
@@ -791,7 +859,7 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "s_content": verdict.get("s_content", verdict.get("s_style")),
         "s_context": verdict.get("s_context", 0.10),
         "s_knowledge": verdict.get("s_knowledge", verdict.get("s_fact")),
-        "s_source": verdict.get("s_source", 0.40),
+        "s_source": verdict.get("s_source", 0.24),
         "temporal_consistency": verdict["temporal_consistency"],
         "five_pillar_breakdown": verdict.get("five_pillar_breakdown", {}),
         "justification_metrics": verdict.get("justification_metrics", {}),
@@ -812,6 +880,18 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "created_at": now()
     }
     news_col.insert_one(doc)
+    if status == "PUBLISHED":
+        try:
+            vector_store.index_live_dispatch(
+                news_id=news_id,
+                title=payload.title,
+                text=payload.text,
+                source=payload.source or "Verified Reporter",
+                category=effective_category,
+                truth_label=0,
+            )
+        except Exception:
+            pass
 
     # Broadcast real-time WebSocket events
     if status == "PUBLISHED":
@@ -838,6 +918,7 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "tag": tag,
         "tag_display": tag_display,
         "status": status,
+        "category": effective_category,
         "message": user_message,
         "fake_probability": verdict["fake_probability"],
         "real_probability": verdict["real_probability"],
@@ -850,7 +931,7 @@ def submit_news(payload: NewsSubmitRequest, background_tasks: BackgroundTasks):
         "s_context": verdict.get("s_context", 0.10),
         "s_knowledge": verdict.get("s_knowledge", verdict.get("s_fact")),
         "s_propagation": verdict.get("s_propagation", 0.10),
-        "s_source": verdict.get("s_source", 0.40),
+        "s_source": verdict.get("s_source", 0.24),
         "temporal_consistency": verdict["temporal_consistency"],
         "five_pillar_breakdown": verdict.get("five_pillar_breakdown", {}),
         "justification_metrics": verdict.get("justification_metrics", {}),
@@ -884,11 +965,11 @@ def get_claim_review_schema(news_id: str):
 
 @app.post("/api/v1/news/extract-document")
 def extract_document(payload: DocumentExtractRequest):
-    """Parses uploaded document files (.txt, .docx, .pdf, .md, .json, .csv) and returns extracted text,
-    archiving the binary attachment into Supabase Storage bucket with local fallback."""
+    """Parses uploaded text, semi-structured, and image+text files and returns extracted text + metadata."""
     try:
         import base64
-        file_bytes = base64.b64decode(payload.base64_content)
+        raw_b64 = payload.base64_content.split(",", 1)[1] if "," in payload.base64_content else payload.base64_content
+        file_bytes = base64.b64decode(raw_b64)
         storage_meta = store_document_attachment(payload.filename, file_bytes)
         extracted = parse_base64_document(payload.filename, payload.base64_content)
         return {
@@ -907,7 +988,7 @@ _NEWS_SYNC_LOCK = threading.Lock()
 
 
 def perform_news_sync(background_tasks: Optional[BackgroundTasks] = None) -> Dict[str, Any]:
-    """Coordinates fast concurrent fetching of live news, fast deduplication, and vector indexing."""
+    """Coordinates fast concurrent fetching of live news, strict deduplication, and vector indexing."""
     if not _NEWS_SYNC_LOCK.acquire(blocking=False):
         return {
             "status": "SYNC_IN_PROGRESS",
@@ -923,8 +1004,8 @@ def perform_news_sync(background_tasks: Optional[BackgroundTasks] = None) -> Dic
         synced_count = 0
 
         try:
-            existing_docs = list(news_col.find({}).limit(250))
-            existing_titles = {str(d.get("title") or "").strip().lower() for d in existing_docs}
+            existing_docs = list(news_col.find({}).sort("created_at", -1).limit(500))
+            existing_titles = {re.sub(r"\s+", " ", str(d.get("title") or "").strip().lower()) for d in existing_docs}
         except Exception:
             existing_titles = set()
 
@@ -932,9 +1013,13 @@ def perform_news_sync(background_tasks: Optional[BackgroundTasks] = None) -> Dic
             if synced_count >= 12:
                 break
             title = story.get("title", "").strip()
-            if not title or title.lower() in existing_titles:
+            norm_t = re.sub(r"\s+", " ", title.lower())
+            if not title or norm_t in existing_titles:
                 continue
-            existing_titles.add(title.lower())
+            if news_col.find_one({"title": title}):
+                existing_titles.add(norm_t)
+                continue
+            existing_titles.add(norm_t)
 
             text = story.get("text", "")
             source_name = story.get("source", "Real-Time News Wire")
@@ -1259,19 +1344,50 @@ def get_admin_queue():
 
 @app.post("/api/v1/admin/approve/{news_id}")
 def approve_news(news_id: str, background_tasks: BackgroundTasks):
-    """Admin approves a moderate-risk article for publication."""
+    """Admin approves an article for publication, promoting its status, timestamp, verification badge, and truth index."""
     doc = news_col.find_one({"news_id": news_id})
     if not doc:
         raise HTTPException(status_code=404, detail="Article not found")
-    news_col.update_one({"news_id": news_id}, {"$set": {"status": "PUBLISHED"}})
-    doc["status"] = "PUBLISHED"
+
+    published_ts = now()
+    orig_real = float(doc.get("real_probability") or 0.50)
+    approved_real = max(0.88, orig_real)
+    approved_fake = round(min(0.12, 1.0 - approved_real), 4)
+    approved_updates = {
+        "status": "PUBLISHED",
+        "tag": "REAL",
+        "tag_display": "REAL (EDITORIALLY APPROVED)",
+        "risk_band": "LOW_RISK_FACTUAL",
+        "action_recommended": "ALLOW_AUTOMATIC_BROADCAST",
+        "real_probability": round(approved_real, 4),
+        "fake_probability": approved_fake,
+        "is_user_submission": True,
+        "created_at": published_ts,
+        "updated_at": published_ts,
+    }
+    news_col.update_one({"news_id": news_id}, {"$set": approved_updates})
+    doc.update(approved_updates)
+
+    try:
+        cache_controller.evict_signature(cache_controller.generate_signature(doc.get("title", ""), doc.get("text", "")))
+        vector_store.index_live_dispatch(
+            news_id=news_id,
+            title=doc.get("title", ""),
+            text=doc.get("text", ""),
+            source=doc.get("source") or "Verified Editorial Desk",
+            category=doc.get("category") or "General",
+            truth_label=0,
+        )
+    except Exception:
+        pass
+
     if "_id" in doc:
         doc["_id"] = str(doc["_id"])
     background_tasks.add_task(
         ws_manager.broadcast,
         {"event": "ARTICLE_APPROVED_AND_PUBLISHED", "article": doc}
     )
-    return {"status": "APPROVED", "news_id": news_id}
+    return {"status": "APPROVED", "news_id": news_id, "article": doc}
 
 
 @app.post("/api/v1/admin/reject/{news_id}")
@@ -1612,23 +1728,23 @@ def _build_clearance_certificate(
 @app.post("/api/v1/admin/unlearn")
 def execute_unlearning(payload: UnlearningExecutionRequest, background_tasks: BackgroundTasks):
     _ensure_ml_ready()
-    sample_id = payload.sample_id
-    news_id = payload.news_id
-    strategy = payload.strategy or multi_model_suite.active_strategy or "algorithm_4_hybrid"
+    sample_id = str(payload.sample_id or payload.news_id or f"SYN_UNL_{uuid.uuid4().hex[:8].upper()}").strip()[:64]
+    news_id = str(payload.news_id).strip()[:64] if payload.news_id else None
+    strategy = str(payload.strategy or multi_model_suite.active_strategy or "algorithm_4_hybrid").strip()[:64]
 
-    title = payload.title or ""
-    text = payload.text or ""
-    if not title and news_id:
+    title = str(payload.title or "")
+    text = str(payload.text or "")
+    if (not title or not text) and news_id:
         doc = news_col.find_one({"news_id": news_id})
         if doc:
-            title = doc.get("title", "")
-            text = doc.get("text", "")
+            title = title or str(doc.get("title", ""))
+            text = text or str(doc.get("text", ""))
 
     logger.info("[UNLEARN] Executing unlearning strategy '%s' for sample: %s", strategy, sample_id)
 
     benchmark_report = multi_model_suite.run_all_benchmark(sample_id, title, text, executed_strategy=strategy)
     result = benchmark_report
-    sisa_telemetry = unlearning_engine.execute_unlearning_sequence(sample_id=sample_id, sample_text=f"{title} {text}")
+    sisa_telemetry = unlearning_engine.execute_unlearning_sequence(sample_id=sample_id, sample_text=f"{title} {text}".strip())
 
     # Pick genuine metrics from the executed strategy (or hybrid default)
     exec_row = next(

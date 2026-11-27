@@ -225,24 +225,26 @@ class QdrantVectorStore:
             logger.warning("Supabase pgvector bulk seed skipped: %s", e)
             return 0
 
-    def search_evidence(self, query_text: str, top_k: int = 4, score_threshold: float = 0.36, query_pgvector: bool = True) -> Dict[str, Any]:
-        """Runs hybrid neural vector search across Qdrant HNSW & Supabase pgvector."""
+    def search_evidence(self, query_text: str, top_k: int = 4, score_threshold: float = 0.56, query_pgvector: bool = True) -> Dict[str, Any]:
+        """Runs hybrid neural vector search across Qdrant HNSW & Supabase pgvector
+        with strict topical/entity overlap filtering so unrelated older stories do not pollute verdicts."""
         start = time.perf_counter()
         query_vec = regional_encoder.encode(query_text, is_query=True).tolist()
+        candidate_limit = max(top_k * 3, 12)
 
         try:
             if hasattr(self.client, 'query_points'):
                 results = self.client.query_points(
                     collection_name=self.collection_name,
                     query=query_vec,
-                    limit=top_k,
+                    limit=candidate_limit,
                     score_threshold=score_threshold
                 ).points
             else:
                 results = self.client.search(
                     collection_name=self.collection_name,
                     query_vector=query_vec,
-                    limit=top_k,
+                    limit=candidate_limit,
                     score_threshold=score_threshold
                 )
         except Exception as e:
@@ -258,6 +260,7 @@ class QdrantVectorStore:
             candidates.append({
                 "source": payload.get("source"),
                 "title": payload.get("title"),
+                "text": payload.get("text", ""),
                 "snippet": (payload.get("text", "")[:210] + "...") if payload.get("text") else "",
                 "source_type": payload.get("source_type", "OFFICIAL_VERIFIED"),
                 "truth_label": int(payload.get("truth_label", 0)),
@@ -274,7 +277,7 @@ class QdrantVectorStore:
           try:
             from db import db as active_db
             if hasattr(active_db, "search_truth_vectors"):
-                pg_hits = active_db.search_truth_vectors(query_vec, top_k=top_k)
+                pg_hits = active_db.search_truth_vectors(query_vec, top_k=candidate_limit)
                 if pg_hits:
                     used_pgvector = True
                 for h in pg_hits:
@@ -288,6 +291,7 @@ class QdrantVectorStore:
                     candidates.append({
                         "source": h.get("source"),
                         "title": h.get("title"),
+                        "text": str(h.get("text") or ""),
                         "snippet": (str(h.get("text") or "")[:210] + "..."),
                         "source_type": h.get("source_type", "OFFICIAL_VERIFIED"),
                         "truth_label": int(h.get("truth_label", 0)),
@@ -300,8 +304,37 @@ class QdrantVectorStore:
           except Exception:
             pass
 
-        candidates.sort(key=lambda x: x["similarity_score"], reverse=True)
-        candidates = candidates[:top_k]
+        # Topical & Entity Relevance Filter: discard unrelated old news/debunks that share only generic embedding proximity
+        import re as _re
+        q_stops = {
+            "the", "and", "for", "that", "this", "with", "from", "are", "was", "were", "has", "have",
+            "india", "indian", "news", "today", "report", "reports", "reported", "viral", "claim",
+            "claims", "video", "photo", "share", "official", "government", "govt", "state", "district",
+            "january", "february", "march", "april", "may", "june", "july", "august", "september",
+            "october", "november", "december", "2024", "2025", "2026", "rises", "falls", "slight",
+        }
+        q_tokens = {
+            w for w in _re.findall(r"[A-Za-z0-9\u0900-\u097F\u0C00-\u0C7F]{3,}", (query_text or "").lower())
+            if w not in q_stops
+        }
+        domain_anchors = {
+            "rbi", "500", "2000", "1000", "isro", "chandrayaan", "aditya", "aadhaar", "uidai",
+            "tatkal", "irctc", "laptop", "5000", "neet", "rafale", "epfo", "upi", "npci", "sim",
+        }
+        relevant_candidates = []
+        for c in candidates:
+            score = float(c.get("similarity_score", 0.0))
+            doc_str = f"{c.get('title', '')} {c.get('text', '')}".lower()
+            doc_tokens = set(_re.findall(r"[A-Za-z0-9\u0900-\u097F\u0C00-\u0C7F]{3,}", doc_str))
+            shared = q_tokens.intersection(doc_tokens)
+            shared_anchors = shared.intersection(domain_anchors)
+            c.pop("text", None)
+            if score >= 0.84 or len(shared) >= 2 or (len(shared_anchors) >= 1 and score >= 0.56):
+                c["shared_terms"] = sorted(shared)[:5]
+                relevant_candidates.append(c)
+
+        relevant_candidates.sort(key=lambda x: x["similarity_score"], reverse=True)
+        candidates = relevant_candidates[:top_k]
 
         elapsed_ms = (time.perf_counter() - start) * 1000.0
         evidence_items = []
@@ -322,7 +355,7 @@ class QdrantVectorStore:
             s_fact = sum(fact_scores) / len(fact_scores)
             verdict_status = "EVIDENCE_MATCHED"
         else:
-            s_fact = 0.50
+            s_fact = 0.42
             verdict_status = "NO_OFFICIAL_CORPUS_MATCH"
 
         return {

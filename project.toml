@@ -1,0 +1,12 @@
+[_]
+schema-version = "0.2"
+id = "smriti-shuddhi"
+name = "Smriti Shuddhi"
+
+[[io.buildpacks.build.env]]
+name = "GOOGLE_PYTHON_VERSION"
+value = "3.11.x"
+
+[[io.buildpacks.build.env]]
+name = "PIP_NO_CACHE_DIR"
+value = "1"

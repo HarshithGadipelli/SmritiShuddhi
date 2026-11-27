@@ -198,9 +198,9 @@ def categorize_headline(title: str, text: str) -> str:
     content = f"{title} {text}".lower()
     if any(k in content for k in ['space', 'isro', 'nasa', 'satellite', 'moon', 'lunar', 'orbit', 'astronomy', 'telescope', 'अंतरिक्ष', 'इसरो', 'चंद्रयान', 'ఉపగ్రహం']):
         return "Science & Space"
-    if any(k in content for k in ['rbi', 'bank', 'rupee', 'stock', 'market', 'inflation', 'economy', 'gdp', 'tariff', 'diesel', 'rate', 'रुपया', 'बैंक', 'अर्थव्यवस्था', 'బడ్జెట్', 'రూపాయి']):
+    if any(k in content for k in ['rbi', 'bank', 'rupee', 'stock', 'stocks', 'share', 'shares', 'nse', 'bse', 'sebi', 'sensex', 'nifty', 'dodla', 'market', 'inflation', 'economy', 'gdp', 'tariff', 'diesel', 'rate', 'profit', 'earnings', 'रुपया', 'बैंक', 'अर्थव्यवस्था', 'బడ్జెట్', 'రూపాయి']):
         return "Banking & Economy"
-    if any(k in content for k in ['imd', 'heatwave', 'rain', 'monsoon', 'temperature', 'cyclone', 'storm', 'weather', 'flood', 'मौसम', 'गर्मी', 'बारिश', 'मानसून', 'వర్షం', 'వాతావరణం']):
+    if any(k in content for k in ['imd', 'heatwave', 'rain', 'rainfall', 'monsoon', 'drizzle', 'shower', 'temperature', 'cyclone', 'storm', 'weather', 'flood', 'मौसम', 'गर्मी', 'बारिश', 'मानसून', 'వర్షం', 'వాతావరణం']):
         return "Weather & Safety"
     if any(k in content for k in ['ai', 'tech', 'software', 'google', 'microsoft', 'algorithm', 'cyber', 'chip', 'model', 'computing', 'तकनीक', 'सॉफ्टवेयर', 'సాంకేతిక']):
         return "Technology & AI"
