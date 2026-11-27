@@ -17,7 +17,7 @@ export default defineConfig({
     workersDev: true,
     env: {
       ASSETS: bindings.assets(),
-      BACKEND_URL: bindings.text("https://smriti-shuddhi-app-889339834867.asia-south1.run.app"),
+      BACKEND_URL: bindings.text("https://smritishuddhi-889339834867.asia-south1.run.app"),
     },
   },
 });

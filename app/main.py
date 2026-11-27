@@ -2437,6 +2437,18 @@ async def websocket_endpoint(websocket: WebSocket):
 # DASHBOARD SERVING
 # -----------------------------------------------------------------------------
 
+@app.get("/favicon.ico", include_in_schema=False)
+def serve_favicon():
+    svg = (
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+        '<rect width="64" height="64" rx="14" fill="#0b1220"/>'
+        '<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" '
+        'font-family="Georgia,serif" font-weight="bold" font-size="34" fill="#f59e0b">S</text>'
+        "</svg>"
+    )
+    return HTMLResponse(content=svg, media_type="image/svg+xml", headers={"Cache-Control": "public, max-age=86400"})
+
+
 @app.get("/", response_class=HTMLResponse)
 def serve_dashboard():
     template_path = config.BASE_DIR / "templates" / "enterprise_dashboard.html"

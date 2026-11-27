@@ -3,7 +3,7 @@ interface Env {
   BACKEND_URL: string;
 }
 
-const DEFAULT_BACKEND_ORIGIN = "https://smriti-shuddhi-app-889339834867.asia-south1.run.app";
+const DEFAULT_BACKEND_ORIGIN = "https://smritishuddhi-889339834867.asia-south1.run.app";
 
 function resolveBackendUrl(requestUrl: URL, env: Env): URL {
   const baseOrigin = (env.BACKEND_URL || DEFAULT_BACKEND_ORIGIN).replace(/\/+$/, "");
@@ -71,7 +71,14 @@ export default {
     }
 
     if (pathname === "/favicon.ico") {
-      return new Response(null, { status: 204 });
+      const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0b1220"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Georgia,serif" font-weight="bold" font-size="34" fill="#f59e0b">S</text></svg>`;
+      return new Response(iconSvg, {
+        status: 200,
+        headers: {
+          "Content-Type": "image/svg+xml",
+          "Cache-Control": "public, max-age=86400",
+        },
+      });
     }
 
     const assetResponse = await env.ASSETS.fetch(request);

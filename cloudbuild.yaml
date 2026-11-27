@@ -17,20 +17,19 @@ steps:
 
   # 2. Build using BuildKit inline layer cache so code-only Git pushes rebuild quickly
   - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
     env:
       - 'DOCKER_BUILDKIT=1'
     args:
-      - '-c'
-      - |
-        IMAGE_BASE="${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi"
-        TAG="${COMMIT_SHA:-${BUILD_ID:-latest}}"
-        docker build \
-          --build-arg BUILDKIT_INLINE_CACHE=1 \
-          --cache-from "${IMAGE_BASE}:latest" \
-          -t "${IMAGE_BASE}:${TAG}" \
-          -t "${IMAGE_BASE}:latest" \
-          .
+      - 'build'
+      - '--build-arg'
+      - 'BUILDKIT_INLINE_CACHE=1'
+      - '--cache-from'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi:latest'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi:${BUILD_ID}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi:latest'
+      - '.'
 
   # 3. Push both immutable commit/build tag and updated :latest cache tag
   - name: 'gcr.io/cloud-builders/docker'
@@ -69,7 +68,7 @@ timeout: '1800s'
 substitutions:
   _REGION: asia-south1
   _REPO: smriti-shuddhi
-  _SERVICE_NAME: smriti-shuddhi-app
+  _SERVICE_NAME: smritishuddhi
 
 images:
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/smriti-shuddhi:latest'

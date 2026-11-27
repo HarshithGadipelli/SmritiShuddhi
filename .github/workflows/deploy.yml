@@ -51,8 +51,8 @@ jobs:
           fi
           if git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
             CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
-            BACKEND=$(echo "$CHANGED" | grep -E '^(app/|config\.py|db\.py|Dockerfile|requirements\.txt|Procfile|\.python-version|project\.toml|\.dockerignore|\.gcloudignore|cloudbuild\.yaml|supabase_schema\.sql|data/|sisa_adapters/)' -q && echo true || echo false)
-            FRONTEND=$(echo "$CHANGED" | grep -E '^(cloudflare/|templates/|static/)' -q && echo true || echo false)
+            BACKEND=$(echo "$CHANGED" | grep -E '^(app/|config\.py|db\.py|Dockerfile|requirements\.txt|Procfile|\.python-version|project\.toml|\.dockerignore|\.gcloudignore|cloudbuild\.yaml|supabase_schema\.sql|data/|sisa_adapters/|templates/|static/|\.github/workflows/deploy\.yml)' -q && echo true || echo false)
+            FRONTEND=$(echo "$CHANGED" | grep -E '^(cloudflare/|templates/|static/|\.github/workflows/deploy\.yml)' -q && echo true || echo false)
           else
             BACKEND=true
             FRONTEND=true
@@ -91,13 +91,14 @@ jobs:
         id: gcp_cfg
         env:
           HAS_SA_KEY: ${{ secrets.GCP_SA_KEY != '' }}
-          HAS_PROJECT_ID: ${{ vars.GCP_PROJECT_ID != '' }}
+          PROJECT_ID: ${{ vars.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID || 'project-5e24ddd4-8856-4b35-aeb' }}
         run: |
-          if [ "$HAS_SA_KEY" = "true" ] && [ "$HAS_PROJECT_ID" = "true" ]; then
+          if [ "$HAS_SA_KEY" = "true" ] && [ -n "$PROJECT_ID" ]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "project_id=$PROJECT_ID" >> "$GITHUB_OUTPUT"
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "Skipping Cloud Run deploy: set GCP_PROJECT_ID variable and GCP_SA_KEY secret in GitHub Actions."
+            echo "Skipping Cloud Run deploy: set GCP_SA_KEY secret (and optional GCP_PROJECT_ID) in GitHub Actions."
           fi
 
       - name: Checkout repository
@@ -114,13 +115,13 @@ jobs:
         if: steps.gcp_cfg.outputs.enabled == 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: ${{ vars.GCP_PROJECT_ID }}
+          project_id: ${{ steps.gcp_cfg.outputs.project_id }}
 
       - name: Deploy Backend to Cloud Run
         if: steps.gcp_cfg.outputs.enabled == 'true'
         run: |
           if [ "${{ vars.GCP_DEPLOY_METHOD }}" = "source" ]; then
-            gcloud run deploy smriti-shuddhi-app \
+            gcloud run deploy smritishuddhi \
               --source . \
               --region=asia-south1 \
               --platform=managed \
@@ -135,9 +136,9 @@ jobs:
               --session-affinity \
               --cpu-boost \
               --quiet \
-              --project "${{ vars.GCP_PROJECT_ID }}"
+              --project "${{ steps.gcp_cfg.outputs.project_id }}"
           else
-            gcloud builds submit --config cloudbuild.yaml --project "${{ vars.GCP_PROJECT_ID }}"
+            gcloud builds submit --config cloudbuild.yaml --project "${{ steps.gcp_cfg.outputs.project_id }}"
           fi
 
   deploy-frontend-cloudflare:
@@ -173,7 +174,7 @@ jobs:
         working-directory: cloudflare
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID || '0e9d9e3453b93f963b60116f28e8368a' }}
         run: |
           npm ci
           npm run deploy
