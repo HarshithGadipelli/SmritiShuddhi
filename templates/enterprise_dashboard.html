@@ -1420,6 +1420,24 @@
           <span class="source-badge">REGISTRY: <strong id="modalSource">ISRO Press Office</strong></span>
         </div>
 
+        <!-- PROMINENT DISPATCH UTILITY & UNLEARNING ACTION BAR -->
+        <div class="dispatch-toolbar-bar" id="modalTopActionBar" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin: 12px 0; padding: 10px 14px; background: rgba(0,0,0,0.18); border-radius: 8px; border: 1px solid var(--border-subtle);">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-unlearn-glow btn-sm" type="button" onclick="openRemovalRequestModal()" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%); color: #ffffff; border: 1px solid #f59e0b; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(217,119,6,0.35); cursor: pointer;" title="Request machine unlearning or removal under Right to be Forgotten">
+              <span>🚩</span> <span style="letter-spacing: 0.02em;">Request for Unlearn</span>
+            </button>
+            <span class="toolbar-sub-pill" style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); padding: 3px 8px; background: rgba(255,255,255,0.05); border-radius: 4px;">Right to be Forgotten Protocol</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm" type="button" onclick="exportDossierReport()">
+              <span>📥</span> <span id="btnExportText">Export Fact Dossier</span>
+            </button>
+            <button class="btn btn-secondary btn-sm" type="button" id="btnBookmark" onclick="toggleBookmarkCurrent()">
+              <span id="bookmarkIcon">🔖</span> <span id="btnBookmarkText">Save Story</span>
+            </button>
+          </div>
+        </div>
+
         <!-- INTERACTIVE MULTILINGUAL AUDIO PLAYER CONSOLE -->
         <div class="audio-player-console" id="audioPlayerConsole">
           <div class="audio-console-top">
@@ -1457,17 +1475,6 @@
               <span class="eq-bar"></span>
               <span class="eq-bar"></span>
               <span class="eq-bar"></span>
-            </div>
-            <div class="modal-utility-actions">
-              <button class="btn btn-outline btn-sm" type="button" onclick="openRemovalRequestModal()" style="border-color: var(--accent-amber); color: var(--accent-amber); font-weight: 700;" title="Request removal of outdated or retracted story under Right to be Forgotten">
-                <span>🚩</span> <span>Request for Unlearn</span>
-              </button>
-              <button class="btn btn-secondary btn-sm" onclick="exportDossierReport()">
-                <span>📥</span> <span id="btnExportText">Export Fact Dossier</span>
-              </button>
-              <button class="btn btn-secondary btn-sm" id="btnBookmark" onclick="toggleBookmarkCurrent()">
-                <span id="bookmarkIcon">🔖</span> <span id="btnBookmarkText">Save Story</span>
-              </button>
             </div>
           </div>
         </div>

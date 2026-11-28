@@ -5846,6 +5846,33 @@ body {
   color: #1c140a;
 }
 
+[data-theme="paper"] .dispatch-toolbar-bar {
+  background: #ede2cb !important;
+  border-color: #c9ba9c !important;
+}
+
+[data-theme="paper"] .dispatch-toolbar-bar .toolbar-sub-pill {
+  color: #574632 !important;
+  background: rgba(28, 20, 10, 0.08) !important;
+}
+
+[data-theme="paper"] .btn-unlearn-glow {
+  background: linear-gradient(135deg, #b45309 0%, #92400e 100%) !important;
+  border-color: #78350f !important;
+  color: #ffffff !important;
+}
+
+[data-theme="paper"] .dispatch-toolbar-bar .btn-secondary {
+  background: #f7f0e0 !important;
+  border-color: #c4b494 !important;
+  color: #1c140a !important;
+}
+
+[data-theme="paper"] .dispatch-toolbar-bar .btn-secondary:hover {
+  background: #1c140a !important;
+  color: #f7f0e0 !important;
+}
+
 /* 12. Admin Unlearning Workbench in Paper Mode (The Typesetter Press Desk) */
 [data-theme="paper"] .admin-panel-card {
   background: rgba(255, 255, 255, 0.6);
