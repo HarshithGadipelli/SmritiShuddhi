@@ -31,6 +31,11 @@ permissions:
   contents: read
   id-token: write
 
+env:
+  GCP_PROJECT_ID: 'project-5e24ddd4-8856-4b35-aeb'
+  GCP_DEPLOY_METHOD: 'build'
+  CLOUDFLARE_ACCOUNT_ID: '0e9d9e3453b93f963b60116f28e8368a'
+
 jobs:
   verify:
     name: Verify & Detect Changed Components
@@ -105,9 +110,9 @@ jobs:
       - name: Resolve Google Cloud project
         id: gcp_cfg
         env:
-          VAR_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          DEFAULT_PROJECT: ${{ env.GCP_PROJECT_ID }}
         run: |
-          PROJECT_ID="${VAR_PROJECT_ID:-project-5e24ddd4-8856-4b35-aeb}"
+          PROJECT_ID="${DEFAULT_PROJECT:-project-5e24ddd4-8856-4b35-aeb}"
           echo "project_id=$PROJECT_ID" >> "$GITHUB_OUTPUT"
 
       - name: Checkout repository
@@ -126,7 +131,7 @@ jobs:
 
       - name: Deploy Backend to Cloud Run
         env:
-          DEPLOY_METHOD: ${{ vars.GCP_DEPLOY_METHOD }}
+          DEPLOY_METHOD: ${{ env.GCP_DEPLOY_METHOD }}
           PROJECT_ID: ${{ steps.gcp_cfg.outputs.project_id }}
         run: |
           if [ "$DEPLOY_METHOD" = "source" ]; then
@@ -160,9 +165,9 @@ jobs:
         id: cf_cfg
         env:
           CF_TOKEN_RAW: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          VAR_CF_ACCOUNT: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          DEFAULT_ACCOUNT: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          ACCOUNT_ID="${VAR_CF_ACCOUNT:-0e9d9e3453b93f963b60116f28e8368a}"
+          ACCOUNT_ID="${DEFAULT_ACCOUNT:-0e9d9e3453b93f963b60116f28e8368a}"
           if [ -z "$CF_TOKEN_RAW" ]; then
             echo "enabled=false" >> "$GITHUB_OUTPUT"
             echo "::warning::Skipping Cloudflare deploy: add CLOUDFLARE_API_TOKEN secret in GitHub Repo Settings -> Secrets and variables -> Actions."
