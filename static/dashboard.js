@@ -2468,7 +2468,10 @@ async function openArticleModal(newsId) {
     if (xaiBox) {
       let breakdownHtml = '';
       if (factors && factors.length > 0) {
-        breakdownHtml += `<div style="font-weight:700; color:var(--text-headline); margin-bottom:4px;">🔍 Multi-Aspect Synthesized Verdict Factors:</div><ul style="margin:0 0 8px 18px; padding:0;">`;
+        breakdownHtml += `<div style="font-weight:700; color:var(--text-headline); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+          <span>🔍 Multi-Aspect Synthesized Verdict Factors:</span>
+          <span style="font-size:0.7rem; font-family:var(--font-mono); background:rgba(6,182,212,0.15); color:var(--accent-cyan); border:1px solid rgba(6,182,212,0.3); padding:2px 8px; border-radius:12px;">🛡️ 21 AI Verification Tracks Active</span>
+        </div><ul style="margin:0 0 8px 18px; padding:0;">`;
         factors.forEach(f => {
           breakdownHtml += `<li>${escapeHtml(f)}</li>`;
         });
