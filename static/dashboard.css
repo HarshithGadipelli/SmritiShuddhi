@@ -741,90 +741,56 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 18px;
-  padding: 10px 0 14px;
+  gap: 36px;
+  padding: 18px 0 16px;
   position: relative;
+  border-bottom: 3.5px double var(--border-subtle);
 }
 
-/* REALISTIC BROADSHEET MASTHEAD EARPIECES */
+/* BROADSHEET MASTHEAD EARPIECES (DISABLED PER USER PREFERENCE) */
 .masthead-ear {
-  flex: 1;
-  max-width: 210px;
-  padding: 8px 12px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 4px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  background: var(--bg-surface);
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.03);
+  display: none !important;
 }
 
-.ear-label {
-  font-size: 0.68rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--accent-amber);
-  margin-bottom: 2px;
-}
-
-.ear-headline {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--text-headline);
-  margin-bottom: 2px;
-  font-family: var(--font-sans);
-}
-
-.ear-quote {
-  font-size: 0.65rem;
-  font-style: italic;
-  color: var(--text-dim);
-  letter-spacing: 0.05em;
-}
-
-@media (max-width: 980px) {
-  .masthead-ear {
-    display: none;
-  }
-}
-
-/* EMBOSSED SEALS: BRAIN & CLEANING BRUSH */
+/* EMBOSSED SEALS: BRAIN & CLEANING BRUSH (ENLARGED & EMBOSSED) */
 .masthead-seal {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 58px;
-  height: 58px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   background: var(--bg-surface);
-  border: 1.5px solid var(--border-subtle);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  border: 2px solid var(--border-subtle);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), inset 0 2px 6px rgba(255, 255, 255, 0.04);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   color: var(--text-headline);
   flex-shrink: 0;
 }
 
+.masthead-seal svg {
+  width: 72px;
+  height: 72px;
+}
+
 .masthead-seal.left-seal {
   color: var(--accent-cyan);
-  border-color: rgba(6, 182, 212, 0.35);
+  border-color: rgba(6, 182, 212, 0.45);
 }
 
 .masthead-seal.left-seal:hover {
   transform: scale(1.08) rotate(-4deg);
-  box-shadow: 0 8px 22px rgba(6, 182, 212, 0.28);
+  box-shadow: 0 10px 28px rgba(6, 182, 212, 0.35);
 }
 
 .masthead-seal.right-seal {
   color: var(--accent-amber);
-  border-color: rgba(245, 158, 11, 0.35);
+  border-color: rgba(245, 158, 11, 0.45);
 }
 
 .masthead-seal.right-seal:hover {
   transform: scale(1.08) rotate(4deg);
-  box-shadow: 0 8px 22px rgba(245, 158, 11, 0.28);
+  box-shadow: 0 10px 28px rgba(245, 158, 11, 0.35);
 }
 
 .masthead-icon-brain {
@@ -863,21 +829,9 @@ body {
   text-shadow: 0 2px 24px rgba(0, 0, 0, 0.9), 0 0 35px rgba(245, 158, 11, 0.18);
 }
 
-/* BROADSHEET OXFORD DOUBLE-RULE TAGLINE */
+/* BROADSHEET OXFORD DOUBLE-RULE TAGLINE (REMOVED PER USER INSTRUCTION) */
 .masthead-tagline {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  font-size: 0.74rem;
-  font-family: var(--font-mono);
-  letter-spacing: 0.12em;
-  color: var(--text-headline);
-  text-align: center;
-  padding: 8px 0;
-  border-top: 3.5px double var(--border-subtle);
-  border-bottom: 1.5px solid var(--border-subtle);
-  margin-top: 8px;
+  display: none !important;
 }
 
 /* ==========================================================================
@@ -5471,11 +5425,15 @@ body {
   font-size: 0.88rem;
 }
 
+[data-theme="paper"] .masthead-main {
+  border-bottom: 3.5px double #1c140a;
+}
+
 [data-theme="paper"] .masthead-seal {
   background: #faf5e8;
-  border: 2px double #1c140a;
+  border: 2.5px double #1c140a;
   color: #7d1515;
-  box-shadow: 0 0 0 1px #1c140a;
+  box-shadow: 0 4px 16px rgba(45, 30, 15, 0.15);
 }
 
 [data-theme="paper"] .masthead-seal span,

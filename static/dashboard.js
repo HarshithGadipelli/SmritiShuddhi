@@ -136,7 +136,7 @@ const state = {
   currentRole: 'JOURNALIST', // 'JOURNALIST' | 'ADMIN'
   currentLang: 'en',
   currentUser: {
-    name: 'Alex Rivera',
+    name: 'Sanjay',
     email: 'reporter@times.com',
     role: 'JOURNALIST',
     title: 'Investigative Tech Journalist'
@@ -456,7 +456,7 @@ function updateUserUI() {
 
   const isAdmin = (state.currentRole === 'ADMIN');
 
-  if (nameEl) nameEl.innerText = state.currentUser.name || (isAdmin ? 'Dr. Sarah Mitchell' : 'Alex Rivera');
+  if (nameEl) nameEl.innerText = state.currentUser.name || (isAdmin ? 'Krishna' : 'Sanjay');
   if (badgeEl) {
     badgeEl.innerText = isAdmin ? 'CHIEF FACT-CHECKER (ADMIN)' : 'CITIZEN JOURNALIST';
     badgeEl.className = `user-role-badge ${isAdmin ? 'badge-crimson' : 'badge-green'}`;
@@ -468,7 +468,7 @@ function updateUserUI() {
   const dEmail = document.getElementById('drawerUserEmail');
   const dAvatar = document.getElementById('drawerAvatar');
   const dRoleBadge = document.getElementById('drawerUserRoleBadge');
-  if (dName) dName.innerText = state.currentUser.name || (isAdmin ? 'Dr. Sarah Mitchell' : 'Alex Rivera');
+  if (dName) dName.innerText = state.currentUser.name || (isAdmin ? 'Krishna' : 'Sanjay');
   if (dEmail) dEmail.innerText = state.currentUser.email || (isAdmin ? 'chief.editor@smritishuddhi.org' : 'reporter@times.com');
   if (dAvatar) dAvatar.innerText = isAdmin ? '🛡️' : '👤';
   if (dRoleBadge) {
@@ -479,7 +479,7 @@ function updateUserUI() {
   // Pre-fill submit authorInput with user's name
   const authorInput = document.getElementById('authorInput');
   if (authorInput && !authorInput.value) {
-    authorInput.value = state.currentUser.name || (isAdmin ? 'Dr. Sarah Mitchell' : 'Alex Rivera');
+    authorInput.value = state.currentUser.name || (isAdmin ? 'Krishna' : 'Sanjay');
   }
 
   // Strict role abstraction for Admin tabs & controls
@@ -551,14 +551,14 @@ function switchUserRole(role) {
   state.currentRole = role;
   if (role === 'ADMIN') {
     state.currentUser = {
-      name: 'Dr. Sarah Mitchell',
+      name: 'Krishna',
       email: 'admin@smritishuddhi.org',
       role: 'ADMIN',
       title: 'Chief Fact-Checking Editor'
     };
   } else {
     state.currentUser = {
-      name: 'Alex Rivera',
+      name: 'Sanjay',
       email: 'reporter@times.com',
       role: 'JOURNALIST',
       title: 'Investigative Tech Journalist'
@@ -1417,7 +1417,7 @@ async function submitAndVerifyNews() {
     });
     const result = await res.json();
     btn.disabled = false;
-    btn.innerHTML = `<span class="btn-icon">⚡</span> Run Dual-Track Scan & Verify`;
+    btn.innerHTML = `<span class="btn-icon">⚡</span> Run Cognitive Integrity Scan & Verify`;
 
     renderScanResult(result);
     loadPublishedNews();
@@ -1425,7 +1425,7 @@ async function submitAndVerifyNews() {
     loadUserSubmissions();
   } catch (err) {
     btn.disabled = false;
-    btn.innerHTML = `<span class="btn-icon">⚡</span> Run Dual-Track Scan & Verify`;
+    btn.innerHTML = `<span class="btn-icon">⚡</span> Run Cognitive Integrity Scan & Verify`;
     console.error('Scan submission error:', err);
     alert('Failed to complete scan. Check server console.');
   }

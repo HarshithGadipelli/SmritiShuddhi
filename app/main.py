@@ -1381,7 +1381,7 @@ def login(payload: LoginRequest):
             "user": {
                 "user_id": "USR_ADMIN_001",
                 "email": payload.email,
-                "name": "Dr. Sarah Mitchell",
+                "name": "Krishna",
                 "role": "ADMIN",
                 "title": "Chief Fact-Checking Editor",
             },
@@ -1441,11 +1441,11 @@ def get_current_user(role: Optional[str] = "JOURNALIST"):
         user = users_col.find_one({"role": "ADMIN"})
         if user:
             return {"user": {k: str(v) for k, v in user.items() if k != "password"}}
-        return {"user": {"user_id": "USR_ADMIN_001", "name": "Dr. Sarah Mitchell", "role": "ADMIN", "title": "Chief Fact-Checking Editor", "email": "admin@smritishuddhi.org"}}
+        return {"user": {"user_id": "USR_ADMIN_001", "name": "Krishna", "role": "ADMIN", "title": "Chief Fact-Checking Editor", "email": "admin@smritishuddhi.org"}}
     user = users_col.find_one({"role": "JOURNALIST"})
     if user:
         return {"user": {k: str(v) for k, v in user.items() if k != "password"}}
-    return {"user": {"user_id": "USR_JOURNALIST_002", "name": "Alex Rivera", "role": "JOURNALIST", "title": "Investigative Tech Journalist", "email": "reporter@times.com"}}
+    return {"user": {"user_id": "USR_JOURNALIST_002", "name": "Sanjay", "role": "JOURNALIST", "title": "Investigative Tech Journalist", "email": "reporter@times.com"}}
 
 
 # -----------------------------------------------------------------------------
