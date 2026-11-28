@@ -5763,10 +5763,9 @@ body {
   font-family: 'Newsreader', Georgia, serif;
 }
 
-[data-theme="paper"] .newspaper-lead-para::first-letter,
 [data-theme="paper"] .newspaper-drop-cap {
   color: #7d1515;
-  font-family: 'Cinzel', Georgia, serif;
+  font-family: 'Cinzel Decorative', 'Cinzel', Georgia, serif;
   font-size: 3.5rem;
   font-weight: 800;
   float: left;
@@ -5787,6 +5786,87 @@ body {
   border-top: 1px double #1c140a;
   color: #574632;
   font-family: 'Cinzel', serif;
+}
+
+[data-theme="paper"] .modal-title {
+  color: #110903;
+  font-family: 'Newsreader', 'Playfair Display', Georgia, serif;
+  font-weight: 800;
+  font-size: 2.1rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+[data-theme="paper"] .modal-meta-row {
+  color: #5c4a36;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+[data-theme="paper"] .modal-category {
+  color: #7d1515;
+  font-weight: 800;
+}
+
+[data-theme="paper"] .modal-author-row {
+  color: #4a3b2b;
+  font-size: 0.82rem;
+  border-bottom: 1px solid #d4c5a9;
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+}
+
+[data-theme="paper"] .modal-author-row strong {
+  color: #1c140a;
+}
+
+[data-theme="paper"] .modal-image-wrapper {
+  border: 1px solid #c9ba9c;
+  box-shadow: 0 4px 14px rgba(45, 30, 15, 0.12);
+  margin-bottom: 18px;
+  border-radius: 6px;
+}
+
+[data-theme="paper"] .broadsheet-modal-card .modal-close-btn {
+  background: #ede2cb;
+  border: 1.5px solid #1c140a;
+  color: #1c140a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="paper"] .broadsheet-modal-card .modal-close-btn:hover {
+  background: #7d1515;
+  color: #ffffff;
+}
+
+[data-theme="paper"] .fact-certificate-box {
+  background: #fdfaf2;
+  border: 1.5px solid #c4b494;
+  border-top: 3px solid #7d1515;
+  color: #1c140a;
+}
+
+[data-theme="paper"] .fact-certificate-box h3 {
+  color: #110903;
+  font-family: 'Cinzel', Georgia, serif;
+}
+
+[data-theme="paper"] .cert-subtext {
+  color: #574632;
+}
+
+[data-theme="paper"] .audio-player-console {
+  background: #f7f0e0;
+  border: 1px solid #c9ba9c;
+  color: #1c140a;
+}
+
+[data-theme="paper"] .audio-player-console span,
+[data-theme="paper"] .audio-player-console strong {
+  color: #1c140a;
 }
 
 /* 12. Admin Unlearning Workbench in Paper Mode (The Typesetter Press Desk) */

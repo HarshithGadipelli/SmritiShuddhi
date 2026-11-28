@@ -4084,7 +4084,14 @@ async function loadRemovalRequests() {
         <div style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 8px; background: rgba(0,0,0,0.15); padding: 6px 8px; border-radius: 4px;">
           “${escapeHtml(req.details || 'Factual obsolescence / citizen request under Right to be Forgotten.')}”
         </div>
-        <div class="queue-actions-row">
+        <div class="queue-actions-row" style="flex-wrap: wrap; gap: 6px; align-items: center;">
+          <select id="unlearnAlgoSelect_${req.request_id}" class="form-select" style="font-size: 0.72rem; padding: 3px 6px; border-radius: 4px; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-subtle); max-width: 170px;">
+            <option value="algorithm_4_hybrid">🚀 Algorithm 4: Hybrid Full-Stack</option>
+            <option value="algorithm_1_sisa">🛡️ Algorithm 1: SISA Sharding</option>
+            <option value="algorithm_2_svm">⚡ Algorithm 2: Decremental SVM</option>
+            <option value="algorithm_3_lora">🧩 Algorithm 3: Modular LoRA</option>
+            <option value="baseline_retrain">🔄 Baseline: Full Retrain</option>
+          </select>
           <button class="btn btn-crimson btn-xs" onclick="approveRemovalRequest('${req.request_id}')" title="Execute Exact Machine Unlearning across models & database">
             ⚡ Approve & Unlearn
           </button>
@@ -4104,10 +4111,14 @@ async function loadRemovalRequests() {
 }
 
 async function approveRemovalRequest(requestId) {
-  if (!confirm(`Execute Exact Machine Unlearning and revoke this article across models and database?`)) return;
+  const algoSelect = document.getElementById(`unlearnAlgoSelect_${requestId}`);
+  const selectedStrategy = (algoSelect && algoSelect.value) || 'algorithm_4_hybrid';
+  if (!confirm(`Execute Exact Machine Unlearning using [${selectedStrategy}] and revoke this article across all models and database?`)) return;
   try {
     const res = await fetch(`/api/v1/admin/removal-requests/${requestId}/approve`, {
-      method: 'POST'
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ strategy: selectedStrategy })
     });
     const raw = await res.text();
     let data = {};

@@ -153,6 +153,10 @@ class ModelProbeRequest(BaseModel):
     query_text: str = Field(..., description="Query phrase or headline to probe model memory for residual influence")
 
 
+class CitizenRemovalApprovalRequest(BaseModel):
+    strategy: Optional[str] = Field(None, description="baseline_retrain | algorithm_1_sisa | algorithm_2_svm | algorithm_3_lora | algorithm_4_hybrid")
+
+
 class CitizenRemovalRequest(BaseModel):
     reason: str = Field(..., description="Reason: OUTDATED_INFO | DEFAMATORY_RETRACTED | PRIVACY_REQUEST | CITIZEN_CONTEST")
     requester_name: Optional[str] = Field("Anonymous Citizen", description="Requester name or citizen alias")
@@ -1187,8 +1191,8 @@ def get_news_sync_status():
 def get_article_detail(news_id: str):
     """Returns single article details with complete XAI fact-checking certificate."""
     doc = news_col.find_one({"news_id": news_id}) or news_col.find_one({"sample_id": news_id})
-    if not doc:
-        raise HTTPException(status_code=404, detail="Article not found")
+    if not doc or doc.get("status") in ["REVOKED_AND_UNLEARNED", "PURGED", "DELETED"]:
+        raise HTTPException(status_code=404, detail="Article not found or has been unlearned and permanently revoked under Right to be Forgotten.")
     if "_id" in doc:
         doc["_id"] = str(doc["_id"])
     if not doc.get("language"):
@@ -1448,7 +1452,7 @@ def get_removal_requests():
 
 
 @app.post("/api/v1/admin/removal-requests/{request_id}/approve")
-def approve_removal_request(request_id: str, background_tasks: BackgroundTasks):
+def approve_removal_request(request_id: str, background_tasks: BackgroundTasks, payload: Optional[CitizenRemovalApprovalRequest] = None):
     """Admin approves citizen removal request -> Executes exact machine unlearning across models and database."""
     _ensure_ml_ready()
     req_doc = requests_col.find_one({"request_id": request_id})
@@ -1459,31 +1463,33 @@ def approve_removal_request(request_id: str, background_tasks: BackgroundTasks):
     sample_id = req_doc.get("sample_id") or f"SYN_{news_id}"
     title = req_doc.get("title", "")
 
-    # Execute admin's active machine unlearning strategy (default algorithm_4_hybrid)
-    active_strat = multi_model_suite.active_strategy or "algorithm_4_hybrid"
+    # Execute admin's selected machine unlearning strategy (or active/hybrid default)
+    selected_strat = (payload.strategy if payload and payload.strategy else None) or multi_model_suite.active_strategy or "algorithm_4_hybrid"
     unlearn_payload = UnlearningExecutionRequest(
         sample_id=sample_id,
         news_id=news_id,
         title=title,
         text="",
-        strategy=active_strat,
+        strategy=selected_strat,
         reason=f"CITIZEN_REMOVAL_APPROVED: {req_doc.get('reason')}"
     )
-    execute_unlearning(unlearn_payload, background_tasks)
+    result = execute_unlearning(unlearn_payload, background_tasks)
 
     requests_col.update_one(
         {"request_id": request_id},
         {"$set": {
             "status": "APPROVED_AND_UNLEARNED",
             "unlearned_at": now(),
-            "unlearned_strategy": active_strat
+            "unlearned_strategy": selected_strat
         }}
     )
     return {
         "success": True,
         "status": "APPROVED_AND_UNLEARNED",
-        "message": f"Story {news_id} successfully unlearned and purged across all models and database.",
-        "request_id": request_id
+        "message": f"Story {news_id} successfully unlearned using {selected_strat} and purged across all models and database.",
+        "request_id": request_id,
+        "strategy": selected_strat,
+        "unlearning_result": result
     }
 
 
