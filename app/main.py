@@ -1028,8 +1028,66 @@ def perform_news_sync(background_tasks: Optional[BackgroundTasks] = None) -> Dic
             text = story.get("text", "")
             source_name = story.get("source", "Real-Time News Wire")
             author_name = story.get("author", "Wire Bureau")
-            verdict = execute_hybrid_inference(title, text, source=source_name, author=author_name, fast_mode=True)
-            status = "PUBLISHED" if verdict["risk_band"] != "HIGH_RISK_FAKE" else "BLOCKED_HIGH_RISK_FAKE"
+
+            # Detect if the story has breaking-news signals in headline/text
+            # If so, run full inference so Track I (breaking corroboration) fires correctly
+            breaking_keywords = (
+                "breaking", "just in", "alert", "urgent", "live:", "developing",
+                "exclusive:", "flash:", "confirmed:", "breaking news", "latest:"
+            )
+            title_lower = title.lower()
+            is_breaking_signal = any(kw in title_lower for kw in breaking_keywords)
+            verdict = execute_hybrid_inference(
+                title, text,
+                source=source_name,
+                author=author_name,
+                fast_mode=not is_breaking_signal,  # Full inference for breaking news
+            )
+
+            risk_band = verdict["risk_band"]
+            p_fake = float(verdict.get("fake_probability", 0.5))
+
+            # Apply 3-tier tagging for synced live news (same logic as user submissions)
+            if risk_band == "LOW_RISK_FACTUAL":
+                sync_tag = "REAL"
+                sync_tag_display = "REAL (VERIFIED FACTUAL)"
+                status = "PUBLISHED"
+            elif risk_band == "MODERATE_RISK":
+                if p_fake < 0.55 and verdict.get("s_source", 0.4) < 0.70:
+                    sync_tag = "DEVELOPING_STORY"
+                    sync_tag_display = "DEVELOPING / UNCORROBORATED (EDITORIAL REVIEW)"
+                else:
+                    sync_tag = "LIKELY_FAKE"
+                    sync_tag_display = "LIKELY FAKE (UNDER EDITORIAL REVIEW)"
+                status = "PENDING_ADMIN_REVIEW"
+            else:
+                sync_tag = "FAKE"
+                sync_tag_display = "FAKE (BLOCKED & QUARANTINED)"
+                status = "BLOCKED_HIGH_RISK_FAKE"
+
+            # Breaking news protocol overrides
+            brk = verdict.get("breaking_protocol", {})
+            if brk.get("is_breaking"):
+                bv = brk.get("breaking_protocol_verdict")
+                if bv == "BREAKING_MULTI_SOURCE_CORROBORATED" and risk_band != "HIGH_RISK_FAKE":
+                    sync_tag = "BREAKING_VERIFIED"
+                    sync_tag_display = "⚡ BREAKING (MULTI-SOURCE CONFIRMED)"
+                    status = "PUBLISHED"
+                elif bv == "CRITICAL_BREAKING_UNSUBSTANTIATED":
+                    sync_tag = "CRITICAL_UNVERIFIED_RUMOR"
+                    sync_tag_display = "⚠️ CRITICAL UNVERIFIED RUMOR (ZERO WIRE CORROBORATION)"
+                    status = "BLOCKED_HIGH_RISK_FAKE"
+                elif bv == "BREAKING_DEVELOPING_UNCONFIRMED" and risk_band != "HIGH_RISK_FAKE":
+                    sync_tag = "DEVELOPING_STORY"
+                    sync_tag_display = "⚡ DEVELOPING STORY (AWAITING WIRE CONFIRMATION)"
+                    status = "PENDING_ADMIN_REVIEW"
+
+            # Half-truth override
+            if (verdict.get("prediction") == "PARTIALLY_TRUE_MISLEADING" or risk_band == "MODERATE_RISK_HALF_TRUTH") and risk_band != "HIGH_RISK_FAKE":
+                sync_tag = "HALF_TRUTH"
+                sync_tag_display = "⚠️ HALF-TRUTH (PARTIALLY ACCURATE / MISLEADING CONTEXT)"
+                status = "PENDING_ADMIN_REVIEW"
+
             news_id = f"NEWS_{uuid.uuid4().hex[:8].upper()}"
             sample_id = f"SYN_LIVE_{uuid.uuid4().hex[:6].upper()}"
 
@@ -1046,6 +1104,8 @@ def perform_news_sync(background_tasks: Optional[BackgroundTasks] = None) -> Dic
                 "image_url": story.get("image_url", TOPIC_IMAGE_MAP.get(story.get("category"), FALLBACK_IMAGE)),
                 "url": story.get("url", ""),
                 "reading_time": story.get("reading_time", f"{max(1, len(text.split()) // 55)} min read"),
+                "tag": sync_tag,
+                "tag_display": sync_tag_display,
                 "status": status,
                 "fake_probability": verdict["fake_probability"],
                 "real_probability": verdict["real_probability"],
@@ -1053,8 +1113,16 @@ def perform_news_sync(background_tasks: Optional[BackgroundTasks] = None) -> Dic
                 "action_recommended": verdict["action_recommended"],
                 "s_style": verdict["s_style"],
                 "s_fact": verdict["s_fact"],
+                "s_quant": verdict.get("s_quant", 0.10),
                 "s_propagation": verdict.get("s_propagation", 0.10),
+                "s_source": verdict.get("s_source", 0.24),
                 "temporal_consistency": verdict["temporal_consistency"],
+                "breaking_protocol": verdict.get("breaking_protocol", {}),
+                "subclaim_analysis": verdict.get("subclaim_analysis", {}),
+                "five_pillar_breakdown": verdict.get("five_pillar_breakdown", {}),
+                "justification_metrics": verdict.get("justification_metrics", {}),
+                "epistemic_calibration": verdict.get("epistemic_calibration", {}),
+                "multimodal_forensics": verdict.get("multimodal_forensics", {}),
                 "xai": verdict["xai"],
                 "view_count": 0,
                 "share_count": 0,

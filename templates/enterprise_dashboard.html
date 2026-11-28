@@ -1399,7 +1399,8 @@
   <div class="modal-backdrop" id="articleModal" style="display: none;"
     onclick="closeModalOnBackdrop(event, 'articleModal')">
     <div class="article-modal-card broadsheet-modal-card">
-      <button class="modal-close-btn" onclick="closeArticleModal()">×</button>
+      <!-- STICKY CLOSE BUTTON — always visible at top right as the user scrolls -->
+      <button class="modal-close-btn" onclick="closeArticleModal()" title="Close" style="position: absolute; top: 14px; right: 14px; z-index: 100; flex-shrink: 0;">×</button>
 
       <!-- AUTHENTIC BROADSHEET MASTHEAD BANNER -->
       <div class="broadsheet-paper-header">
