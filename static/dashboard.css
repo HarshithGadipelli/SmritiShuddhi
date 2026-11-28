@@ -4349,40 +4349,14 @@ body {
   overflow: hidden;
 }
 
-/* Authentic physical newspaper center crease spine shadow */
+/* Authentic physical newspaper center crease spine shadow - disabled to prevent vertical dividing seam over text */
 .broadsheet-modal-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 36px;
-  transform: translateX(-50%);
-  background: linear-gradient(
-    to right,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(0, 0, 0, 0.04) 42%,
-    rgba(0, 0, 0, 0.10) 50%,
-    rgba(255, 255, 255, 0.04) 52%,
-    rgba(0, 0, 0, 0) 100%
-  );
-  pointer-events: none;
-  z-index: 5;
+  display: none !important;
 }
 
-/* Authentic physical dog-ear folded corner */
+/* Authentic physical dog-ear folded corner - removed to prevent clipping close button */
 .broadsheet-modal-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.18) 50%, rgba(230, 220, 200, 0.95) 55%);
-  border-bottom-left-radius: 4px;
-  box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-  z-index: 6;
+  display: none !important;
 }
 
 .broadsheet-paper-header {
@@ -5736,18 +5710,11 @@ body {
 }
 
 [data-theme="paper"] .broadsheet-modal-card::before {
-  background: linear-gradient(
-    to right,
-    rgba(28, 20, 10, 0) 0%,
-    rgba(28, 20, 10, 0.06) 42%,
-    rgba(28, 20, 10, 0.14) 50%,
-    rgba(255, 250, 240, 0.25) 52%,
-    rgba(28, 20, 10, 0) 100%
-  );
+  display: none !important;
 }
 
 [data-theme="paper"] .broadsheet-modal-card::after {
-  background: linear-gradient(135deg, transparent 50%, rgba(28, 20, 10, 0.25) 50%, #ded0b0 55%);
+  display: none !important;
 }
 
 [data-theme="paper"] .broadsheet-paper-header {
@@ -5835,6 +5802,15 @@ body {
   border: 1.5px solid #1c140a;
   color: #1c140a;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  z-index: 50;
+}
+
+[data-theme="paper"] .broadsheet-paper-header {
+  padding-right: 48px;
 }
 
 [data-theme="paper"] .broadsheet-modal-card .modal-close-btn:hover {
